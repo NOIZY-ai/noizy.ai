@@ -3,14 +3,16 @@
 # TURBO & GABRIEL Search Script
 # 
 # This script performs a comprehensive search for "TURBO" and "GABRIEL" 
-# occurrences in the noizy.ai repository.
+# occurrences in the repository.
 #
-# Usage: ./find_turbo_gabriel.sh
+# Usage: ./find_turbo_gabriel.sh [repository_root]
+#   If repository_root is not provided, auto-detects using git or uses current directory
 ################################################################################
 
 set -e
 
-REPO_ROOT="/home/runner/work/noizy.ai/noizy.ai"
+# Determine repository root dynamically
+REPO_ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 REPORT_FILE="search_results_$(date +%Y%m%d_%H%M%S).txt"
 
 echo "================================================================================"
