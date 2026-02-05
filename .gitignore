@@ -57,6 +57,9 @@ codec/build/iOS/dec/welsdec/build/
 # editor files
 *~
 
+# Search result files
+search_results_*.txt
+
 # android gradle integration – regenerated when the project is opened in Android Studio
 /.idea/
 /.gradle/
