@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizy.ai/schemas/HybridReceipt75_25.schema.json",
+  "title": "HybridReceipt75_25",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "created_at",
+    "event",
+    "gross",
+    "splits",
+    "attribution",
+    "proof_links",
+    "status"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+
+    "receipt_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_type", "event_ref"],
+      "properties": {
+        "event_type": {
+          "type": "string",
+          "enum": ["synthesis", "license", "subscription", "export", "marketplace_use", "commission"]
+        },
+        "event_ref": { "type": "string", "description": "Pointer to the originating event (session, job, contract, etc.)." },
+        "unit_basis": {
+          "type": "string",
+          "enum": ["flat", "per_second", "per_character", "per_render", "per_seat", "per_project"],
+          "description": "How gross was computed (for audit)."
+        },
+        "quantity": { "type": "number" }
+      }
+    },
+
+    "gross": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "minLength": 3, "maxLength": 3 }
+      }
+    },
+
+    "splits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "artist_pool", "platform_pool", "contributors"],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "const": "75_25",
+          "description": "Protocol-level split rule."
+        },
+        "artist_pool": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["amount", "percent"],
+          "properties": {
+            "amount": { "type": "number", "minimum": 0 },
+            "percent": { "type": "number", "const": 0.75 }
+          }
+        },
+        "platform_pool": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["amount", "percent"],
+          "properties": {
+            "amount": { "type": "number", "minimum": 0 },
+            "percent": { "type": "number", "const": 0.25 }
+          }
+        },
+
+        "contributors": {
+          "type": "array",
+          "description": "How the artist_pool is apportioned among contributors in a hybrid output.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contributor_id", "display_name", "role", "amount", "share_of_artist_pool"],
+            "properties": {
+              "contributor_id": { "type": "string" },
+              "display_name": { "type": "string" },
+              "role": {
+                "type": "string",
+                "enum": ["origin_voice", "language_library", "style_layer", "prosody_layer", "character_dna", "session_creator"]
+              },
+              "amount": { "type": "number", "minimum": 0 },
+              "share_of_artist_pool": { "type": "number", "minimum": 0, "maximum": 1 },
+              "payout_destination": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "type": "string", "enum": ["wallet", "bank", "platform_account", "estate"] },
+                  "ref": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_contributions"],
+      "properties": {
+        "source_contributions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contribution_id", "contributor_id", "asset_ref", "consent_token_ref"],
+            "properties": {
+              "contribution_id": { "type": "string" },
+              "contributor_id": { "type": "string" },
+              "asset_ref": { "type": "string", "description": "Pointer to the contributing asset (e.g., Mandarin library, character DNA module)." },
+              "consent_token_ref": { "type": "string", "description": "Consent token proving permission for this contribution." },
+              "notes": { "type": "string" }
+            }
+          }
+        },
+        "display_credit_line": {
+          "type": "string",
+          "description": "A human-readable credit line suitable for UI/export."
+        }
+      }
+    },
+
+    "proof_links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "manifest_id"],
+      "properties": {
+        "artifact_id": { "type": "string" },
+        "manifest_id": { "type": "string" },
+        "consent_decision_ids": { "type": "array", "items": { "type": "string" } },
+        "memcell_id": { "type": "string" }
+      }
+    },
+
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": { "type": "string", "enum": ["issued", "pending_settlement", "settled", "voided"] },
+        "settled_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizy.ai/schemas/index.schema.json",
+  "title": "NOIZY Schema Index",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "EchoMoment": { "$ref": "EchoMoment.schema.json" },
+    "HybridReceipt75_25": { "$ref": "HybridReceipt75_25.schema.json" },
+    "ProvenanceManifest": { "$ref": "ProvenanceManifest.schema.json" },
+    "ArtifactTruthBundle": { "$ref": "ArtifactTruthBundle.schema.json" }
+  }
+}

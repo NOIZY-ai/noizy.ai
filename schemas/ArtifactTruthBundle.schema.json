@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizy.ai/schemas/ArtifactTruthBundle.schema.json",
+  "title": "ArtifactTruthBundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "bundle_id",
+    "created_at",
+    "echo_moment",
+    "receipt",
+    "manifest",
+    "truth_strip"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "bundle_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+
+    "echo_moment": { "$ref": "EchoMoment.schema.json" },
+    "receipt": { "$ref": "HybridReceipt75_25.schema.json" },
+    "manifest": { "$ref": "ProvenanceManifest.schema.json" },
+
+    "truth_strip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consent", "provenance", "receipt_75_25", "memory", "risk"],
+      "properties": {
+        "consent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "refs"],
+          "properties": {
+            "status": { "type": "string", "enum": ["clear", "conditional", "blocked"] },
+            "refs": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "manifest_id"],
+          "properties": {
+            "status": { "type": "string", "enum": ["pending", "signed", "verified"] },
+            "manifest_id": { "type": "string" }
+          }
+        },
+        "receipt_75_25": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "receipt_id", "rule"],
+          "properties": {
+            "status": { "type": "string", "enum": ["emitted", "missing"] },
+            "receipt_id": { "type": "string" },
+            "rule": { "type": "string", "const": "75_25" }
+          }
+        },
+        "memory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "memcell_ids"],
+          "properties": {
+            "status": { "type": "string", "enum": ["written", "queued", "failed"] },
+            "memcell_ids": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "risk": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["level"],
+          "properties": {
+            "level": { "type": "string", "enum": ["safe", "caution", "stop"] },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "Enforce 75/25 rule consistency across receipt + manifest.",
+      "properties": {
+        "receipt": {
+          "properties": {
+            "splits": {
+              "properties": {
+                "rule": { "const": "75_25" }
+              }
+            }
+          }
+        },
+        "manifest": {
+          "properties": {
+            "rights": {
+              "properties": {
+                "royalty_rule": { "const": "75_25" }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

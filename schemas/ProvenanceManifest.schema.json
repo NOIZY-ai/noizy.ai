@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizy.ai/schemas/ProvenanceManifest.schema.json",
+  "title": "ProvenanceManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "created_at",
+    "producer",
+    "artifact",
+    "integrity",
+    "rights",
+    "attribution",
+    "links",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+
+    "manifest_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "version"],
+      "properties": {
+        "system": { "type": "string", "description": "e.g., NOIZY.ai / DreamChamber" },
+        "version": { "type": "string" },
+        "environment": { "type": "string", "enum": ["dev", "staging", "prod"] }
+      }
+    },
+
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "type"],
+      "properties": {
+        "artifact_id": { "type": "string" },
+        "type": { "type": "string", "enum": ["audio", "text", "image", "video", "mixed", "other"] },
+        "title": { "type": "string" },
+        "duration_seconds": { "type": "number", "minimum": 0 },
+        "format": { "type": "string", "description": "e.g., wav, flac, mp3, json, mp4" }
+      }
+    },
+
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload_sha256", "lineage_hash"],
+      "properties": {
+        "payload_sha256": { "type": "string", "description": "SHA-256 hex of artifact bytes." },
+        "lineage_hash": { "type": "string", "description": "Canonical hash over lineage + policy-bound metadata." },
+        "render_locked_before_output": { "type": "boolean", "description": "If true, provenance lock gate occurred pre-render." }
+      }
+    },
+
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consent_required", "royalty_rule", "allowed_uses", "blocked_uses"],
+      "properties": {
+        "consent_required": { "type": "boolean", "const": true },
+        "royalty_rule": {
+          "type": "string",
+          "const": "75_25",
+          "description": "Protocol economic law."
+        },
+        "allowed_uses": { "type": "array", "items": { "type": "string" } },
+        "blocked_uses": { "type": "array", "items": { "type": "string" } },
+        "revocation_policy_ref": { "type": "string", "description": "Pointer to revocation semantics (if applicable)." }
+      }
+    },
+
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary_creator", "source_contributions"],
+      "properties": {
+        "primary_creator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["actor_id", "display_name"],
+          "properties": {
+            "actor_id": { "type": "string" },
+            "display_name": { "type": "string" }
+          }
+        },
+        "source_contributions": {
+          "type": "array",
+          "description": "All contributors to the hybrid output (identity, language libraries, style layers).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contributor_id", "asset_ref", "consent_token_ref"],
+            "properties": {
+              "contributor_id": { "type": "string" },
+              "asset_ref": { "type": "string" },
+              "consent_token_ref": { "type": "string" },
+              "contribution_type": { "type": "string" },
+              "notes": { "type": "string" }
+            }
+          }
+        },
+        "display_credit_line": { "type": "string" }
+      }
+    },
+
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receipt_id"],
+      "properties": {
+        "receipt_id": { "type": "string" },
+        "echo_ids": { "type": "array", "items": { "type": "string" } },
+        "memcell_id": { "type": "string" },
+        "parent_manifest_id": { "type": "string" },
+        "session_id": { "type": "string" }
+      }
+    },
+
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algo", "public_key_ref", "signature_b64", "signed_canonical_json_sha256"],
+      "properties": {
+        "algo": { "type": "string", "enum": ["ed25519", "rsa-pss", "ecdsa-p256"] },
+        "public_key_ref": { "type": "string" },
+        "signature_b64": { "type": "string" },
+        "signed_canonical_json_sha256": { "type": "string", "description": "Hash of canonical JSON that was signed." }
+      }
+    }
+  }
+}
