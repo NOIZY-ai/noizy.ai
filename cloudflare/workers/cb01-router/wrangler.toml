@@ -1,0 +1,7 @@
+name = "cb01-router"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+
+[vars]
+CONSENT_GATEWAY_URL = "https://consent-gateway.noizy.ai"
+ALLOWED_ORIGINS = "*"
