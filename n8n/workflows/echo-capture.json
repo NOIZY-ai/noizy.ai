@@ -1,0 +1,191 @@
+{
+  "name": "Echo Capture",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "echo-capture",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ec-webhook",
+      "name": "Webhook: Echo Capture",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generate a stable echo_id\nconst crypto = require('crypto');\n\nconst echoId = `echo-${crypto.randomUUID()}`;\n\nreturn [\n  {\n    json: {\n      echo_id: echoId,\n      ...($json.body)\n    }\n  }\n];"
+      },
+      "id": "ec-gen-id",
+      "name": "Function: Generate echo_id",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Build EchoMoment JSON matching /schemas/EchoMoment.schema.json\nconst data = $json;\n\nconst echoMoment = {\n  schema_version: \"1.0.0\",\n  echo_id: data.echo_id,\n  moment_type: data.moment_type || \"memory\",\n  title: data.title,\n  subtitle: data.subtitle || undefined,\n  narrative: data.narrative || \"\",\n  created_at: new Date().toISOString(),\n  creator: {\n    actor_id: data.creator_id || \"system\",\n    display_name: data.creator_name || \"NOIZY System\",\n    brand_home: data.brand_home || \"NOIZY\"\n  },\n  sovereignty: {\n    consent_required: true,\n    provenance_required: true,\n    receipt_required: true\n  },\n  sensory: {\n    tags: data.sensory_tags || [],\n    mood: Array.isArray(data.mood) ? data.mood : (data.mood ? [data.mood] : [])\n  },\n  links: {\n    artifact_ids: [],\n    manifest_ids: [],\n    receipt_ids: [],\n    memcell_ids: []\n  }\n};\n\nreturn [{ json: echoMoment }];"
+      },
+      "id": "ec-build-echo",
+      "name": "Function: Build EchoMoment JSON",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/d1/database/{{$env.CLOUDFLARE_D1_DATABASE_ID}}/query",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sql",
+              "value": "INSERT INTO agent_memory (echo_id, moment_type, title, narrative, created_at, creator_id, echo_json) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            },
+            {
+              "name": "params",
+              "value": "=[\"{{$json.echo_id}}\", \"{{$json.moment_type}}\", \"{{$json.title}}\", \"{{$json.narrative}}\", \"{{$json.created_at}}\", \"{{$json.creator.actor_id}}\", {{JSON.stringify(JSON.stringify($json))}}]"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ec-store-d1",
+      "name": "HTTP: Store in D1 agent-memory",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [960, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.DISCORD_WEBHOOK_URL}}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=**New EchoMoment captured** -- `{{$node[\"Function: Build EchoMoment JSON\"].json.echo_id}}`\n**Type:** {{$node[\"Function: Build EchoMoment JSON\"].json.moment_type}}\n**Title:** {{$node[\"Function: Build EchoMoment JSON\"].json.title}}\n{{$node[\"Function: Build EchoMoment JSON\"].json.narrative ? '> ' + $node[\"Function: Build EchoMoment JSON\"].json.narrative.substring(0, 200) : ''}}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "ec-discord",
+      "name": "HTTP: Notify Discord (Optional)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [960, 420],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"echo_id\": \"{{$node[\"Function: Build EchoMoment JSON\"].json.echo_id}}\",\n  \"moment_type\": \"{{$node[\"Function: Build EchoMoment JSON\"].json.moment_type}}\",\n  \"title\": \"{{$node[\"Function: Build EchoMoment JSON\"].json.title}}\",\n  \"created_at\": \"{{$node[\"Function: Build EchoMoment JSON\"].json.created_at}}\",\n  \"stored\": true\n}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "id": "ec-respond",
+      "name": "Respond: Echo ID",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    }
+  ],
+  "connections": {
+    "Webhook: Echo Capture": {
+      "main": [
+        [
+          {
+            "node": "Function: Generate echo_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Generate echo_id": {
+      "main": [
+        [
+          {
+            "node": "Function: Build EchoMoment JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Build EchoMoment JSON": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Store in D1 agent-memory",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP: Notify Discord (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Store in D1 agent-memory": {
+      "main": [
+        [
+          {
+            "node": "Respond: Echo ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Notify Discord (Optional)": {
+      "main": [
+        [
+          {
+            "node": "Respond: Echo ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "echo"
+    },
+    {
+      "name": "memory"
+    },
+    {
+      "name": "noizy-core"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-28T00:00:00.000Z",
+  "versionId": "1"
+}

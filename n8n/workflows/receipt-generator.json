@@ -1,0 +1,219 @@
+{
+  "name": "Receipt Generator (75/25)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "receipt-generator",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "rg-webhook",
+      "name": "Webhook: Receipt Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Calculate 75/25 split per NOIZY protocol\nconst { gross_amount, currency } = $json.body;\n\nconst grossNum = parseFloat(gross_amount);\nconst artistPool = Math.round(grossNum * 0.75 * 100) / 100;\nconst platformPool = Math.round(grossNum * 0.25 * 100) / 100;\n\nreturn [\n  {\n    json: {\n      ...$json.body,\n      gross: {\n        amount: grossNum,\n        currency: currency\n      },\n      splits: {\n        rule: \"75_25\",\n        artist_pool: {\n          amount: artistPool,\n          percent: 0.75\n        },\n        platform_pool: {\n          amount: platformPool,\n          percent: 0.25\n        }\n      }\n    }\n  }\n];"
+      },
+      "id": "rg-calc-split",
+      "name": "Function: Calculate 75/25 Split",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Apportion artist_pool among contributors based on share_of_artist_pool\nconst data = $json;\nconst artistPoolAmount = data.splits.artist_pool.amount;\nconst contributors = data.contributors || [];\n\nconst apportioned = contributors.map(c => ({\n  contributor_id: c.contributor_id,\n  display_name: c.display_name,\n  role: c.role,\n  share_of_artist_pool: c.share_of_artist_pool,\n  amount: Math.round(artistPoolAmount * c.share_of_artist_pool * 100) / 100,\n  payout_destination: c.payout_destination || null\n}));\n\nreturn [\n  {\n    json: {\n      ...data,\n      splits: {\n        ...data.splits,\n        contributors: apportioned\n      }\n    }\n  }\n];"
+      },
+      "id": "rg-apportion",
+      "name": "Function: Apportion Artist Pool",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Build HybridReceipt75_25 JSON matching /schemas/HybridReceipt75_25.schema.json\nconst crypto = require('crypto');\nconst data = $json;\n\nconst receipt = {\n  schema_version: \"1.0.0\",\n  receipt_id: `rcpt-${crypto.randomUUID()}`,\n  created_at: new Date().toISOString(),\n  event: {\n    event_type: data.event_type,\n    event_ref: data.event_ref\n  },\n  gross: data.gross,\n  splits: data.splits,\n  attribution: {\n    source_contributions: data.splits.contributors.map(c => ({\n      contribution_id: `contrib-${crypto.randomUUID()}`,\n      contributor_id: c.contributor_id,\n      asset_ref: c.contributor_id,\n      consent_token_ref: `pending`\n    })),\n    display_credit_line: data.splits.contributors.map(c => c.display_name).join(' + ')\n  },\n  proof_links: {\n    artifact_id: data.event_ref,\n    manifest_id: \"pending\"\n  },\n  status: {\n    state: \"issued\"\n  }\n};\n\nreturn [{ json: receipt }];"
+      },
+      "id": "rg-build-receipt",
+      "name": "Function: Build HybridReceipt75_25",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/d1/database/{{$env.CLOUDFLARE_D1_DATABASE_ID}}/query",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sql",
+              "value": "INSERT INTO receipts (receipt_id, created_at, event_type, event_ref, gross_amount, currency, artist_pool, platform_pool, receipt_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            },
+            {
+              "name": "params",
+              "value": "=[\"{{$json.receipt_id}}\", \"{{$json.created_at}}\", \"{{$json.event.event_type}}\", \"{{$json.event.event_ref}}\", {{$json.gross.amount}}, \"{{$json.gross.currency}}\", {{$json.splits.artist_pool.amount}}, {{$json.splits.platform_pool.amount}}, {{JSON.stringify(JSON.stringify($json))}}]"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "rg-store-d1",
+      "name": "HTTP: Store Receipt in D1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/storage/kv/namespaces/{{$env.CLOUDFLARE_KV_ROYALTIES_NAMESPACE_ID}}/values/receipt:{{$node[\"Function: Build HybridReceipt75_25\"].json.receipt_id}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "value",
+              "value": "={{JSON.stringify($node[\"Function: Build HybridReceipt75_25\"].json)}}"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "rg-store-kv",
+      "name": "HTTP: Store Receipt in KV (noizyvox-royalties)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1200, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($node[\"Function: Build HybridReceipt75_25\"].json)}}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "id": "rg-respond",
+      "name": "Respond: Receipt",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1440, 300]
+    }
+  ],
+  "connections": {
+    "Webhook: Receipt Request": {
+      "main": [
+        [
+          {
+            "node": "Function: Calculate 75/25 Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Calculate 75/25 Split": {
+      "main": [
+        [
+          {
+            "node": "Function: Apportion Artist Pool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Apportion Artist Pool": {
+      "main": [
+        [
+          {
+            "node": "Function: Build HybridReceipt75_25",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Build HybridReceipt75_25": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Store Receipt in D1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP: Store Receipt in KV (noizyvox-royalties)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Store Receipt in D1": {
+      "main": [
+        [
+          {
+            "node": "Respond: Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Store Receipt in KV (noizyvox-royalties)": {
+      "main": [
+        [
+          {
+            "node": "Respond: Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "receipts"
+    },
+    {
+      "name": "noizy-core"
+    },
+    {
+      "name": "75-25"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-28T00:00:00.000Z",
+  "versionId": "1"
+}

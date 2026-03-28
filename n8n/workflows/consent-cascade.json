@@ -1,0 +1,378 @@
+{
+  "name": "Consent Cascade",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "consent-cascade",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "cc-webhook",
+      "name": "Webhook: Consent Check Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/storage/kv/namespaces/{{$env.CLOUDFLARE_KV_NAMESPACE_ID}}/values/voice-estate:{{$json.body.creator_id}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "fullResponse": true
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}"
+            }
+          ]
+        }
+      },
+      "id": "cc-check-voice-estate",
+      "name": "HTTP: Check Voice Estate (KV)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.statusCode}}",
+              "operation": "equal",
+              "value2": 200
+            }
+          ]
+        }
+      },
+      "id": "cc-if-creator-verified",
+      "name": "IF: Creator Verified?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/d1/database/{{$env.CLOUDFLARE_D1_DATABASE_ID}}/query",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sql",
+              "value": "SELECT * FROM consent_records WHERE creator_id = ? AND status = 'active' ORDER BY created_at DESC LIMIT 1"
+            },
+            {
+              "name": "params",
+              "value": "=[\"{{$node[\"Webhook: Consent Check Request\"].json.body.creator_id}}\"]"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cc-lookup-consent",
+      "name": "HTTP: Lookup Consent Record (D1)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [960, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.result[0].results.length}}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "cc-if-consent-active",
+      "name": "IF: Consent Active?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Check if the requested usage_type falls within blocked scope exclusions\nconst consentRecord = $node[\"HTTP: Lookup Consent Record (D1)\"].json.result[0].results[0];\nconst usageType = $node[\"Webhook: Consent Check Request\"].json.body.usage_type;\n\nconst blockedScopes = consentRecord.blocked_uses ? JSON.parse(consentRecord.blocked_uses) : [];\nconst isBlocked = blockedScopes.includes(usageType);\n\nreturn [\n  {\n    json: {\n      scope_clear: !isBlocked,\n      usage_type: usageType,\n      blocked_scopes: blockedScopes,\n      consent_id: consentRecord.consent_id,\n      creator_id: consentRecord.creator_id\n    }\n  }\n];"
+      },
+      "id": "cc-check-scope",
+      "name": "Function: Check Scope Exclusions",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1440, 100]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.scope_clear}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "cc-if-scope-clear",
+      "name": "IF: Scope Clear?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1680, 100]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generate a consent clearance token\nconst crypto = require('crypto');\n\nconst clearanceToken = {\n  token_id: crypto.randomUUID(),\n  consent_id: $json.consent_id,\n  creator_id: $json.creator_id,\n  usage_type: $json.usage_type,\n  asset_ref: $node[\"Webhook: Consent Check Request\"].json.body.asset_ref,\n  cleared_at: new Date().toISOString(),\n  expires_at: new Date(Date.now() + 3600000).toISOString(), // 1 hour TTL\n  status: \"cleared\"\n};\n\nreturn [{ json: clearanceToken }];"
+      },
+      "id": "cc-generate-token",
+      "name": "Function: Generate Clearance Token",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1920, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/d1/database/{{$env.CLOUDFLARE_D1_DATABASE_ID}}/query",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sql",
+              "value": "INSERT INTO usage_events (token_id, consent_id, creator_id, usage_type, asset_ref, cleared_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            },
+            {
+              "name": "params",
+              "value": "=[\"{{$json.token_id}}\", \"{{$json.consent_id}}\", \"{{$json.creator_id}}\", \"{{$json.usage_type}}\", \"{{$json.asset_ref}}\", \"{{$json.cleared_at}}\", \"{{$json.expires_at}}\"]"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cc-log-usage",
+      "name": "HTTP: Log Usage Event (D1)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [2160, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"cleared\",\n  \"token\": {{JSON.stringify($node[\"Function: Generate Clearance Token\"].json)}},\n  \"checked_at\": \"{{new Date().toISOString()}}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "cc-respond-cleared",
+      "name": "Respond: Clearance Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2400, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"blocked\",\n  \"reason\": \"creator_not_verified\",\n  \"creator_id\": \"{{$node[\"Webhook: Consent Check Request\"].json.body.creator_id}}\",\n  \"checked_at\": \"{{new Date().toISOString()}}\"\n}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "cc-respond-blocked-unverified",
+      "name": "Respond: Blocked (Not Verified)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [960, 460]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"blocked\",\n  \"reason\": \"no_active_consent\",\n  \"creator_id\": \"{{$node[\"Webhook: Consent Check Request\"].json.body.creator_id}}\",\n  \"checked_at\": \"{{new Date().toISOString()}}\"\n}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "cc-respond-blocked-no-consent",
+      "name": "Respond: Blocked (No Consent)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1440, 360]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"blocked\",\n  \"reason\": \"scope_excluded\",\n  \"usage_type\": \"{{$node[\"Function: Check Scope Exclusions\"].json.usage_type}}\",\n  \"blocked_scopes\": {{JSON.stringify($node[\"Function: Check Scope Exclusions\"].json.blocked_scopes)}},\n  \"checked_at\": \"{{new Date().toISOString()}}\"\n}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "cc-respond-blocked-scope",
+      "name": "Respond: Blocked (Scope Excluded)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1920, 260]
+    }
+  ],
+  "connections": {
+    "Webhook: Consent Check Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Check Voice Estate (KV)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Check Voice Estate (KV)": {
+      "main": [
+        [
+          {
+            "node": "IF: Creator Verified?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Creator Verified?": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Lookup Consent Record (D1)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Blocked (Not Verified)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Lookup Consent Record (D1)": {
+      "main": [
+        [
+          {
+            "node": "IF: Consent Active?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Consent Active?": {
+      "main": [
+        [
+          {
+            "node": "Function: Check Scope Exclusions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Blocked (No Consent)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Check Scope Exclusions": {
+      "main": [
+        [
+          {
+            "node": "IF: Scope Clear?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Scope Clear?": {
+      "main": [
+        [
+          {
+            "node": "Function: Generate Clearance Token",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Blocked (Scope Excluded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Generate Clearance Token": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Log Usage Event (D1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Log Usage Event (D1)": {
+      "main": [
+        [
+          {
+            "node": "Respond: Clearance Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "consent"
+    },
+    {
+      "name": "noizy-core"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-28T00:00:00.000Z",
+  "versionId": "1"
+}

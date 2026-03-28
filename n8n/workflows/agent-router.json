@@ -1,0 +1,436 @@
+{
+  "name": "Agent Router (CB01 Dispatch)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agent-router",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ar-webhook",
+      "name": "Webhook: Agent Router",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// CB01-style keyword classification / dispatch matrix\nconst message = ($json.body.message || '').toLowerCase();\nconst source = $json.body.source || 'unknown';\n\n// Dispatch matrix: keyword patterns -> agent classification\nconst dispatchMatrix = [\n  { agent: 'lucy', keywords: ['creative', 'design', 'brand', 'visual', 'color', 'logo', 'aesthetic', 'campaign', 'mood board'], model: 'llama3', description: 'Creative Director' },\n  { agent: 'voice-engine', keywords: ['voice', 'speak', 'synthesize', 'tts', 'vocal', 'clone', 'speech', 'prosody', 'phoneme'], model: 'llama3', description: 'Voice Synthesis Engine' },\n  { agent: 'consent-oracle', keywords: ['consent', 'permission', 'rights', 'license', 'block', 'allow', 'revoke', 'scope'], model: 'mistral', description: 'Consent Oracle' },\n  { agent: 'memory-keeper', keywords: ['remember', 'memory', 'echo', 'moment', 'origin', 'story', 'narrative', 'history', 'dream'], model: 'llama3', description: 'Memory Keeper / Echo Engine' },\n  { agent: 'code-architect', keywords: ['code', 'build', 'deploy', 'api', 'schema', 'database', 'function', 'worker', 'debug', 'fix'], model: 'codellama', description: 'Code Architect' },\n  { agent: 'provenance-signer', keywords: ['provenance', 'manifest', 'sign', 'hash', 'integrity', 'chain', 'verify', 'seal'], model: 'mistral', description: 'Provenance Signer' },\n  { agent: 'receipts-clerk', keywords: ['receipt', 'payment', 'split', '75', 'royalty', 'payout', 'revenue', 'settlement'], model: 'mistral', description: 'Receipts Clerk (75/25)' },\n  { agent: 'general', keywords: [], model: 'mixtral', description: 'General Assistant (fallback)' }\n];\n\n// Score each agent by keyword match count\nlet bestMatch = dispatchMatrix[dispatchMatrix.length - 1]; // default to general\nlet bestScore = 0;\n\nfor (const entry of dispatchMatrix) {\n  const score = entry.keywords.filter(kw => message.includes(kw)).length;\n  if (score > bestScore) {\n    bestScore = score;\n    bestMatch = entry;\n  }\n}\n\nreturn [\n  {\n    json: {\n      original_message: $json.body.message,\n      source: source,\n      classification: bestMatch.agent,\n      agent_description: bestMatch.description,\n      model: bestMatch.model,\n      confidence: bestScore > 0 ? Math.min(bestScore / 3, 1.0) : 0.1,\n      matched_keywords: bestMatch.keywords.filter(kw => message.includes(kw)),\n      classified_at: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "id": "ar-classify",
+      "name": "Function: Keyword Classification",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [480, 400]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value": "lucy",
+              "output": 0
+            },
+            {
+              "value": "voice-engine",
+              "output": 1
+            },
+            {
+              "value": "consent-oracle",
+              "output": 2
+            },
+            {
+              "value": "memory-keeper",
+              "output": 3
+            },
+            {
+              "value": "code-architect",
+              "output": 4
+            },
+            {
+              "value": "provenance-signer",
+              "output": 5
+            },
+            {
+              "value": "receipts-clerk",
+              "output": 6
+            }
+          ],
+          "fallbackOutput": 7
+        },
+        "dataType": "string",
+        "value1": "={{$json.classification}}"
+      },
+      "id": "ar-switch",
+      "name": "Switch: Route to Agent",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [720, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are Lucy, NOIZY's Creative Director. You guide brand aesthetics, campaign ideation, and visual storytelling for the NOIZY ecosystem.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-lucy",
+      "name": "HTTP: Ollama - Lucy (Creative Director)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are the NOIZY Voice Engine. You handle voice synthesis requests, vocal analysis, prosody guidance, and speech-related tasks within the NOIZY consent framework.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-voice",
+      "name": "HTTP: Ollama - Voice Engine",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistral\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are the NOIZY Consent Oracle. You evaluate consent questions, interpret scope boundaries, and advise on rights management within the NOIZY Voice Estate system.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-consent",
+      "name": "HTTP: Ollama - Consent Oracle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 240]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are the NOIZY Memory Keeper. You help capture, recall, and weave EchoMoments -- origin stories, creative memories, techniques, rituals, and the narrative threads that make up an artist's identity.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-memory",
+      "name": "HTTP: Ollama - Memory Keeper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 360]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"codellama\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are the NOIZY Code Architect. You build, debug, and deploy the technical infrastructure -- Cloudflare Workers, D1 schemas, KV stores, APIs, and n8n integrations for the NOIZY consent-as-code platform.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-code",
+      "name": "HTTP: Ollama - Code Architect",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 480]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistral\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are the NOIZY Provenance Signer. You manage artifact integrity, SHA-256 hashing, manifest generation, and the cryptographic chain of trust for all NOIZY outputs.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-provenance",
+      "name": "HTTP: Ollama - Provenance Signer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistral\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are the NOIZY Receipts Clerk. You handle 75/25 split calculations, royalty questions, payout tracking, and revenue attribution across the NOIZY ecosystem.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-receipts",
+      "name": "HTTP: Ollama - Receipts Clerk",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 720]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mixtral\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are a general assistant for the NOIZY ecosystem. Help with any questions about the platform, its consent infrastructure, voice estates, or creative tools.\"},\n    {\"role\": \"user\", \"content\": \"{{$node[\"Function: Keyword Classification\"].json.original_message}}\"}\n  ],\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ar-general",
+      "name": "HTTP: Ollama - General (Fallback)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 840]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Log routing decision to master-command-log format\nconst classification = $node[\"Function: Keyword Classification\"].json;\nconst agentResponse = $json.message ? $json.message.content : ($json.response || 'No response');\n\nconst logEntry = {\n  log_type: \"agent-route\",\n  timestamp: new Date().toISOString(),\n  source: classification.source,\n  message_preview: classification.original_message.substring(0, 100),\n  routed_to: classification.classification,\n  agent_description: classification.agent_description,\n  model: classification.model,\n  confidence: classification.confidence,\n  matched_keywords: classification.matched_keywords,\n  response_preview: agentResponse.substring(0, 200),\n  full_response: agentResponse\n};\n\nreturn [\n  {\n    json: {\n      routing: logEntry,\n      response: agentResponse\n    }\n  }\n];"
+      },
+      "id": "ar-log",
+      "name": "Function: Log Routing Decision",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1280, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"agent\": \"{{$json.routing.routed_to}}\",\n  \"agent_description\": \"{{$json.routing.agent_description}}\",\n  \"model\": \"{{$json.routing.model}}\",\n  \"confidence\": {{$json.routing.confidence}},\n  \"matched_keywords\": {{JSON.stringify($json.routing.matched_keywords)}},\n  \"response\": {{JSON.stringify($json.response)}},\n  \"routed_at\": \"{{$json.routing.timestamp}}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "ar-respond",
+      "name": "Respond: Agent Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1520, 400]
+    }
+  ],
+  "connections": {
+    "Webhook: Agent Router": {
+      "main": [
+        [
+          {
+            "node": "Function: Keyword Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Keyword Classification": {
+      "main": [
+        [
+          {
+            "node": "Switch: Route to Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch: Route to Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Ollama - Lucy (Creative Director)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Ollama - Voice Engine",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Ollama - Consent Oracle",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Ollama - Memory Keeper",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Ollama - Code Architect",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Ollama - Provenance Signer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Ollama - Receipts Clerk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Ollama - General (Fallback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - Lucy (Creative Director)": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - Voice Engine": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - Consent Oracle": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - Memory Keeper": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - Code Architect": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - Provenance Signer": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - Receipts Clerk": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Ollama - General (Fallback)": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Routing Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Log Routing Decision": {
+      "main": [
+        [
+          {
+            "node": "Respond: Agent Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "routing"
+    },
+    {
+      "name": "cb01"
+    },
+    {
+      "name": "agents"
+    },
+    {
+      "name": "noizy-core"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-28T00:00:00.000Z",
+  "versionId": "1"
+}

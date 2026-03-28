@@ -1,0 +1,193 @@
+{
+  "name": "Provenance Signer",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "provenance-signer",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ps-webhook",
+      "name": "Webhook: Provenance Signer",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Compute SHA-256 of the artifact payload\nconst crypto = require('crypto');\n\nconst body = $json.body;\nconst artifactPayload = JSON.stringify({\n  artifact_id: body.artifact_id,\n  artifact_type: body.artifact_type,\n  creator_id: body.creator_id,\n  receipt_id: body.receipt_id,\n  consent_tokens: body.consent_tokens || []\n});\n\nconst payloadSha256 = crypto.createHash('sha256').update(artifactPayload).digest('hex');\n\nreturn [\n  {\n    json: {\n      ...body,\n      payload_sha256: payloadSha256,\n      artifact_payload_raw: artifactPayload\n    }\n  }\n];"
+      },
+      "id": "ps-hash-payload",
+      "name": "Function: Compute SHA-256 of Artifact",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Build ProvenanceManifest JSON matching /schemas/ProvenanceManifest.schema.json\nconst crypto = require('crypto');\nconst data = $json;\n\nconst manifest = {\n  schema_version: \"1.0.0\",\n  manifest_id: `manifest-${crypto.randomUUID()}`,\n  created_at: new Date().toISOString(),\n  producer: {\n    system: \"NOIZY.ai / n8n Provenance Signer\",\n    version: \"1.0.0\",\n    environment: \"dev\"\n  },\n  artifact: {\n    artifact_id: data.artifact_id,\n    type: data.artifact_type || \"mixed\",\n    title: data.artifact_title || undefined,\n    format: data.artifact_format || undefined\n  },\n  integrity: {\n    payload_sha256: data.payload_sha256,\n    lineage_hash: \"pending\"\n  },\n  rights: {\n    consent_required: true,\n    royalty_rule: \"75_25\",\n    allowed_uses: data.allowed_uses || [],\n    blocked_uses: data.blocked_uses || []\n  },\n  attribution: {\n    primary_creator: {\n      actor_id: data.creator_id,\n      display_name: data.creator_name || data.creator_id\n    },\n    source_contributions: (data.consent_tokens || []).map(token => ({\n      contributor_id: token.creator_id || data.creator_id,\n      asset_ref: token.asset_ref || data.artifact_id,\n      consent_token_ref: token.token_id || token\n    }))\n  },\n  links: {\n    receipt_id: data.receipt_id || \"pending\"\n  },\n  signature: {\n    algo: \"ed25519\",\n    public_key_ref: \"pending\",\n    signature_b64: \"pending\",\n    signed_canonical_json_sha256: \"pending\"\n  }\n};\n\nreturn [{ json: manifest }];"
+      },
+      "id": "ps-build-manifest",
+      "name": "Function: Build ProvenanceManifest",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Compute canonical JSON hash for signing\n// This creates a deterministic hash of the manifest (excluding the signature field)\nconst crypto = require('crypto');\nconst manifest = { ...$json };\n\n// Remove the signature block before computing the canonical hash\nconst { signature, ...manifestWithoutSig } = manifest;\n\n// Sort keys for canonical JSON\nconst canonicalJson = JSON.stringify(manifestWithoutSig, Object.keys(manifestWithoutSig).sort());\nconst canonicalHash = crypto.createHash('sha256').update(canonicalJson).digest('hex');\n\n// Also compute lineage_hash from the integrity-relevant fields\nconst lineagePayload = JSON.stringify({\n  artifact_id: manifest.artifact.artifact_id,\n  payload_sha256: manifest.integrity.payload_sha256,\n  creator_id: manifest.attribution.primary_creator.actor_id,\n  contributions: manifest.attribution.source_contributions.map(c => c.consent_token_ref).sort()\n});\nconst lineageHash = crypto.createHash('sha256').update(lineagePayload).digest('hex');\n\n// Update manifest with computed hashes\nmanifest.integrity.lineage_hash = lineageHash;\nmanifest.signature.signed_canonical_json_sha256 = canonicalHash;\n\nreturn [{ json: manifest }];"
+      },
+      "id": "ps-canonical-hash",
+      "name": "Function: Compute Canonical JSON Hash",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Placeholder for Ed25519 signing\n// Replace with actual key signing in production:\n//   1. Load Ed25519 private key from secure store (e.g., Cloudflare Workers secret, Vault)\n//   2. Sign the signed_canonical_json_sha256 with the private key\n//   3. Base64-encode the signature\n//   4. Set public_key_ref to the key identifier\n//\n// Example production implementation:\n//   const nacl = require('tweetnacl');\n//   const keyPair = nacl.sign.keyPair.fromSecretKey(privateKeyBytes);\n//   const sig = nacl.sign.detached(Buffer.from(manifest.signature.signed_canonical_json_sha256), keyPair.secretKey);\n//   manifest.signature.signature_b64 = Buffer.from(sig).toString('base64');\n//   manifest.signature.public_key_ref = publicKeyId;\n\nconst crypto = require('crypto');\nconst manifest = $json;\n\n// Dev placeholder: self-signed with a random key for testing\nmanifest.signature.algo = \"ed25519\";\nmanifest.signature.public_key_ref = \"dev-placeholder-key\";\nmanifest.signature.signature_b64 = crypto.randomBytes(64).toString('base64');\n\nreturn [{ json: manifest }];"
+      },
+      "id": "ps-sign",
+      "name": "Function: Ed25519 Signing (Placeholder)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/d1/database/{{$env.CLOUDFLARE_D1_DATABASE_ID}}/query",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sql",
+              "value": "INSERT INTO provenance_manifests (manifest_id, artifact_id, creator_id, payload_sha256, lineage_hash, created_at, manifest_json) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            },
+            {
+              "name": "params",
+              "value": "=[\"{{$json.manifest_id}}\", \"{{$json.artifact.artifact_id}}\", \"{{$json.attribution.primary_creator.actor_id}}\", \"{{$json.integrity.payload_sha256}}\", \"{{$json.integrity.lineage_hash}}\", \"{{$json.created_at}}\", {{JSON.stringify(JSON.stringify($json))}}]"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ps-store-d1",
+      "name": "HTTP: Store Manifest in D1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($node[\"Function: Ed25519 Signing (Placeholder)\"].json)}}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "id": "ps-respond",
+      "name": "Respond: Manifest",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook: Provenance Signer": {
+      "main": [
+        [
+          {
+            "node": "Function: Compute SHA-256 of Artifact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Compute SHA-256 of Artifact": {
+      "main": [
+        [
+          {
+            "node": "Function: Build ProvenanceManifest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Build ProvenanceManifest": {
+      "main": [
+        [
+          {
+            "node": "Function: Compute Canonical JSON Hash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Compute Canonical JSON Hash": {
+      "main": [
+        [
+          {
+            "node": "Function: Ed25519 Signing (Placeholder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Ed25519 Signing (Placeholder)": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Store Manifest in D1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Store Manifest in D1": {
+      "main": [
+        [
+          {
+            "node": "Respond: Manifest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "provenance"
+    },
+    {
+      "name": "signing"
+    },
+    {
+      "name": "noizy-core"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-28T00:00:00.000Z",
+  "versionId": "1"
+}
