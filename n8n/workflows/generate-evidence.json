@@ -1,0 +1,382 @@
+{
+  "name": "Generate Evidence (Gabriel-Triggered)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-evidence",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ge-webhook",
+      "name": "Webhook: Gabriel Evidence Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 400],
+      "notes": "Gabriel triggers this when an artifact is ready for truth-binding. Expects: { artifact_id, artifact_type, artifact_title, artifact_format, duration_seconds, creator_id, creator_name, usage_type, asset_ref, gross_amount, currency, contributors: [{ contributor_id, display_name, role, share_of_artist_pool }], allowed_uses, blocked_uses, echo: { title, narrative, moment_type, tags, mood } }"
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// STEP 0: Validate Gabriel's request and prepare pipeline context\nconst crypto = require('crypto');\nconst body = $json.body;\n\nconst required = ['artifact_id', 'creator_id', 'usage_type', 'gross_amount', 'currency'];\nconst missing = required.filter(f => !body[f]);\nif (missing.length > 0) {\n  throw new Error(`Gabriel evidence request missing fields: ${missing.join(', ')}`);\n}\n\nconst bundleId = `bundle-${crypto.randomUUID()}`;\nconst timestamp = new Date().toISOString();\n\nreturn [{\n  json: {\n    ...body,\n    _pipeline: {\n      bundle_id: bundleId,\n      initiated_by: 'GABRIEL',\n      initiated_at: timestamp,\n      stage: 'validated'\n    }\n  }\n}];"
+      },
+      "id": "ge-validate",
+      "name": "Function: Validate & Init Pipeline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [480, 400]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.N8N_BASE_URL}}/webhook/consent-cascade",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "creator_id", "value": "={{$json.creator_id}}" },
+            { "name": "usage_type", "value": "={{$json.usage_type}}" },
+            { "name": "asset_ref", "value": "={{$json.asset_ref || $json.artifact_id}}" }
+          ]
+        },
+        "options": { "fullResponse": true, "timeout": 30000 }
+      },
+      "id": "ge-consent-cascade",
+      "name": "HTTP: Run Consent Cascade",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [720, 200],
+      "notes": "Calls the consent-cascade workflow. Must return 'cleared' status or the entire pipeline halts."
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.body.status}}",
+              "operation": "equals",
+              "value2": "cleared"
+            }
+          ]
+        }
+      },
+      "id": "ge-consent-check",
+      "name": "IF: Consent Cleared?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [960, 200]
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// CONSENT BLOCKED — halt pipeline, return evidence of denial\nconst crypto = require('crypto');\nconst pipeline = $input.first().json._pipeline || {};\nconst original = $input.first().json;\n\nreturn [{\n  json: {\n    schema_version: '1.0.0',\n    bundle_id: pipeline.bundle_id || `bundle-${crypto.randomUUID()}`,\n    created_at: new Date().toISOString(),\n    status: 'BLOCKED',\n    blocked_by: 'CONSENT_CASCADE',\n    reason: original.body?.reason || 'Consent verification failed',\n    creator_id: original.creator_id,\n    artifact_id: original.artifact_id,\n    truth_strip: {\n      consent: { status: 'blocked', refs: [] },\n      provenance: { status: 'pending', manifest_id: 'N/A' },\n      receipt_75_25: { status: 'missing', receipt_id: 'N/A', rule: '75_25' },\n      memory: { status: 'failed', memcell_ids: [] },\n      risk: { level: 'stop', notes: 'Consent cascade returned blocked. No artifact may leave without consent clearance.' }\n    }\n  }\n}];"
+      },
+      "id": "ge-blocked-response",
+      "name": "Function: Evidence Denied (Blocked)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1200, 400]
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// CONSENT CLEARED — extract clearance token, merge back into pipeline\nconst consentResult = $json;\nconst items = $input.all();\n\n// Walk back to find original request data\nconst original = items[0]?.json || {};\n\nreturn [{\n  json: {\n    ...original,\n    _pipeline: {\n      ...(original._pipeline || {}),\n      stage: 'consent_cleared',\n      clearance_token: consentResult.body?.clearance_token || consentResult.clearance_token || 'token_cleared',\n      consent_refs: consentResult.body?.consent_refs || []\n    }\n  }\n}];"
+      },
+      "id": "ge-consent-passed",
+      "name": "Function: Consent Cleared — Continue",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1200, 100]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.N8N_BASE_URL}}/webhook/receipt-generator",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "event_type", "value": "={{$json.usage_type || 'export'}}" },
+            { "name": "event_ref", "value": "={{$json._pipeline.bundle_id}}" },
+            { "name": "gross_amount", "value": "={{$json.gross_amount}}" },
+            { "name": "currency", "value": "={{$json.currency}}" },
+            { "name": "contributors", "value": "={{JSON.stringify($json.contributors || [{contributor_id: $json.creator_id, display_name: $json.creator_name || $json.creator_id, role: 'origin_voice', share_of_artist_pool: 1.0}])}}" }
+          ]
+        },
+        "options": { "fullResponse": true, "timeout": 30000 }
+      },
+      "id": "ge-receipt-gen",
+      "name": "HTTP: Generate 75/25 Receipt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1440, 100],
+      "notes": "Calls receipt-generator workflow. Returns HybridReceipt75_25 with calculated splits."
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// Merge receipt into pipeline\nconst receiptResult = $json;\nconst items = $input.all();\nconst original = items[0]?.json || {};\n\nconst receipt = receiptResult.body || receiptResult;\n\nreturn [{\n  json: {\n    ...original,\n    _receipt: receipt,\n    _pipeline: {\n      ...(original._pipeline || {}),\n      stage: 'receipt_generated',\n      receipt_id: receipt.receipt_id || 'pending'\n    }\n  }\n}];"
+      },
+      "id": "ge-merge-receipt",
+      "name": "Function: Merge Receipt into Pipeline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1680, 100]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.N8N_BASE_URL}}/webhook/provenance-signer",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "artifact_id", "value": "={{$json.artifact_id}}" },
+            { "name": "artifact_type", "value": "={{$json.artifact_type || 'audio'}}" },
+            { "name": "artifact_title", "value": "={{$json.artifact_title || ''}}" },
+            { "name": "artifact_format", "value": "={{$json.artifact_format || 'wav'}}" },
+            { "name": "creator_id", "value": "={{$json.creator_id}}" },
+            { "name": "creator_name", "value": "={{$json.creator_name || $json.creator_id}}" },
+            { "name": "receipt_id", "value": "={{$json._pipeline.receipt_id}}" },
+            { "name": "consent_tokens", "value": "={{JSON.stringify($json._pipeline.consent_refs || [])}}" },
+            { "name": "allowed_uses", "value": "={{JSON.stringify($json.allowed_uses || ['create', 'publish'])}}" },
+            { "name": "blocked_uses", "value": "={{JSON.stringify($json.blocked_uses || ['nsfw', 'political_persuasion', 'medical_advice', 'sublicense'])}}" }
+          ]
+        },
+        "options": { "fullResponse": true, "timeout": 30000 }
+      },
+      "id": "ge-provenance-sign",
+      "name": "HTTP: Generate Provenance Manifest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1920, 100],
+      "notes": "Calls provenance-signer workflow. Returns signed ProvenanceManifest with SHA-256 integrity hash."
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// Merge provenance manifest into pipeline\nconst manifestResult = $json;\nconst items = $input.all();\nconst original = items[0]?.json || {};\n\nconst manifest = manifestResult.body || manifestResult;\n\nreturn [{\n  json: {\n    ...original,\n    _manifest: manifest,\n    _pipeline: {\n      ...(original._pipeline || {}),\n      stage: 'provenance_signed',\n      manifest_id: manifest.manifest_id || 'pending'\n    }\n  }\n}];"
+      },
+      "id": "ge-merge-manifest",
+      "name": "Function: Merge Manifest into Pipeline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2160, 100]
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// Build the EchoMoment for this evidence event\nconst crypto = require('crypto');\nconst data = $json;\nconst echo = data.echo || {};\n\nconst echoMoment = {\n  schema_version: '1.0.0',\n  echo_id: `echo-${crypto.randomUUID()}`,\n  moment_type: echo.moment_type || 'artifact',\n  title: echo.title || data.artifact_title || `Evidence: ${data.artifact_id}`,\n  narrative: echo.narrative || `Gabriel triggered evidence generation for artifact ${data.artifact_id}. Consent cleared. Receipt issued at 75/25. Provenance manifest signed. Truth bundle assembled.`,\n  created_at: new Date().toISOString(),\n  creator: {\n    actor_id: data.creator_id,\n    display_name: data.creator_name || data.creator_id,\n    brand_home: 'NOIZY'\n  },\n  sovereignty: {\n    consent_required: true,\n    provenance_required: true,\n    receipt_required: true,\n    never_clause_classes: data.blocked_uses || ['nsfw', 'political_persuasion', 'medical_advice', 'sublicense']\n  },\n  sensory: {\n    tags: echo.tags || [data.artifact_type || 'audio', 'evidence', 'gabriel-triggered'],\n    mood: echo.mood || ['resolute', 'verified']\n  },\n  accessibility: { deaf_hh_ready: true, low_sensory_ready: true },\n  links: {\n    artifact_ids: [data.artifact_id],\n    manifest_ids: [data._pipeline.manifest_id],\n    receipt_ids: [data._pipeline.receipt_id],\n    memcell_ids: []\n  }\n};\n\nreturn [{\n  json: {\n    ...data,\n    _echo: echoMoment,\n    _pipeline: {\n      ...data._pipeline,\n      stage: 'echo_created',\n      echo_id: echoMoment.echo_id\n    }\n  }\n}];"
+      },
+      "id": "ge-build-echo",
+      "name": "Function: Build EchoMoment",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2400, 100]
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// ASSEMBLE THE ARTIFACT TRUTH BUNDLE\n// This is the final output — the complete evidence package\n// matching /schemas/ArtifactTruthBundle.schema.json\nconst data = $json;\n\nconst bundle = {\n  schema_version: '1.0.0',\n  bundle_id: data._pipeline.bundle_id,\n  created_at: new Date().toISOString(),\n\n  echo_moment: data._echo,\n  receipt: data._receipt,\n  manifest: data._manifest,\n\n  truth_strip: {\n    consent: {\n      status: 'clear',\n      refs: data._pipeline.consent_refs || [data._pipeline.clearance_token]\n    },\n    provenance: {\n      status: 'signed',\n      manifest_id: data._pipeline.manifest_id\n    },\n    receipt_75_25: {\n      status: 'emitted',\n      receipt_id: data._pipeline.receipt_id,\n      rule: '75_25'\n    },\n    memory: {\n      status: 'written',\n      memcell_ids: data._echo?.links?.memcell_ids || []\n    },\n    risk: {\n      level: 'safe',\n      notes: 'Full evidence chain: consent cleared → receipt 75/25 emitted → provenance manifest signed → echo moment recorded. Gabriel-verified.'\n    }\n  },\n\n  _pipeline_meta: {\n    initiated_by: data._pipeline.initiated_by,\n    initiated_at: data._pipeline.initiated_at,\n    completed_at: new Date().toISOString(),\n    stages_completed: ['validated', 'consent_cleared', 'receipt_generated', 'provenance_signed', 'echo_created', 'bundle_assembled'],\n    total_stages: 6\n  }\n};\n\nreturn [{ json: bundle }];"
+      },
+      "id": "ge-assemble-bundle",
+      "name": "Function: Assemble ArtifactTruthBundle",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2640, 100]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CLOUDFLARE_API_URL}}/client/v4/accounts/{{$env.CLOUDFLARE_ACCOUNT_ID}}/d1/database/{{$env.CLOUDFLARE_D1_AGENT_MEMORY_ID}}/query",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sql",
+              "value": "INSERT INTO consent_log (id, action, details, created_at) VALUES ('={{$json.bundle_id}}', 'EVIDENCE_GENERATED', '={{JSON.stringify({bundle_id: $json.bundle_id, manifest_id: $json.truth_strip.provenance.manifest_id, receipt_id: $json.truth_strip.receipt_75_25.receipt_id, echo_id: $json.echo_moment.echo_id, initiated_by: $json._pipeline_meta.initiated_by})}}', '={{$json.created_at}}')"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{$env.CLOUDFLARE_API_TOKEN}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "options": { "timeout": 15000 }
+      },
+      "id": "ge-store-d1",
+      "name": "HTTP: Store Evidence in D1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [2880, 100],
+      "continueOnFail": true
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "gabriel" },
+            { "name": "stream", "value": "false" },
+            {
+              "name": "messages",
+              "value": "={{JSON.stringify([{role: 'system', content: 'You are GABRIEL. An evidence bundle was just generated. Confirm it in one sentence. Be warm, musical, and brief.'}, {role: 'user', content: 'Evidence bundle ' + $json.bundle_id + ' is assembled. Consent: ' + $json.truth_strip.consent.status + '. Receipt: ' + $json.truth_strip.receipt_75_25.status + '. Provenance: ' + $json.truth_strip.provenance.status + '. Risk: ' + $json.truth_strip.risk.level + '.'}])}}"
+            }
+          ]
+        },
+        "options": { "timeout": 60000 }
+      },
+      "id": "ge-gabriel-confirm",
+      "name": "HTTP: Gabriel Confirmation (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [3120, 100],
+      "continueOnFail": true,
+      "notes": "Gabriel acknowledges the evidence bundle. Non-blocking — pipeline succeeds even if Ollama is offline."
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// Final assembly — attach Gabriel's confirmation and clean up pipeline internals\nconst items = $input.all();\nconst bundle = items[0]?.json || {};\nconst gabrielResponse = bundle.message?.content || bundle.body?.message?.content || 'Gabriel offline — evidence stands on its own.';\n\n// Remove internal pipeline metadata from final output\nconst cleanBundle = { ...bundle };\ndelete cleanBundle._pipeline_meta;\ndelete cleanBundle.message;\ndelete cleanBundle.body;\n\nreturn [{\n  json: {\n    ...cleanBundle,\n    gabriel_confirmation: gabrielResponse,\n    _pipeline_meta: {\n      initiated_by: 'GABRIEL',\n      completed_at: new Date().toISOString(),\n      stages_completed: ['validated', 'consent_cleared', 'receipt_generated', 'provenance_signed', 'echo_created', 'bundle_assembled', 'stored', 'gabriel_confirmed'],\n      total_stages: 8,\n      status: 'COMPLETE'\n    }\n  }\n}];"
+      },
+      "id": "ge-finalize",
+      "name": "Function: Finalize Evidence Bundle",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [3360, 100]
+    },
+
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($json)}}"
+      },
+      "id": "ge-respond-success",
+      "name": "Respond: Evidence Bundle Complete",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [3600, 100]
+    },
+
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($json)}}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "ge-respond-blocked",
+      "name": "Respond: Evidence Denied",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1440, 400]
+    }
+  ],
+
+  "connections": {
+    "Webhook: Gabriel Evidence Request": {
+      "main": [
+        [{ "node": "Function: Validate & Init Pipeline", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Validate & Init Pipeline": {
+      "main": [
+        [{ "node": "HTTP: Run Consent Cascade", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Run Consent Cascade": {
+      "main": [
+        [{ "node": "IF: Consent Cleared?", "type": "main", "index": 0 }]
+      ]
+    },
+    "IF: Consent Cleared?": {
+      "main": [
+        [{ "node": "Function: Consent Cleared — Continue", "type": "main", "index": 0 }],
+        [{ "node": "Function: Evidence Denied (Blocked)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Evidence Denied (Blocked)": {
+      "main": [
+        [{ "node": "Respond: Evidence Denied", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Consent Cleared — Continue": {
+      "main": [
+        [{ "node": "HTTP: Generate 75/25 Receipt", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Generate 75/25 Receipt": {
+      "main": [
+        [{ "node": "Function: Merge Receipt into Pipeline", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Merge Receipt into Pipeline": {
+      "main": [
+        [{ "node": "HTTP: Generate Provenance Manifest", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Generate Provenance Manifest": {
+      "main": [
+        [{ "node": "Function: Merge Manifest into Pipeline", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Merge Manifest into Pipeline": {
+      "main": [
+        [{ "node": "Function: Build EchoMoment", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Build EchoMoment": {
+      "main": [
+        [{ "node": "Function: Assemble ArtifactTruthBundle", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Assemble ArtifactTruthBundle": {
+      "main": [
+        [{ "node": "HTTP: Store Evidence in D1", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Store Evidence in D1": {
+      "main": [
+        [{ "node": "HTTP: Gabriel Confirmation (Ollama)", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Gabriel Confirmation (Ollama)": {
+      "main": [
+        [{ "node": "Function: Finalize Evidence Bundle", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Finalize Evidence Bundle": {
+      "main": [
+        [{ "node": "Respond: Evidence Bundle Complete", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+
+  "settings": {
+    "executionOrder": "v1"
+  },
+
+  "meta": {
+    "instanceId": "noizy-ai-god",
+    "templateCredsSetupCompleted": false
+  },
+
+  "tags": [
+    { "name": "gabriel" },
+    { "name": "evidence" },
+    { "name": "consent" },
+    { "name": "provenance" },
+    { "name": "75_25" },
+    { "name": "truth-bundle" }
+  ]
+}

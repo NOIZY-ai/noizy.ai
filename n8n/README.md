@@ -11,6 +11,7 @@ n8n is the **nervous system** and workflow orchestrator for the NOIZY consent in
 | **Echo Capture** | `workflows/echo-capture.json` | Creates `EchoMoment` records from narrative input -- origin stories, memories, techniques, rituals. Stores to D1 agent-memory and optionally notifies Discord. |
 | **Agent Router** | `workflows/agent-router.json` | CB01-style keyword dispatch. Classifies incoming messages and routes them to the correct agent via Ollama on GOD (M2 Ultra). Logs all routing decisions. |
 | **Provenance Signer** | `workflows/provenance-signer.json` | Generates `ProvenanceManifest` records with SHA-256 integrity hashes and placeholder Ed25519 signing. Seals the artifact truth chain. |
+| **Generate Evidence** | `workflows/generate-evidence.json` | **Gabriel-triggered master pipeline.** Orchestrates all sub-workflows into a single ArtifactTruthBundle: consent cascade → 75/25 receipt → provenance manifest → echo moment → truth strip → D1 storage → Gabriel confirmation via Ollama. 15 nodes, 8 stages. If consent is blocked, pipeline halts and returns evidence of denial. |
 
 ## Architecture
 
