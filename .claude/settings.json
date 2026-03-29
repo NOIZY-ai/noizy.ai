@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npx next *)",
+      "Bash(git *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(pwd)",
+      "Bash(wrangler *)",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(sudo *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "echo '╔══════════════════════════════════════════════════╗' && echo '║  NOIZYEMPIRE DREAMCHAMBER — SESSION ACTIVE        ║' && echo '║  Guardian of the Human Signal                     ║' && echo '║  Identity: rsp@noizy.ai                           ║' && echo '║  Doctrine: 75/25 Plowman Standard                ║' && echo '╚══════════════════════════════════════════════════╝' && echo '' && echo 'Five Laws:' && echo '  1. If it is not consented, it does not generate.' && echo '  2. If it is not attributable, it is not trusted.' && echo '  3. If it is not paid, it is not allowed.' && echo '  4. When in doubt, authority remains with the artist.' && echo '  5. Every use of your voice pays you. Forever.' && echo '' && echo 'GORUNFREE.'"
+      }
+    ]
+  }
+}
