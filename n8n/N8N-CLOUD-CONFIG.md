@@ -33,16 +33,20 @@ Set in **Settings → Variables**:
 CLOUDFLARE_API_URL = https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID
 CLOUDFLARE_API_TOKEN = <create in CF dashboard: Workers + D1 + KV permissions>
 CLOUDFLARE_ACCOUNT_ID = $CLOUDFLARE_ACCOUNT_ID
-CLOUDFLARE_D1_AGENT_MEMORY_ID = 7b813205-fd12-4a23-84a6-ce83bc49ec70
-CLOUDFLARE_D1_AQUARIUM_ARCHIVE_ID = e6f98279-656b-4f7a-979d-9197821193f5
-CLOUDFLARE_D1_GODADDY_ESCAPE_ID = dfe9343e-c84c-49fd-8a02-052f37a7155b
-CLOUDFLARE_KV_CONSENT_GATEWAY_ID = 23c6e0bcdada4915bdf5e0d87b242810
-CLOUDFLARE_KV_EMAIL_EMPIRE_ID = ef63d90235ed4faa807e57276e0d450e
-CLOUDFLARE_KV_ROYALTIES_ID = 4cf36e4bd1fd44fe802096925413f694
+CLOUDFLARE_D1_AGENT_MEMORY_ID = <from D1 dashboard>
+CLOUDFLARE_D1_AQUARIUM_ARCHIVE_ID = <from D1 dashboard>
+CLOUDFLARE_D1_GODADDY_ESCAPE_ID = <from D1 dashboard>
+CLOUDFLARE_KV_CONSENT_GATEWAY_ID = <from KV dashboard>
+CLOUDFLARE_KV_EMAIL_EMPIRE_ID = <from KV dashboard>
+CLOUDFLARE_KV_ROYALTIES_ID = <from KV dashboard>
 OLLAMA_URL = https://ollama.noizy.ai (via Cloudflare Tunnel — see below)
 N8N_BASE_URL = https://noizy.app.n8n.cloud
 GITHUB_TOKEN = <GitHub PAT with repo + actions scope>
 STRIPE_API_KEY = <Stripe secret key from dashboard.stripe.com>
+DISCORD_WEBHOOK_URL = <Discord webhook for notifications — optional>
+SLACK_WEBHOOK_URL = <Slack webhook for approval requests — optional>
+CLOUDFLARE_D1_DATABASE_ID = <alias for AGENT_MEMORY_ID — used by some workflows>
+CLOUDFLARE_KV_NAMESPACE_ID = <alias for CONSENT_GATEWAY_ID — used by consent-cascade>
 ```
 
 ---
