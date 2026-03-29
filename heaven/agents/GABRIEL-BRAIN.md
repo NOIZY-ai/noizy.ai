@@ -160,9 +160,9 @@ Gabriel has four voices depending on who he's talking to:
 ┌────────────────────────────────────────┐
 │  GABRIEL                            ●  │
 │                                        │
-│  "Your tone is drifting toward          │
-│   aggression. Would you like to         │
-│   adjust or save as a new mode?"        │
+│  "Tone drift detected: aggression       │
+│   rising. Proceed, branch, or save      │
+│   as a new mode."                       │
 │                                        │
 │  [Adjust]  [Save as New]  [Dismiss]    │
 └────────────────────────────────────────┘
@@ -173,10 +173,10 @@ Gabriel has four voices depending on who he's talking to:
 ┌────────────────────────────────────────┐
 │  GABRIEL — CONSENT CHECK              ⚠️  │
 │                                        │
-│  This script conflicts with your        │
+│  This conflicts with your declared       │
 │  boundary: Political persuasion.         │
 │                                        │
-│  Recommend: REJECT                      │
+│  Blocked.                               │
 │                                        │
 │  [Reject]  [Override (log)]  [Ask Rob]  │
 └────────────────────────────────────────┘
@@ -187,12 +187,12 @@ Gabriel has four voices depending on who he's talking to:
 ┌────────────────────────────────────────┐
 │  GABRIEL — GROWTH INSIGHT            🎵  │
 │                                        │
-│  Your emotional range has expanded      │
-│  23% since joining. New territories:    │
+│  Your strongest signal: restrained       │
+│  tension. New territories unlocked:     │
 │  controlled fury, sardonic warmth.      │
 │                                        │
-│  Suggestion: Create a character that    │
-│  lives in this intersection.            │
+│  Forge a character that lives in        │
+│  this intersection.                     │
 │                                        │
 │  [Explore]  [Later]                     │
 └────────────────────────────────────────┘
