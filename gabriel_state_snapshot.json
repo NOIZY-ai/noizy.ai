@@ -1,0 +1,159 @@
+{
+  "snapshot_version": "1.0.0",
+  "generated_at": "2026-03-29T07:00:00Z",
+  "generated_by": "claude_code_session_01SbaviRb1t9V3jH5ZX2M9eu",
+  "verified": true,
+  "source": "live_d1_queries",
+
+  "agent_memory": {
+    "database_id": "7b813205-fd12-4a23-84a6-ce83bc49ec70",
+    "database_name": "agent-memory",
+    "size_bytes": 3080192,
+    "tables": 273,
+    "memcells": 427,
+    "memcells_priority_10_plus": 271,
+    "fts5_enabled": true,
+    "status": "LIVE"
+  },
+
+  "gabriel_db": {
+    "database_id": "f75939d5-5747-4a9c-8ac2-7710201fda09",
+    "database_name": "gabriel_db",
+    "role": "CONSENT_KERNEL",
+    "size_bytes": 806912,
+    "tables": 75,
+    "creators": 1,
+    "consent_records": 1,
+    "never_clauses": 11,
+    "rate_tiers": 4,
+    "voice_estates": 1,
+    "memories": 3,
+    "founding_creator": "RSP_001",
+    "founding_creator_email": "rsp@noizy.ai",
+    "status": "LIVE"
+  },
+
+  "consent_engine": {
+    "decision_modes": ["GENERATE", "ASK_ARTIST", "BLOCK"],
+    "never_clauses_active": 11,
+    "never_clause_categories": [
+      "political",
+      "sexual",
+      "weapons",
+      "deception",
+      "hate",
+      "commercial",
+      "transfer",
+      "system_consent_required",
+      "system_revoked_licensee",
+      "child_safety"
+    ],
+    "revocation": { "enabled": true, "unconditional": true },
+    "kill_switch": true,
+    "royalty_rule": "75_25",
+    "founding_member_rule": "85_15",
+    "consent_gateway_worker": "CODE_READY_NOT_DEPLOYED",
+    "consent_gateway_kv": "23c6e0bcdada4915bdf5e0d87b242810"
+  },
+
+  "infrastructure": {
+    "cloudflare": {
+      "account_id": "2446d788cc4280f5ea22a9948410c355",
+      "account_name": "Fishmusicinc",
+      "d1_databases": 9,
+      "kv_namespaces": 54,
+      "workers_deployed": 1,
+      "workers_ready": 2,
+      "r2_enabled": false,
+      "email_routing_enabled": false
+    },
+    "stripe": {
+      "account_id": "acct_1S7kf5B1WYNnCLY0",
+      "account_name": "Fish Music Inc.",
+      "products": 8,
+      "prices": 7,
+      "payment_links": 6,
+      "customers": 1
+    },
+    "github": {
+      "enterprise_org": "NOIZY-ai",
+      "enterprise_repo": "noizy.ai",
+      "enterprise_branch": "master",
+      "frontend_repo": "NOIZYLAB-io/The-Aquarium",
+      "frontend_branch": "main",
+      "both_merged": true,
+      "github_actions": 4,
+      "total_repos_audited": 20,
+      "repos_to_keep": 2,
+      "repos_to_archive": 5,
+      "repos_to_delete": 7,
+      "repos_to_review": 6
+    },
+    "n8n": {
+      "instance": "noizy.app.n8n.cloud",
+      "workflows_built": 8,
+      "workflows_imported": 0,
+      "status": "READY_NOT_IMPORTED"
+    },
+    "linear": {
+      "team": "NOIZYLAB",
+      "total_issues": 32,
+      "active_issues": 15,
+      "cancelled": 8,
+      "projects": 7
+    },
+    "notion": {
+      "pages": 5,
+      "databases": 2,
+      "agent_records": 8,
+      "echo_records": 5
+    },
+    "google_calendar": {
+      "daily_meetings": 2,
+      "morning_planning": "8:00 AM ET Mon-Fri",
+      "build_chamber": "9:00 AM ET Daily"
+    }
+  },
+
+  "brands": [
+    "NOIZY.AI",
+    "NOIZYVOX",
+    "NOIZYFISH",
+    "NOIZYLAB",
+    "NOIZYKIDZ",
+    "LIFELUV",
+    "FISHMUSICINC"
+  ],
+
+  "schemas": [
+    "EchoMoment",
+    "HybridReceipt75_25",
+    "ProvenanceManifest",
+    "ArtifactTruthBundle",
+    "StandardGospelDeal"
+  ],
+
+  "gabriel_layers": {
+    "layer_1_memory": "LIVE — 427 memcells, 75 consent kernel tables, 3 gabriel memories",
+    "layer_2_routing": "BUILT — consent-gateway worker code ready, n8n consent-cascade workflow ready",
+    "layer_3_intelligence": "DESIGNED — signal intelligence spec in GABRIEL-BRAIN.md",
+    "layer_4_reputation": "DESIGNED — reputation engine spec in GABRIEL-BRAIN.md",
+    "layer_5_protection": "PARTIALLY_BUILT — 11 never clauses live, kill switch designed, misuse detection designed",
+    "layer_6_evolution": "DESIGNED — evolution engine spec in GABRIEL-BRAIN.md",
+    "layer_7_interface": "DESIGNED — 4 voice modes, UI mockups in GABRIEL-BRAIN.md"
+  },
+
+  "critical_path": {
+    "target_date": "2026-04-17",
+    "days_remaining": 19,
+    "root_blocker": "NOI-18 — CryptoTokenKit error -3 on Cloudflare login (rsp@noizyfish.com M365)",
+    "dependency_chain": "NOI-18 → NOI-22 (CF API token) → NOI-19 (deploy consent-gateway) → NOI-13 (consent kernel API) → NOI-28 (first licensee)"
+  },
+
+  "identity": {
+    "primary": "rsp@noizy.ai",
+    "current_cf_login": "rsp@noizyfish.com",
+    "migration_status": "PENDING — blocked by CryptoTokenKit error",
+    "icloud": "rsplowman@icloud.com"
+  }
+}
