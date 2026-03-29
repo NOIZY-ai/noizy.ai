@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-03-29T07:30:00Z",
+  "root": "/docs/noizyempire",
+  "documents": [
+    {
+      "id": "canon",
+      "file": "CANON.md",
+      "priority": 1,
+      "visibility": "internal",
+      "description": "The top-level truth source. What NOIZY is."
+    },
+    {
+      "id": "doctrine",
+      "file": "DOCTRINE.md",
+      "priority": 2,
+      "visibility": "internal",
+      "description": "The principles that govern everything we build."
+    },
+    {
+      "id": "architecture",
+      "file": "ARCHITECTURE.md",
+      "priority": 3,
+      "visibility": "internal",
+      "description": "System map: what exists, how it connects, where it runs."
+    },
+    {
+      "id": "gabriel_core",
+      "file": "GABRIEL_CORE.md",
+      "priority": 4,
+      "visibility": "internal",
+      "description": "Gabriel role, decision contract, state model, memory spine."
+    },
+    {
+      "id": "dreamchamber_flow",
+      "file": "DREAMCHAMBER_FLOW.md",
+      "priority": 5,
+      "visibility": "internal",
+      "description": "Creation journey, approval journey, guidance moments."
+    },
+    {
+      "id": "economics",
+      "file": "ECONOMICS.md",
+      "priority": 6,
+      "visibility": "internal_restricted",
+      "description": "Default split, override handling, estate routing. RESTRICTED."
+    },
+    {
+      "id": "security",
+      "file": "SECURITY.md",
+      "priority": 7,
+      "visibility": "internal_restricted",
+      "description": "Consent gate, never clauses, provenance, SonarQube policy."
+    },
+    {
+      "id": "release_checklist",
+      "file": "RELEASE_CHECKLIST.md",
+      "priority": 8,
+      "visibility": "internal",
+      "description": "The auditable release artifact."
+    }
+  ]
+}
