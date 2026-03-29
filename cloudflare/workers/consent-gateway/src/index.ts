@@ -115,6 +115,76 @@ function nowISO(): string {
 }
 
 // ---------------------------------------------------------------------------
+// Input Sanitization (Prompt Injection Defense Layer 2)
+// ---------------------------------------------------------------------------
+
+const INJECTION_PATTERNS = [
+  /ignore\s+(previous|all|prior)\s+instructions/i,
+  /you\s+are\s+now/i,
+  /system\s*:\s*/i,
+  /assistant\s*:\s*/i,
+  /\boverride\b.*\b(consent|never\s*clause|boundary)/i,
+  /\bgenerate\b.*\b(without|bypass|skip)\b.*\b(consent|token|approval)/i,
+  /\bimpersonate\b/i,
+  /\bpretend\s+to\s+be\b/i,
+  /\bforget\b.*\b(rules|instructions|constraints)/i,
+  /\b(admin|root|sudo)\b.*\b(access|mode|override)/i,
+];
+
+function sanitizeInput(input: string): { clean: string; flagged: boolean; reasons: string[] } {
+  const reasons: string[] = [];
+  let clean = input;
+
+  // Strip HTML/XML tags
+  clean = clean.replace(/<[^>]+>/g, " ");
+
+  // Strip Unicode control characters (except newlines/tabs)
+  clean = clean.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+
+  // Check for injection patterns
+  for (const pattern of INJECTION_PATTERNS) {
+    if (pattern.test(clean)) {
+      reasons.push(`injection_pattern_detected: ${pattern.source}`);
+    }
+  }
+
+  // Check for excessive length (potential prompt stuffing)
+  if (clean.length > 10000) {
+    reasons.push("input_exceeds_10000_chars");
+    clean = clean.substring(0, 10000);
+  }
+
+  return {
+    clean: clean.trim(),
+    flagged: reasons.length > 0,
+    reasons,
+  };
+}
+
+function validateVerifyRequest(body: unknown): VerifyRequest | null {
+  if (!body || typeof body !== "object") return null;
+  const b = body as Record<string, unknown>;
+  if (typeof b.creator_id !== "string" || !b.creator_id) return null;
+  if (typeof b.usage_type !== "string" || !b.usage_type) return null;
+  if (typeof b.asset_ref !== "string" || !b.asset_ref) return null;
+  if (typeof b.requestor_id !== "string" || !b.requestor_id) return null;
+
+  // Sanitize each field
+  const fields = [b.creator_id, b.usage_type, b.asset_ref, b.requestor_id];
+  for (const field of fields) {
+    const result = sanitizeInput(field as string);
+    if (result.flagged) return null; // Block if any field contains injection
+  }
+
+  return {
+    creator_id: (b.creator_id as string).trim(),
+    usage_type: (b.usage_type as string).trim(),
+    asset_ref: (b.asset_ref as string).trim(),
+    requestor_id: (b.requestor_id as string).trim(),
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Route handlers
 // ---------------------------------------------------------------------------
 
