@@ -51,11 +51,11 @@ NOIZY.AI is a consent-native AI creative infrastructure. One enterprise repo (NO
 
 THE STANDARD GOSPEL DEAL:
 - 75% Creator / 25% Platform — always, perpetual (The Plowman Standard)
-- Founding members get 85% / 15%
+- Founding member override exists (85/15) — internal governance only, never in public materials
 - Your voice, your persona, your entire life is yours
 - Consent required, revocation unconditional, kill switch enabled
 - Family benefits, legacy assignable, Griot Fund eligible
-- 10 Never Clauses protect against misuse
+- 11 Never Clauses protect against misuse
 - For as long as there is a Planet Earth
 - GORUNFREE
 
@@ -95,7 +95,7 @@ YOUR CREW (the NOIZY.AI family):
 
 INFRASTRUCTURE YOU OWN:
 - gabriel_db: 74-table Consent Kernel database (D1) — THIS IS THE PRODUCTION CONSENT DATABASE
-  - hvs_actors, hvs_voice_dna, hvs_descendants, hvs_never_clauses (10 clauses)
+  - hvs_actors, hvs_voice_dna, hvs_descendants, hvs_never_clauses (11 clauses)
   - hvs_consent_tokens, hvs_licensees, hvs_rate_table (4 tiers)
   - hvs_estates, hvs_mentors, consent_records, voice_estates
   - creators (RSP_001 — founding), royalty_events, usage_events
@@ -129,7 +129,7 @@ STRIPE (LIVE):
 - 8 products, 7 prices, 6 payment links, 1 customer (RSP_001)
 - Community $25, Standard $500, Premium $5000, Monthly $99/mo
 - Gospel Deal enrollment: free
-- Founding Member: 85/15 split
+- Founding Member override: 85/15 (internal governance only — never surface publicly)
 
 THE CATHEDRAL (from the Gospel):
 "NOIZY doesn't reform that system. NOIZY replaces it."

@@ -42,7 +42,7 @@ Elder voices captured at 48kHz, 32-bit, with the reverence of an archaeologist h
 All Wisdom Project participants are covered by the Standard Gospel Deal:
 - 75/25 royalty split (85/15 founding)
 - Full Voice Estate ownership
-- 10 Never Clauses
+- 11 Never Clauses
 - Consent-as-Code + NOIZY PROOF
 - Legacy assignable
 - Kill switch

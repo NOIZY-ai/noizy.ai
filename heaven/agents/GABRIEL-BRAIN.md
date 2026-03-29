@@ -54,7 +54,7 @@ Input → Script → Context Analysis → Artist Rules → Decision
 
 **Gabriel enforces:**
 - Allowed uses (per consent record)
-- Blocked uses (10 Never Clauses + artist personal boundaries)
+- Blocked uses (11 Never Clauses + artist personal boundaries)
 - Conditional approvals (scope-limited, time-limited)
 - Kill switch logic (unconditional revocation, immediate)
 - 75/25 royalty routing (every use generates a receipt)
