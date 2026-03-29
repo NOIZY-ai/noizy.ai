@@ -1,0 +1,179 @@
+{
+  "name": "NOIZY Deploy Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "deploy-orchestrator",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "do-webhook",
+      "name": "Webhook: Deploy Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "notes": "Trigger deployments via POST. Expects: { target: 'consent-gateway' | 'cb01-router' | 'aquarium' | 'all', branch: 'main' | 'claude/code-review-hf5hD' }"
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.body.target}}",
+              "operation": "equals",
+              "value2": "aquarium"
+            }
+          ]
+        }
+      },
+      "id": "do-is-aquarium",
+      "name": "IF: Aquarium Deploy?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [480, 300]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.github.com/repos/NOIZY-ai/noizy.ai/actions/workflows/deploy-all-workers.yml/dispatches",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "ref", "value": "={{$json.body.branch || 'main'}}" },
+            { "name": "inputs", "value": "={{JSON.stringify({worker: $json.body.target || 'all'})}}" }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{$env.GITHUB_TOKEN}}" },
+            { "name": "Accept", "value": "application/vnd.github.v3+json" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "do-trigger-cf-deploy",
+      "name": "HTTP: Trigger Cloudflare Workers Deploy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [720, 200],
+      "notes": "Triggers the GitHub Action that deploys Cloudflare Workers via wrangler"
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.github.com/repos/NOIZYLAB-io/The-Aquarium/actions/workflows/deploy-vercel.yml/dispatches",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "ref", "value": "={{$json.body.branch || 'main'}}" }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{$env.GITHUB_TOKEN}}" },
+            { "name": "Accept", "value": "application/vnd.github.v3+json" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "do-trigger-vercel-deploy",
+      "name": "HTTP: Trigger Vercel Deploy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [720, 450],
+      "notes": "Triggers the GitHub Action that deploys The Aquarium to Vercel"
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// Log the deployment to D1\nconst target = $json.body?.target || 'unknown';\nconst branch = $json.body?.branch || 'main';\nconst timestamp = new Date().toISOString();\n\nreturn [{\n  json: {\n    status: 'triggered',\n    target: target,\n    branch: branch,\n    triggered_at: timestamp,\n    message: `Deployment triggered for ${target} from branch ${branch}. GitHub Actions will handle the actual deploy.`,\n    next_steps: [\n      'GitHub Action runs wrangler deploy (Cloudflare) or vercel deploy (Vercel)',\n      'Check GitHub Actions tab for deployment status',\n      'Workers appear at consent-gateway.noizy.ai and cb01-router.noizy.ai',\n      'The Aquarium appears at the Vercel URL'\n    ]\n  }\n}];"
+      },
+      "id": "do-response-cf",
+      "name": "Function: CF Deploy Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [960, 200]
+    },
+
+    {
+      "parameters": {
+        "functionCode": "const timestamp = new Date().toISOString();\nreturn [{\n  json: {\n    status: 'triggered',\n    target: 'aquarium',\n    branch: $json.body?.branch || 'main',\n    triggered_at: timestamp,\n    message: 'Vercel deployment triggered for The Aquarium. Check GitHub Actions for status.',\n    url: 'https://the-aquarium.vercel.app'\n  }\n}];"
+      },
+      "id": "do-response-vercel",
+      "name": "Function: Vercel Deploy Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [960, 450]
+    },
+
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($json)}}"
+      },
+      "id": "do-respond-cf",
+      "name": "Respond: CF Deploy Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 200]
+    },
+
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($json)}}"
+      },
+      "id": "do-respond-vercel",
+      "name": "Respond: Vercel Deploy Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 450]
+    }
+  ],
+
+  "connections": {
+    "Webhook: Deploy Request": {
+      "main": [
+        [{ "node": "IF: Aquarium Deploy?", "type": "main", "index": 0 }]
+      ]
+    },
+    "IF: Aquarium Deploy?": {
+      "main": [
+        [{ "node": "HTTP: Trigger Vercel Deploy", "type": "main", "index": 0 }],
+        [{ "node": "HTTP: Trigger Cloudflare Workers Deploy", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Trigger Cloudflare Workers Deploy": {
+      "main": [
+        [{ "node": "Function: CF Deploy Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Trigger Vercel Deploy": {
+      "main": [
+        [{ "node": "Function: Vercel Deploy Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: CF Deploy Response": {
+      "main": [
+        [{ "node": "Respond: CF Deploy Status", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Vercel Deploy Response": {
+      "main": [
+        [{ "node": "Respond: Vercel Deploy Status", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "noizy-ai-god" },
+  "tags": [{ "name": "deploy" }, { "name": "ci-cd" }, { "name": "vercel" }, { "name": "cloudflare" }]
+}

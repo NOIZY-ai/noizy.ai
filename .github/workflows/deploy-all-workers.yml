@@ -1,0 +1,51 @@
+name: Deploy All Workers
+
+on:
+  workflow_dispatch:
+    inputs:
+      worker:
+        description: 'Which worker to deploy (all, consent-gateway, cb01-router)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - consent-gateway
+          - cb01-router
+
+jobs:
+  consent-gateway:
+    if: ${{ github.event.inputs.worker == 'all' || github.event.inputs.worker == 'consent-gateway' }}
+    runs-on: ubuntu-latest
+    name: Deploy Consent Gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - working-directory: cloudflare/workers/consent-gateway
+        run: npm install
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare/workers/consent-gateway
+          command: deploy
+
+  cb01-router:
+    if: ${{ github.event.inputs.worker == 'all' || github.event.inputs.worker == 'cb01-router' }}
+    runs-on: ubuntu-latest
+    name: Deploy CB01 Router
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - working-directory: cloudflare/workers/cb01-router
+        run: npm install
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare/workers/cb01-router
+          command: deploy

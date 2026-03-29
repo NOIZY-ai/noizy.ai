@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizy.ai/schemas/EchoMoment.schema.json",
+  "title": "EchoMoment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "echo_id",
+    "moment_type",
+    "title",
+    "created_at",
+    "creator",
+    "sovereignty",
+    "links"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+
+    "echo_id": { "type": "string", "description": "Stable ID for the EchoMoment." },
+
+    "moment_type": {
+      "type": "string",
+      "enum": [
+        "origin",
+        "memory",
+        "artifact",
+        "lesson",
+        "technique",
+        "performance",
+        "place",
+        "people",
+        "ritual"
+      ],
+      "description": "What kind of echo this is."
+    },
+
+    "title": { "type": "string", "minLength": 1 },
+    "subtitle": { "type": "string" },
+    "narrative": { "type": "string", "description": "Human story of the moment (non-legal, non-technical)." },
+
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+
+    "creator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor_id", "display_name"],
+      "properties": {
+        "actor_id": { "type": "string" },
+        "display_name": { "type": "string" },
+        "brand_home": {
+          "type": "string",
+          "enum": ["NOIZY", "NOIZYVOX", "NOIZYFISH", "NOIZYLAB", "NOIZYKIDZ", "LIFELUV", "FISHMUSICINC"]
+        }
+      }
+    },
+
+    "sovereignty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consent_required", "provenance_required", "receipt_required"],
+      "properties": {
+        "consent_required": { "type": "boolean", "const": true },
+        "provenance_required": { "type": "boolean", "const": true },
+        "receipt_required": { "type": "boolean", "const": true },
+        "never_clause_classes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Classes that must be hard-blocked by policy (names are system-defined)."
+        }
+      }
+    },
+
+    "sensory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "mood": { "type": "array", "items": { "type": "string" } },
+        "culture_context": { "type": "string", "description": "Optional respectful context about cultural lineage." }
+      }
+    },
+
+    "accessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "deaf_hh_ready": { "type": "boolean" },
+        "low_sensory_ready": { "type": "boolean" },
+        "haptic_mapping_ref": { "type": "string", "description": "Pointer to a haptic mapping preset (if applicable)." },
+        "captions_transcript_ref": { "type": "string" }
+      }
+    },
+
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_ids", "manifest_ids", "receipt_ids", "memcell_ids"],
+      "properties": {
+        "artifact_ids": { "type": "array", "items": { "type": "string" } },
+        "manifest_ids": { "type": "array", "items": { "type": "string" } },
+        "receipt_ids": { "type": "array", "items": { "type": "string" } },
+        "memcell_ids": { "type": "array", "items": { "type": "string" } },
+
+        "origin_engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "prompt_id": { "type": "string" },
+            "questions": { "type": "array", "items": { "type": "string" } },
+            "answers_ref": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parent_echo_id": { "type": "string" },
+        "lineage_hash": { "type": "string", "description": "Hash pointer to canonical lineage state." }
+      }
+    }
+  }
+}

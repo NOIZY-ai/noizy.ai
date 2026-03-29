@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "echo_id": "echo_00000005-synapse-created",
+  "moment_type": "ritual",
+  "title": "The Synapse Goes Live — Google Meet Build Chamber",
+  "subtitle": "Three devices, one meeting, daily at 9AM",
+  "narrative": "The Dream Chamber became real infrastructure. A daily recurring Google Meet — the NOIZYEMPIRE Build Chamber — starting tomorrow at 9AM Toronto time. Three devices join the same call: iPhone 15 Pro Max is THE VOICE (mic, Claude MAX, walks with Robert). iPad 12.9 Gen 2 is THE APERTURE (captions, screen share view, touch control). M2 Ultra Mac Studio is GOD (VS Code Insiders with Claude Code + Gemini Code Assist, Ollama running all 8 agents, n8n orchestrating workflows, terminal for git and deploys). Google Meet replaces Teams. No M365 dependency. No GoDaddy chain. Every session recorded to Google Drive. Every word carries consent. Every artifact carries proof. The stack flows: Robert speaks into iPhone → Meet captures audio + live captions → iPad shows transcript in real-time → Claude formats the instruction → GOD executes via VS Code/n8n/Ollama → screen share shows progress on iPad → n8n triggers consent cascade + receipts + provenance → Cloudflare stores the truth → The Aquarium on Vercel updates the cockpit → iPad shows the result → Robert speaks the next instruction. The 5th Epoch builds here.",
+  "created_at": "2026-03-28T06:00:00Z",
+  "creator": { "actor_id": "RSP_001", "display_name": "Rob Plowman", "brand_home": "NOIZY" },
+  "sovereignty": {
+    "consent_required": true,
+    "provenance_required": true,
+    "receipt_required": true,
+    "never_clause_classes": ["nsfw", "political_persuasion", "medical_advice", "sublicense"]
+  },
+  "sensory": {
+    "tags": ["google-meet", "synapse", "build-chamber", "daily-ritual", "three-devices", "iPhone", "iPad", "GOD", "voice-first", "live-captions", "screen-share", "5th-epoch"],
+    "mood": ["operational", "sacred", "resolute", "alive"],
+    "culture_context": "The moment the Dream Chamber became a calendar event. Poetry became infrastructure became a daily 9AM meeting. Three devices, one human, eight agents, and consent flowing through every synapse."
+  },
+  "accessibility": { "deaf_hh_ready": true, "low_sensory_ready": true },
+  "links": {
+    "artifact_ids": [],
+    "manifest_ids": [],
+    "receipt_ids": [],
+    "memcell_ids": ["mem_005"],
+    "origin_engine": {
+      "prompt_id": "dream_chamber_session_001",
+      "questions": ["How would you use Google Meet with my M2Ultra MacStudio & my iPhone 15ProMax & iPad 2nd Gen & Claude MAX Account, n8n, & Vercel?"],
+      "answers_ref": "echo_00000004-email-empire-launch"
+    }
+  },
+  "lineage": {
+    "parent_echo_id": "echo_00000004-email-empire-launch",
+    "lineage_hash": "sha256:synapse_created_v1"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "echo_id": "echo_9f5d2d1c-0c6f-4fbb-8c4b-9e0c2b2c1a11",
+  "moment_type": "memory",
+  "title": "Thunderstorm Dinner in the Valley",
+  "subtitle": "Cheese, darkness, and the sound of weather",
+  "narrative": "The power went out. We ate by storm light. The valley sounded like a slow drum. I remember being held by the world, not rushed by it.",
+  "created_at": "2026-03-28T00:22:10Z",
+  "creator": { "actor_id": "RSP_001", "display_name": "Rob Plowman", "brand_home": "NOIZYFISH" },
+  "sovereignty": { "consent_required": true, "provenance_required": true, "receipt_required": true, "never_clause_classes": ["nsfw", "political_persuasion", "medical_advice", "sublicense"] },
+  "sensory": { "tags": ["storm", "valley", "cheese", "silence"], "mood": ["calm", "awe"] },
+  "accessibility": { "deaf_hh_ready": true, "low_sensory_ready": true },
+  "links": {
+    "artifact_ids": ["art_4a2f..."],
+    "manifest_ids": ["man_2b11..."],
+    "receipt_ids": ["rcpt_aa91..."],
+    "memcell_ids": ["mem_316"]
+  },
+  "lineage": { "parent_echo_id": "echo_root", "lineage_hash": "sha256:4d1c..." }
+}

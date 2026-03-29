@@ -1,0 +1,160 @@
+{
+  "name": "Git Repair Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "git-repair",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "gr-webhook",
+      "name": "Webhook: Git Repair Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "notes": "Trigger git repair. POST { mode: 'dry-run' | 'apply', roots: ['/Volumes/ARCHIVE1', ...], device: 'GOD' }"
+    },
+
+    {
+      "parameters": {
+        "functionCode": "// Validate request and prepare SSH command\nconst body = $json.body || {};\nconst mode = body.mode || 'dry-run';\nconst roots = body.roots || ['/Users/m2ultra', '/Volumes/GOD_PRIMARY', '/Volumes/ARCHIVE1', '/Volumes/ARCHIVE2'];\nconst device = body.device || 'GOD';\nconst timestamp = new Date().toISOString();\n\nconst rootsArg = roots.join(',');\nconst applyFlag = mode === 'apply' ? '--apply' : '';\nconst command = `cd ~/noizy.ai && ./tools/claudecode-git-repair.sh --roots ${rootsArg} ${applyFlag}`;\n\nreturn [{\n  json: {\n    mode,\n    device,\n    roots,\n    command,\n    timestamp,\n    status: 'prepared'\n  }\n}];"
+      },
+      "id": "gr-prepare",
+      "name": "Function: Prepare Repair Command",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [480, 300]
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.mode}}",
+              "operation": "equals",
+              "value2": "apply"
+            }
+          ]
+        }
+      },
+      "id": "gr-check-mode",
+      "name": "IF: Apply Mode?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [720, 300]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SLACK_WEBHOOK_URL}}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=:warning: *GIT REPAIR — APPROVAL REQUIRED*\n\nMode: `apply` (will modify repos)\nDevice: {{$json.device}}\nRoots: {{$json.roots.join(', ')}}\nCommand: `{{$json.command}}`\n\nBackups will be created before any repair.\n\nReply :white_check_mark: to approve or :x: to cancel."
+            }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "gr-slack-approval",
+      "name": "HTTP: Slack Approval Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [960, 200],
+      "continueOnFail": true,
+      "notes": "Posts approval request to Slack before running --apply mode. Manual approval required."
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_URL}}/api/chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "gabriel" },
+            { "name": "stream", "value": "false" },
+            {
+              "name": "messages",
+              "value": "={{JSON.stringify([{role: 'system', content: 'You are GABRIEL. A git repair scan is about to run. Acknowledge it briefly and musically.'}, {role: 'user', content: 'Git repair ' + $json.mode + ' mode on ' + $json.device + '. Scanning: ' + $json.roots.join(', ')}])}}"
+            }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "gr-gabriel-ack",
+      "name": "HTTP: Gabriel Acknowledges",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [960, 450],
+      "continueOnFail": true,
+      "notes": "Gabriel acknowledges the dry-run scan. Non-blocking."
+    },
+
+    {
+      "parameters": {
+        "functionCode": "const data = $json;\nconst gabrielSays = data.message?.content || 'Gabriel offline.';\n\nreturn [{\n  json: {\n    status: data.mode === 'apply' ? 'approval_requested' : 'dry_run_ready',\n    mode: data.mode,\n    device: data.device,\n    command: data.command,\n    roots: data.roots,\n    gabriel_says: gabrielSays,\n    message: data.mode === 'apply' \n      ? 'Approval posted to Slack. Run the command on GOD after approval.'\n      : 'Dry-run command ready. Run on GOD to see diagnostics without changes.',\n    next_step: `SSH into ${data.device} and run: ${data.command}`\n  }\n}];"
+      },
+      "id": "gr-response",
+      "name": "Function: Build Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    },
+
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($json)}}"
+      },
+      "id": "gr-respond",
+      "name": "Respond: Repair Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1440, 300]
+    }
+  ],
+
+  "connections": {
+    "Webhook: Git Repair Request": {
+      "main": [
+        [{ "node": "Function: Prepare Repair Command", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Prepare Repair Command": {
+      "main": [
+        [{ "node": "IF: Apply Mode?", "type": "main", "index": 0 }]
+      ]
+    },
+    "IF: Apply Mode?": {
+      "main": [
+        [{ "node": "HTTP: Slack Approval Request", "type": "main", "index": 0 }],
+        [{ "node": "HTTP: Gabriel Acknowledges", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Slack Approval Request": {
+      "main": [
+        [{ "node": "Function: Build Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP: Gabriel Acknowledges": {
+      "main": [
+        [{ "node": "Function: Build Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "Function: Build Response": {
+      "main": [
+        [{ "node": "Respond: Repair Status", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "noizy-ai-god" },
+  "tags": [{ "name": "git" }, { "name": "repair" }, { "name": "archive" }, { "name": "ops" }]
+}
