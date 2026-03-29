@@ -25,3 +25,11 @@ Make love rise. Make poop sink. Every system has gravity. NOIZY inverts it.
 
 ## 8. The 5th Epoch
 Creation becomes sovereign. The creator profits. Finally. Forever. By design.
+
+## 9. The Three Laws
+If it is not consented, it does not generate.
+If it is not attributable, it is not trusted.
+If it is not paid, it is not allowed.
+
+## 10. The Identity Rule
+Artists are not users. Artists are the infrastructure.
