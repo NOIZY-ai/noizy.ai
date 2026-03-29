@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "deal_id": "gospel_RSP_001_founding",
+  "created_at": "2026-03-28T08:00:00Z",
+
+  "creator": {
+    "actor_id": "RSP_001",
+    "display_name": "Robert Stephen Plowman",
+    "creator_type": ["artist", "producer", "engineer", "composer", "mentor", "griot"],
+    "brand_home": "NOIZY"
+  },
+
+  "creator_type": ["artist", "producer", "engineer", "composer", "mentor", "griot"],
+
+  "brands": ["NOIZY.AI", "NOIZYVOX", "NOIZYFISH", "NOIZYLAB", "NOIZYKIDZ", "LIFELUV", "FISHMUSICINC"],
+
+  "sovereignty": {
+    "voice_is_yours": true,
+    "persona_is_yours": true,
+    "life_is_yours": true,
+    "you_choose_usage": true,
+    "consent_required": true,
+    "revocation_unconditional": true,
+    "kill_switch": true,
+    "encouraged_to_monetize": true,
+    "never_harvested": true,
+    "prohibited_uses": ["nsfw", "political_persuasion", "medical_advice", "sublicense", "deepfake_impersonation", "hate_speech", "unauthorized_cloning", "weapons_advocacy"]
+  },
+
+  "economics": {
+    "royalty_rule": "75_25",
+    "artist_percent": 0.75,
+    "platform_percent": 0.25,
+    "family_benefits": true,
+    "perpetual": true,
+    "currency": "CAD",
+    "settlement": "same_day"
+  },
+
+  "legacy": {
+    "after_death_assignable": true,
+    "after_death_options": ["assign_to_family", "commit_to_noizy_griot_fund"],
+    "beneficiaries": [],
+    "griot_fund_commitment": 0.25
+  },
+
+  "manifesto": {
+    "declaration": "NOIZY.AI knows that your voice, your persona, your entire life is yours. You get to choose how it's used. You should be allowed and encouraged to monetize anything you are able to create with your body, mind, and spirit.",
+    "mission": "To counteract the speed of the dread that is destroying the entertainment industry, and to protect the careers of millions of creators who are being harvested and absorbed — by building systems, services, applications, and digital products that help and work with humans to create anything that can increase the standard of any living soul.",
+    "promise": "In our DreamChambers, you and your family will benefit from your complete talent offering for as long as there is a Planet Earth. And when you die, you can assign your credits and tokens to anyone you want, or commit them back to NOIZY.AI for future aspiring Griots.",
+    "closing": "GORUNFREE"
+  },
+
+  "signatures": [
+    {
+      "signer_id": "RSP_001",
+      "signer_name": "Robert Stephen Plowman",
+      "role": "creator",
+      "signed_at": "2026-03-28T08:00:00Z",
+      "signature_ref": "founding_gospel_rsp001"
+    },
+    {
+      "signer_id": "NOIZY_PLATFORM",
+      "signer_name": "NOIZY.AI / Fishmusicinc",
+      "role": "platform",
+      "signed_at": "2026-03-28T08:00:00Z",
+      "signature_ref": "founding_gospel_platform"
+    }
+  ]
+}

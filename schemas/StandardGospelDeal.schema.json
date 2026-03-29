@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizy.ai/schemas/StandardGospelDeal.schema.json",
+  "title": "StandardGospelDeal",
+  "description": "The universal agreement that governs every creator relationship across all NOIZY brands. Your voice, your persona, your entire life is yours. You choose how it's used. You and your family benefit for as long as there is a Planet Earth.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "deal_id",
+    "created_at",
+    "creator",
+    "creator_type",
+    "brands",
+    "sovereignty",
+    "economics",
+    "legacy",
+    "manifesto"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "deal_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+
+    "creator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor_id", "display_name", "creator_type"],
+      "properties": {
+        "actor_id": { "type": "string" },
+        "display_name": { "type": "string" },
+        "creator_type": { "$ref": "#/properties/creator_type" },
+        "brand_home": {
+          "type": "string",
+          "enum": ["NOIZY", "NOIZYVOX", "NOIZYFISH", "NOIZYLAB", "NOIZYKIDZ", "LIFELUV", "FISHMUSICINC"]
+        }
+      }
+    },
+
+    "creator_type": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "artist",
+          "teacher",
+          "mentor",
+          "guide",
+          "author",
+          "composer",
+          "voice_actor",
+          "performance_actor",
+          "musician",
+          "producer",
+          "engineer",
+          "designer",
+          "animator",
+          "filmmaker",
+          "podcaster",
+          "griot",
+          "other"
+        ]
+      },
+      "description": "Every kind of creator who joins the movement."
+    },
+
+    "brands": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["NOIZY.AI", "NOIZYVOX", "NOIZYFISH", "NOIZYLAB", "NOIZYKIDZ", "LIFELUV", "FISHMUSICINC"]
+      },
+      "description": "All NOIZY brands this deal applies to. Standard Gospel Deal covers all brands."
+    },
+
+    "sovereignty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "voice_is_yours",
+        "persona_is_yours",
+        "life_is_yours",
+        "you_choose_usage",
+        "consent_required",
+        "revocation_unconditional",
+        "kill_switch"
+      ],
+      "properties": {
+        "voice_is_yours": { "type": "boolean", "const": true },
+        "persona_is_yours": { "type": "boolean", "const": true },
+        "life_is_yours": { "type": "boolean", "const": true },
+        "you_choose_usage": { "type": "boolean", "const": true },
+        "consent_required": { "type": "boolean", "const": true },
+        "revocation_unconditional": { "type": "boolean", "const": true },
+        "kill_switch": { "type": "boolean", "const": true },
+        "encouraged_to_monetize": {
+          "type": "boolean",
+          "const": true,
+          "description": "You should be allowed AND encouraged to monetize anything you create with body, mind & spirit."
+        },
+        "never_harvested": {
+          "type": "boolean",
+          "const": true,
+          "description": "Your work is never harvested, absorbed, or consumed without your explicit consent."
+        },
+        "prohibited_uses": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Uses the creator has explicitly blocked."
+        }
+      }
+    },
+
+    "economics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["royalty_rule", "artist_percent", "platform_percent", "family_benefits", "perpetual"],
+      "properties": {
+        "royalty_rule": { "type": "string", "const": "75_25" },
+        "artist_percent": { "type": "number", "const": 0.75 },
+        "platform_percent": { "type": "number", "const": 0.25 },
+        "family_benefits": {
+          "type": "boolean",
+          "const": true,
+          "description": "In our DreamChambers, you AND your family benefit from your complete talent offering."
+        },
+        "perpetual": {
+          "type": "boolean",
+          "const": true,
+          "description": "For as long as there is a Planet Earth."
+        },
+        "currency": { "type": "string", "default": "CAD" },
+        "settlement": {
+          "type": "string",
+          "enum": ["same_day", "weekly", "monthly"],
+          "default": "same_day"
+        }
+      }
+    },
+
+    "legacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["after_death_assignable", "after_death_options"],
+      "properties": {
+        "after_death_assignable": {
+          "type": "boolean",
+          "const": true,
+          "description": "When you die, you can assign your credits & tokens to anyone you want."
+        },
+        "after_death_options": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "assign_to_family",
+              "assign_to_individual",
+              "assign_to_organization",
+              "commit_to_noizy_griot_fund",
+              "split_custom"
+            ]
+          },
+          "description": "Options for legacy disposition. 'commit_to_noizy_griot_fund' returns credits to NOIZY.AI for future aspiring Griots."
+        },
+        "beneficiaries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "relationship": { "type": "string" },
+              "share": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "griot_fund_commitment": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Percentage of legacy credits committed back to the Griot Fund for future creators."
+        }
+      }
+    },
+
+    "manifesto": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["declaration", "mission"],
+      "properties": {
+        "declaration": {
+          "type": "string",
+          "const": "NOIZY.AI knows that your voice, your persona, your entire life is yours. You get to choose how it's used. You should be allowed and encouraged to monetize anything you are able to create with your body, mind, and spirit."
+        },
+        "mission": {
+          "type": "string",
+          "const": "To counteract the speed of the dread that is destroying the entertainment industry, and to protect the careers of millions of creators who are being harvested and absorbed — by building systems, services, applications, and digital products that help and work with humans to create anything that can increase the standard of any living soul."
+        },
+        "promise": {
+          "type": "string",
+          "const": "In our DreamChambers, you and your family will benefit from your complete talent offering for as long as there is a Planet Earth. And when you die, you can assign your credits and tokens to anyone you want, or commit them back to NOIZY.AI for future aspiring Griots."
+        },
+        "closing": {
+          "type": "string",
+          "const": "GORUNFREE"
+        }
+      }
+    },
+
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "signer_id": { "type": "string" },
+          "signer_name": { "type": "string" },
+          "role": { "type": "string", "enum": ["creator", "platform", "witness"] },
+          "signed_at": { "type": "string", "format": "date-time" },
+          "signature_ref": { "type": "string" }
+        }
+      }
+    }
+  }
+}
