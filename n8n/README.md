@@ -13,6 +13,7 @@ n8n is the **nervous system** and workflow orchestrator for the NOIZY consent in
 | **Provenance Signer** | `workflows/provenance-signer.json` | Generates `ProvenanceManifest` records with SHA-256 integrity hashes and placeholder Ed25519 signing. Seals the artifact truth chain. |
 | **Generate Evidence** | `workflows/generate-evidence.json` | **Gabriel-triggered master pipeline.** Orchestrates all sub-workflows into a single ArtifactTruthBundle: consent cascade → 75/25 receipt → provenance manifest → echo moment → truth strip → D1 storage → Gabriel confirmation via Ollama. 15 nodes, 8 stages. If consent is blocked, pipeline halts and returns evidence of denial. |
 | **Deploy Orchestrator** | `workflows/deploy-orchestrator.json` | **CI/CD trigger.** POST with target (consent-gateway, cb01-router, aquarium, all) to trigger GitHub Actions deployments. Cloudflare Workers deploy via wrangler, The Aquarium deploys to Vercel. n8n becomes the deployment control plane. |
+| **Git Repair Orchestrator** | `workflows/git-repair-orchestrator.json` | **Repo health ops.** POST with mode (dry-run/apply), roots, and device. Dry-run: prepares command + Gabriel acknowledgment. Apply: posts Slack approval request before any destructive action. Generates manifest.ndjson per scan. |
 
 ## Architecture
 
