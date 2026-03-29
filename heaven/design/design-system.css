@@ -1,0 +1,152 @@
+/* NOIZY.AI — Enterprise Design System v1.0
+ * The Cathedral Visual Language
+ *
+ * Colors: Black + Amber + Cyan
+ * Typography: Cormorant (display) + Inter (UI)
+ * Grid: 12-column, 40px gutters, 80px margins
+ * Baseline: 8px modular scale
+ */
+
+:root {
+  /* ═══════════════════════════════════════════
+   * COLORS — The Cathedral Palette
+   * ═══════════════════════════════════════════ */
+
+  /* Primary */
+  --noizy-black: #0B0B0B;
+  --noizy-amber: #FFB300;
+  --noizy-cyan: #00D1FF;
+
+  /* Neutral */
+  --noizy-neutral: #F6F6F6;
+  --noizy-muted: #6B7280;
+  --noizy-dark-gray: #1A1A1A;
+  --noizy-card-bg: #111111;
+
+  /* Agent Colors */
+  --agent-gabriel: #FFD700;    /* Gold — The Voice */
+  --agent-lucy: #FF69B4;      /* Hot Pink — Creative Director */
+  --agent-shirley: #9370DB;   /* Purple — Business Ops */
+  --agent-pops: #8B4513;      /* Brown — Wisdom */
+  --agent-keith: #00CED1;     /* Turquoise — Engineering */
+  --agent-dream: #FF4500;     /* Orange Red — Visionary */
+  --agent-cb01: #708090;      /* Slate Gray — Router */
+  --agent-aeon: #000000;      /* Black — God Kernel */
+
+  /* Semantic */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  /* ═══════════════════════════════════════════
+   * TYPOGRAPHY
+   * ═══════════════════════════════════════════ */
+  --font-display: "Cormorant", serif;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Menlo, Monaco, monospace;
+
+  /* Scale */
+  --text-hero: 72px;      /* Cathedral titles */
+  --text-h1: 56px;        /* Page titles */
+  --text-h2: 36px;        /* Section titles */
+  --text-h3: 24px;        /* Card titles */
+  --text-body: 16px;      /* Body copy */
+  --text-caption: 12px;   /* Captions, labels */
+  --text-micro: 10px;     /* Badges, tags */
+
+  /* Line heights */
+  --leading-tight: 1.1;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* ═══════════════════════════════════════════
+   * SPACING — 8px Modular Scale
+   * ═══════════════════════════════════════════ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ═══════════════════════════════════════════
+   * GRID
+   * ═══════════════════════════════════════════ */
+  --grid-columns: 12;
+  --gutter: 40px;
+  --margin: 80px;
+  --safe-area: 48px;
+  --baseline: 8px;
+
+  /* ═══════════════════════════════════════════
+   * BORDERS & RADIUS
+   * ═══════════════════════════════════════════ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ═══════════════════════════════════════════
+   * SHADOWS
+   * ═══════════════════════════════════════════ */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-glow-amber: 0 0 20px rgba(255, 179, 0, 0.3);
+  --shadow-glow-cyan: 0 0 20px rgba(0, 209, 255, 0.3);
+
+  /* ═══════════════════════════════════════════
+   * ANIMATION
+   * ═══════════════════════════════════════════ */
+  --ease-entrance: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: ease-out;
+  --duration-fast: 200ms;
+  --duration-normal: 400ms;
+  --duration-slow: 700ms;
+  --stagger: 80ms;
+}
+
+/* ═══════════════════════════════════════════
+ * BASE STYLES
+ * ═══════════════════════════════════════════ */
+body {
+  background: var(--noizy-black);
+  color: var(--noizy-neutral);
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+}
+
+/* ═══════════════════════════════════════════
+ * UTILITY CLASSES
+ * ═══════════════════════════════════════════ */
+.text-amber { color: var(--noizy-amber); }
+.text-cyan { color: var(--noizy-cyan); }
+.text-muted { color: var(--noizy-muted); }
+.bg-card { background: var(--noizy-card-bg); }
+.glow-amber { box-shadow: var(--shadow-glow-amber); }
+.glow-cyan { box-shadow: var(--shadow-glow-cyan); }
+
+/* Agent color classes */
+.agent-gabriel { color: var(--agent-gabriel); }
+.agent-lucy { color: var(--agent-lucy); }
+.agent-shirley { color: var(--agent-shirley); }
+.agent-pops { color: var(--agent-pops); }
+.agent-keith { color: var(--agent-keith); }
+.agent-dream { color: var(--agent-dream); }
+.agent-cb01 { color: var(--agent-cb01); }
+.agent-aeon { color: var(--agent-aeon); }
