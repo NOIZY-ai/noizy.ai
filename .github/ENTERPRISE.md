@@ -5,7 +5,7 @@
 > Identity: `rsp@noizy.ai`
 > Domain: `noizy.ai`
 > Org: `NOIZY-ai`
-> Account: Fishmusicinc (Cloudflare 2446d788)
+> Account: Fishmusicinc (see private ops inventory)
 
 This is the single source of truth for the NOIZY consent-native creative infrastructure.
 

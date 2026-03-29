@@ -29,9 +29,9 @@
 Go to **Settings → Variables** and add:
 
 ```
-CLOUDFLARE_API_URL        = https://api.cloudflare.com/client/v4/accounts/2446d788cc4280f5ea22a9948410c355
+CLOUDFLARE_API_URL        = https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID
 CLOUDFLARE_API_TOKEN      = <create at dash.cloudflare.com → My Profile → API Tokens>
-CLOUDFLARE_ACCOUNT_ID     = 2446d788cc4280f5ea22a9948410c355
+CLOUDFLARE_ACCOUNT_ID     = $CLOUDFLARE_ACCOUNT_ID
 CLOUDFLARE_D1_AGENT_MEMORY_ID = 7b813205-fd12-4a23-84a6-ce83bc49ec70
 CLOUDFLARE_KV_CONSENT_ID  = 23c6e0bcdada4915bdf5e0d87b242810
 N8N_BASE_URL              = https://noizy.app.n8n.cloud
@@ -99,7 +99,7 @@ Go to: `github.com/NOIZY-ai/noizy.ai/settings/secrets/actions`
 Add these repository secrets:
 ```
 CLOUDFLARE_API_TOKEN    = <same token from n8n setup>
-CLOUDFLARE_ACCOUNT_ID   = 2446d788cc4280f5ea22a9948410c355
+CLOUDFLARE_ACCOUNT_ID   = $CLOUDFLARE_ACCOUNT_ID
 ```
 
 This activates the GitHub Actions auto-deploy for Cloudflare Workers.
