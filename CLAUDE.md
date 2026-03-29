@@ -53,7 +53,7 @@ Primary identity: `rsp@noizy.ai` (replaces rsp@noizyfish.com)
 All agents have @noizy.ai addresses via Cloudflare Email Routing.
 
 ## Cloudflare Account
-- Account: Fishmusicinc (2446d788cc4280f5ea22a9948410c355)
+- Account: Fishmusicinc (see private ops inventory for account ID)
 - Domain: noizy.ai (Cloudflare DNS, fully transferred)
 - Login: rsp@noizyfish.com (MIGRATING to rsp@noizy.ai)
 
