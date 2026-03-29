@@ -142,7 +142,7 @@ We want you to be the voices that fill it.
 Every voice actor who joins the Wisdom Project is covered by the **Standard Gospel Deal**:
 - **75/25** royalty split (85/15 for founding members)
 - Full Voice Estate ownership
-- 10 Never Clauses protecting against misuse
+- 11 Never Clauses protecting against misuse
 - Consent-as-Code — every use logged, tracked, stamped with NOIZY PROOF
 - Legacy assignable — credits pass to family or the Griot Fund
 - Kill switch — unconditional revocation at any time

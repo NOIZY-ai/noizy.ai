@@ -67,7 +67,7 @@ The agency doesn't "promise" rights safety. It **enforces** it.
 
 **Enforcement primitives** (live in gabriel_db):
 - Consent token issuance (JWT, HSM-signed)
-- 10 Never Clauses binding
+- 11 Never Clauses binding
 - Revocation path (kill-switch, unconditional)
 - Audit trail / metadata binding
 - Provenance signing / NOIZY PROOF
@@ -217,7 +217,7 @@ Not SaaS tooling. **Agency licensing.**
 1. **Consent infrastructure** — no other platform has consent-as-code at the protocol level
 2. **Union compatibility** — ACTRA/SAG-AFTRA aligned from day one
 3. **75/25 Plowman Standard** — actors promote the platform because it's the best deal that exists
-4. **Never Clauses** — 10 hardcoded protections that no executive can override
+4. **Never Clauses** — 11 hardcoded protections that no executive can override
 5. **Voice Estate** — perpetual, inheritable, earning body of work
 6. **Guild of Trust** — structurally immortal foundation (legal trust + distributed ledger + creator governance)
 7. **DreamChamber** — the only capture environment designed for the human nervous system

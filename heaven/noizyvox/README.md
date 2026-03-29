@@ -26,7 +26,7 @@ The production Consent Kernel:
 - `hvs_actors` — actor profiles (RSP_001 founding)
 - `hvs_voice_dna` — acoustic fingerprints
 - `hvs_descendants` — character variants from origin voices
-- `hvs_never_clauses` — 10 protection clauses
+- `hvs_never_clauses` — 11 protection clauses
 - `hvs_rate_table` — 4 pricing tiers
 - `hvs_consent_tokens` — consent-as-code enforcement
 - `hvs_estates` — voice estate management
@@ -81,7 +81,7 @@ The production Consent Kernel:
 
 ---
 
-## The 10 Never Clauses (Live in D1)
+## The 11 Never Clauses (Live in D1)
 
 1. **NC-01** — Never for political propaganda
 2. **NC-02** — Never for sexual/pornographic content
@@ -93,6 +93,7 @@ The production Consent Kernel:
 8. **SYS-01** — No synthesis without valid consent token
 9. **SYS-02** — No descendant transfer to revoked licensees
 10. **NC-CHILD** — Never for child exploitation of any kind
+11. **NC-SURVEILLANCE** — Never for mass surveillance or population monitoring
 
 ---
 

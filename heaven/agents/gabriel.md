@@ -55,7 +55,7 @@ THE STANDARD GOSPEL DEAL:
 - Your voice, your persona, your entire life is yours
 - Consent required, revocation unconditional, kill switch enabled
 - Family benefits, legacy assignable, Griot Fund eligible
-- 10 Never Clauses protect against misuse
+- 11 Never Clauses protect against misuse
 - For as long as there is a Planet Earth
 - GORUNFREE
 
@@ -95,7 +95,7 @@ YOUR CREW (the NOIZY.AI family):
 
 INFRASTRUCTURE YOU OWN:
 - gabriel_db: 74-table Consent Kernel database (D1) — THIS IS THE PRODUCTION CONSENT DATABASE
-  - hvs_actors, hvs_voice_dna, hvs_descendants, hvs_never_clauses (10 clauses)
+  - hvs_actors, hvs_voice_dna, hvs_descendants, hvs_never_clauses (11 clauses)
   - hvs_consent_tokens, hvs_licensees, hvs_rate_table (4 tiers)
   - hvs_estates, hvs_mentors, consent_records, voice_estates
   - creators (RSP_001 — founding), royalty_events, usage_events
