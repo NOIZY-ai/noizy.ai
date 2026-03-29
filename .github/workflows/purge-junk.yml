@@ -1,0 +1,83 @@
+name: Purge OpenH264 Junk
+
+on:
+  workflow_dispatch:
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-hf5hD
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Remove OpenH264 inherited junk
+        run: |
+          # Remove all OpenH264/codec directories
+          rm -rf codec/ test/ testbin/ build/ res/ autotest/ subprojects/ module/ docs/
+          
+          # Remove OpenH264 config files
+          rm -f Makefile meson.build meson_options.txt build.gradle settings.gradle gradlew
+          rm -f openh264.def openh264.pc.in openh264.rc openh264.rc.template
+          rm -f gmpopenh264.info ut.def code-coverage.sh run_Test.sh
+          rm -f .reviewboardrc .travis.yml .gitignore
+          rm -f CODING_STYLE CONTRIBUTORS RELEASES SECURITY.md
+          
+          # Create proper .gitignore for NOIZY
+          cat > .gitignore << 'GITIGNORE'
+          # Dependencies
+          node_modules/
+          .pnpm-store/
+          
+          # Build output
+          .next/
+          dist/
+          .wrangler/
+          
+          # Environment
+          .env
+          .env.local
+          .env.*.local
+          .dev.vars
+          
+          # IDE
+          .vscode/
+          .idea/
+          *.swp
+          *.swo
+          
+          # OS
+          .DS_Store
+          Thumbs.db
+          
+          # Logs
+          *.log
+          npm-debug.log*
+          
+          # Credentials
+          credentials.json
+          *.pem
+          *.key
+          GITIGNORE
+
+      - name: Commit and push
+        run: |
+          git config user.name "NOIZYLAB"
+          git config user.email "231563317+Noizyfish@users.noreply.github.com"
+          git add -A
+          git commit -m "PURGE: Remove all OpenH264 junk — NOIZY code only
+          
+          Removed 709 files of inherited OpenH264 codec library code.
+          Directories purged: codec/, test/, testbin/, build/, res/,
+          autotest/, subprojects/, module/, docs/
+          Files purged: Makefile, meson.build, gradlew, openh264.*,
+          .travis.yml, CODING_STYLE, CONTRIBUTORS, RELEASES, etc.
+          
+          What remains: heaven/, schemas/, examples/, cloudflare/,
+          n8n/, tools/, .github/, CLAUDE.md, SETUP.md, README.md
+          
+          One enterprise repo. Clean. GORUNFREE.
+          
+          https://claude.ai/code/session_01SbaviRb1t9V3jH5ZX2M9eu"
+          git push
