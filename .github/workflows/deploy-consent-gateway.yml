@@ -2,7 +2,7 @@ name: Deploy Consent Gateway
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
     paths:
       - 'cloudflare/workers/consent-gateway/**'
   workflow_dispatch:
