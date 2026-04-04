@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOD Command Dashboard — NOIZY Imperial</title>
+<style>
+:root {
+  --black: #050505;
+  --amber: #FF9F1C;
+  --cyan: #00E5FF;
+  --gold: #C49000;
+  --white: #F5F5F5;
+  --muted: #6B7280;
+  --card: #0A0A0A;
+  --green: #22C55E;
+  --red: #EF4444;
+  --yellow: #F59E0B;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'Inter', system-ui, sans-serif; }
+.header { padding: 24px 32px; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-family: 'Cormorant Garamond', serif; color: var(--amber); font-size: 28px; }
+.header .clock { color: var(--muted); font-size: 14px; }
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #1a1a1a; }
+.tab { padding: 12px 24px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font-size: 14px; }
+.tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+.tab:hover { color: var(--white); }
+.content { padding: 32px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 8px; padding: 20px; }
+.card h3 { color: var(--amber); font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.card .value { font-size: 32px; font-weight: 700; margin-bottom: 4px; }
+.card .label { color: var(--muted); font-size: 12px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+.status-dot.green { background: var(--green); }
+.status-dot.red { background: var(--red); }
+.status-dot.yellow { background: var(--yellow); }
+.status-dot.cyan { background: var(--cyan); }
+.registry { width: 100%; border-collapse: collapse; margin-top: 16px; }
+.registry th { text-align: left; color: var(--amber); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; border-bottom: 1px solid #1a1a1a; }
+.registry td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #0f0f0f; }
+.registry tr:hover { background: #0f0f0f; }
+.laws { list-style: none; }
+.laws li { padding: 8px 0; border-bottom: 1px solid #0f0f0f; font-size: 14px; color: var(--white); }
+.laws li span { color: var(--amber); font-weight: 600; margin-right: 8px; }
+.section-title { color: var(--cyan); font-size: 18px; margin-bottom: 16px; font-family: 'Cormorant Garamond', serif; }
+.loop { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 32px; }
+.loop-step { background: var(--card); border: 1px solid #1a1a1a; border-radius: 8px; padding: 16px; text-align: center; }
+.loop-step .name { color: var(--cyan); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.loop-step .question { color: var(--muted); font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GOD COMMAND DASHBOARD</h1>
+  <div class="clock" id="liveClock"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('now')">NOW</div>
+  <div class="tab" onclick="showTab('next')">NEXT (30 days)</div>
+  <div class="tab" onclick="showTab('forever')">FOREVER</div>
+  <div class="tab" onclick="showTab('registry')">REGISTRY</div>
+  <div class="tab" onclick="showTab('laws')">SEVEN LAWS</div>
+</div>
+
+<div class="content">
+
+  <!-- OPERATING LOOP -->
+  <div class="loop">
+    <div class="loop-step"><div class="name">Manifest</div><div class="question">What is true?</div></div>
+    <div class="loop-step"><div class="name">Health</div><div class="question">What is broken?</div></div>
+    <div class="loop-step"><div class="name">Session</div><div class="question">What is happening?</div></div>
+    <div class="loop-step"><div class="name">Proof</div><div class="question">What is defensible?</div></div>
+    <div class="loop-step"><div class="name">Deploy</div><div class="question">What is live?</div></div>
+    <div class="loop-step"><div class="name">Memory</div><div class="question">What must not be lost?</div></div>
+  </div>
+
+  <!-- NOW CLOCK -->
+  <div id="tab-now">
+    <h2 class="section-title">NOW Clock — Blockers, Repairs, Launches</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Root Blocker</h3>
+        <div class="value" style="color:var(--red)">NOI-18</div>
+        <div class="label">CryptoTokenKit error -3 on CF login (rsp@noizyfish.com M365)</div>
+      </div>
+      <div class="card">
+        <h3>Email Routing</h3>
+        <div class="value" style="color:var(--yellow)">BLOCKED</div>
+        <div class="label">rsp@noizy.ai → rsplowman@icloud.com (needs CF dashboard)</div>
+      </div>
+      <div class="card">
+        <h3>Workers Deploy</h3>
+        <div class="value" style="color:var(--yellow)">CODE READY</div>
+        <div class="label">consent-gateway + cb01-router (needs CF API token)</div>
+      </div>
+      <div class="card">
+        <h3>GitHub PRs Merged</h3>
+        <div class="value" style="color:var(--green)">17</div>
+        <div class="label">All on master. Both repos clean.</div>
+      </div>
+      <div class="card">
+        <h3>D1 Memcells</h3>
+        <div class="value" style="color:var(--cyan)">455+</div>
+        <div class="label">298 priority 10+ | 9 D1 databases</div>
+      </div>
+      <div class="card">
+        <h3>Stripe</h3>
+        <div class="value" style="color:var(--green)">6 LINKS</div>
+        <div class="label">8 products, 7 prices, 1 customer (RSP_001)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEXT CLOCK -->
+  <div id="tab-next" style="display:none">
+    <h2 class="section-title">NEXT Clock — 30-Day Milestones</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>NOIZYFISH Pilot</h3>
+        <div class="value" style="color:var(--cyan)">0-30 DAYS</div>
+        <div class="label">Constitution written. Manifest schema live. Scorecard ready.</div>
+      </div>
+      <div class="card">
+        <h3>The Aquarium</h3>
+        <div class="value" style="color:var(--green)">BUILDS CLEAN</div>
+        <div class="label">14 routes. 4 API endpoints. Connect to Vercel.</div>
+      </div>
+      <div class="card">
+        <h3>Cathedral Web</h3>
+        <div class="value" style="color:var(--green)">BUILDS CLEAN</div>
+        <div class="label">Brutal polished. 8 sections. Deploy to noizy.ai.</div>
+      </div>
+      <div class="card">
+        <h3>Anchor Partners</h3>
+        <div class="value" style="color:var(--yellow)">0 / 12</div>
+        <div class="label">Ping template ready. Send when pilot ships.</div>
+      </div>
+      <div class="card">
+        <h3>Cathedral Deck</h3>
+        <div class="value" style="color:var(--green)">SPEC DONE</div>
+        <div class="label">18 slides. Production pipeline. Figma specs.</div>
+      </div>
+      <div class="card">
+        <h3>n8n Workflows</h3>
+        <div class="value" style="color:var(--yellow)">8 BUILT</div>
+        <div class="label">Import to noizy.app.n8n.cloud when CF token available.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOREVER CLOCK -->
+  <div id="tab-forever" style="display:none">
+    <h2 class="section-title">FOREVER Clock — Doctrine, Rights, Legacy</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Gospel</h3>
+        <div class="value" style="color:var(--gold)">5 VERSIONS</div>
+        <div class="label">Cathedral + Public + Covenant + Short + Dreed Briefing</div>
+      </div>
+      <div class="card">
+        <h3>Schemas</h3>
+        <div class="value" style="color:var(--green)">7</div>
+        <div class="label">EchoMoment, Receipt, Manifest, Bundle, Gospel, NoizyFish, Index</div>
+      </div>
+      <div class="card">
+        <h3>Never Clauses</h3>
+        <div class="value" style="color:var(--red)">11</div>
+        <div class="label">Live in D1. Hardcoded. No override.</div>
+      </div>
+      <div class="card">
+        <h3>GABRIEL Layers</h3>
+        <div class="value" style="color:var(--amber)">7</div>
+        <div class="label">Memory, Routing, Intelligence, Reputation, Protection, Evolution, Interface</div>
+      </div>
+      <div class="card">
+        <h3>Doctrine Principles</h3>
+        <div class="value" style="color:var(--amber)">11</div>
+        <div class="label">Artist First through Protection Principle</div>
+      </div>
+      <div class="card">
+        <h3>Imperial Laws</h3>
+        <div class="value" style="color:var(--gold)">7</div>
+        <div class="label">Creation before optimization through No output without lineage</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTRY -->
+  <div id="tab-registry" style="display:none">
+    <h2 class="section-title">Imperial Registry — 10 Pillars</h2>
+    <table class="registry">
+      <tr><th>ID</th><th>Name</th><th>Type</th><th>Status</th><th>Owner</th><th>Clock</th><th>Next Milestone</th></tr>
+      <tr><td>n001</td><td>NOIZY.AI</td><td>command_center</td><td><span class="status-dot green"></span>ACTIVE</td><td>RSP_001</td><td>NOW</td><td>Email routing</td></tr>
+      <tr><td>n002</td><td>DreamChamber</td><td>creation_interface</td><td><span class="status-dot yellow"></span>DESIGNED</td><td>RSP_001</td><td>NEXT</td><td>Pilot launch</td></tr>
+      <tr><td>n003</td><td>GABRIEL</td><td>guardian_strategist</td><td><span class="status-dot green"></span>LIVE_D1</td><td>RSP_001</td><td>NOW</td><td>Deploy Ollama</td></tr>
+      <tr><td>n004</td><td>HEAVEN</td><td>routing</td><td><span class="status-dot yellow"></span>DESIGNED</td><td>CB01</td><td>NEXT</td><td>Deploy Worker</td></tr>
+      <tr><td>n005</td><td>NOIZY PROOF</td><td>truth_engine</td><td><span class="status-dot green"></span>BUILT</td><td>GABRIEL</td><td>NEXT</td><td>Pilot validation</td></tr>
+      <tr><td>n006</td><td>Consent Gateway</td><td>legal_boundary</td><td><span class="status-dot cyan"></span>CODE_READY</td><td>ENGR_KEITH</td><td>NOW</td><td>Deploy Worker</td></tr>
+      <tr><td>n007</td><td>NOIZYFISH</td><td>music_engine</td><td><span class="status-dot yellow"></span>CONSTITUTION</td><td>RSP_001</td><td>NEXT</td><td>Pilot 0-30d</td></tr>
+      <tr><td>n008</td><td>NOIZYVOX</td><td>voice_sovereignty</td><td><span class="status-dot yellow"></span>POSITIONED</td><td>GABRIEL</td><td>NEXT</td><td>First talent</td></tr>
+      <tr><td>n009</td><td>NOIZYLAB</td><td>revenue_engine</td><td><span class="status-dot green"></span>ACTIVE</td><td>SHIRLEY</td><td>NOW</td><td>Repair ops</td></tr>
+      <tr><td>n010</td><td>NOIZYKIDZ</td><td>future_culture</td><td><span class="status-dot red"></span>PLANNED</td><td>POPS</td><td>FOREVER</td><td>Q3 design</td></tr>
+    </table>
+  </div>
+
+  <!-- SEVEN LAWS -->
+  <div id="tab-laws" style="display:none">
+    <h2 class="section-title">Seven Permanent Laws</h2>
+    <ul class="laws">
+      <li><span>I</span>Creation before optimization</li>
+      <li><span>II</span>Consent before generation</li>
+      <li><span>III</span>Provenance before scale</li>
+      <li><span>IV</span>Memory before motion</li>
+      <li><span>V</span>Verification before deployment</li>
+      <li><span>VI</span>Sovereignty before convenience</li>
+      <li><span>VII</span>No output without lineage</li>
+    </ul>
+    <br>
+    <h2 class="section-title">Five Operational Laws</h2>
+    <ul class="laws">
+      <li><span>1</span>If it is not consented, it does not generate.</li>
+      <li><span>2</span>If it is not attributable, it is not trusted.</li>
+      <li><span>3</span>If it is not paid, it is not allowed.</li>
+      <li><span>4</span>When in doubt, authority remains with the artist.</li>
+      <li><span>5</span>Every use of your voice pays you. Forever.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).style.display = 'block';
+  event.target.classList.add('active');
+}
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveClock').textContent = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+
+</body>
+</html>
