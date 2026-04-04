@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizy.ai/schemas/NoizyFishManifest.schema.json",
+  "title": "NoizyFishManifest",
+  "description": "The proof spine. Every AI-generated music asset carries this manifest from generation to export.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "asset_id",
+    "creator_id",
+    "session_id",
+    "model_id",
+    "model_version",
+    "generation_timestamp",
+    "prompt_history_hash",
+    "consent_state",
+    "license_terms",
+    "split_terms",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+
+    "asset_id": { "type": "string", "description": "UUID of the generated asset." },
+    "creator_id": { "type": "string", "description": "Who authorized this generation." },
+    "session_id": { "type": "string", "description": "Generation session identifier." },
+    "model_id": { "type": "string", "description": "Which model produced this asset." },
+    "model_version": { "type": "string", "description": "Exact model version." },
+    "generation_timestamp": { "type": "string", "format": "date-time" },
+
+    "prompt_history_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the full prompt chain used to generate this asset."
+    },
+
+    "declared_source_set": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of source IDs (samples, models, packs) declared as influences."
+    },
+
+    "consent_state": {
+      "type": "string",
+      "enum": ["active", "revoked", "pending"],
+      "description": "Current consent status. If revoked, asset must not be used."
+    },
+
+    "license_terms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["usage_types", "territory", "term"],
+      "properties": {
+        "usage_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Allowed usage types: synthesis, commercial, broadcast, etc."
+        },
+        "exclusions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Blocked usage types: political, nsfw, etc."
+        },
+        "territory": { "type": "string", "default": "global" },
+        "term": { "type": "string", "default": "perpetual" }
+      }
+    },
+
+    "split_terms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "contributors"],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "const": "75_25",
+          "description": "The Plowman Standard. Constitutional."
+        },
+        "contributors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contributor_id", "share", "role"],
+            "properties": {
+              "contributor_id": { "type": "string" },
+              "share": { "type": "number", "minimum": 0, "maximum": 1 },
+              "role": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "export_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["export_id", "format", "exported_at", "exported_by"],
+        "properties": {
+          "export_id": { "type": "string" },
+          "format": { "type": "string", "enum": ["wav", "flac", "mp3", "stems", "midi", "session"] },
+          "exported_at": { "type": "string", "format": "date-time" },
+          "exported_by": { "type": "string" }
+        }
+      }
+    },
+
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parent_asset_id": { "type": ["string", "null"] },
+        "remix_depth": { "type": "integer", "minimum": 0, "default": 0 }
+      }
+    },
+
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algo", "proof_hash"],
+      "properties": {
+        "algo": { "type": "string", "enum": ["ed25519", "sha256-hmac"] },
+        "proof_hash": { "type": "string", "description": "SHA-256 of canonical JSON (excluding signature block)." },
+        "public_key_ref": { "type": "string" },
+        "signature_b64": { "type": "string" }
+      }
+    }
+  }
+}
