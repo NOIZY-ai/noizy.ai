@@ -3,6 +3,8 @@ name: Purge OpenH264 Junk
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
 jobs:
   purge:
     runs-on: ubuntu-latest
