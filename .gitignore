@@ -59,3 +59,9 @@ codec_unittest
 bin/
 gtest/
 gmp-api/
+
+# Search result artifacts
+search_results_*.txt
+
+# Proof bundles (generated)
+artifacts/proof/*.json

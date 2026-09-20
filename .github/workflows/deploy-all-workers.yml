@@ -13,6 +13,8 @@ on:
           - consent-gateway
           - cb01-router
 
+permissions:
+  contents: read
 jobs:
   consent-gateway:
     if: ${{ github.event.inputs.worker == 'all' || github.event.inputs.worker == 'consent-gateway' }}

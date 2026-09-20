@@ -2,15 +2,15 @@
   "name": "cb01-router",
   "version": "1.0.0",
   "private": true,
-  "description": "CB01 Router — classifies and dispatches requests to NOIZY agents",
+  "description": "CB01 Router \u2014 classifies and dispatches requests to NOIZY agents",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "tail": "wrangler tail"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241004.0",
-    "typescript": "^5.6.3",
-    "wrangler": "^3.80.0"
+    "@cloudflare/workers-types": "^4.20250327.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^4.78.0"
   }
 }

@@ -2,11 +2,13 @@ name: Deploy CB01 Router
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
     paths:
       - 'cloudflare/workers/cb01-router/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
 jobs:
   deploy:
     runs-on: ubuntu-latest
