@@ -2,13 +2,13 @@
 
 import { motion } from 'framer-motion'
 
-interface NoisyLogoProps {
+interface NOIZYLogoProps {
   size?: number
   className?: string
   animate?: boolean
 }
 
-export function NoisyLogo({ size = 40, className = '', animate = true }: NoisyLogoProps) {
+export function NOIZYLogo({ size = 40, className = '', animate = true }: NOIZYLogoProps) {
   return (
     <motion.div
       className={`relative rounded-xl overflow-hidden flex items-center justify-center ${className}`}

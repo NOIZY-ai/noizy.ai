@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { navigation } from '@/config/navigation'
-import { NoisyLogo } from '@/components/ui/NoisyLogo'
+import { NOIZYLogo } from '@/components/ui/NOIZYLogo'
 import { cn } from '@/lib/utils'
 
 export function Header() {
@@ -41,7 +41,7 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-6 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <NoisyLogo size={40} />
+          <NOIZYLogo size={40} />
           <div className="flex flex-col">
             <span className="text-lg font-bold tracking-tight text-noizy-white">
               NOIZY<span className="text-violet-400">.AI</span>
