@@ -1,0 +1,35 @@
+# ═══════════════════════════════════════════════════════════
+# GABRIEL - THE ETERNAL MEMORY KEEPER
+# ═══════════════════════════════════════════════════════════
+# Claude's external brain. Persists across sessions.
+# Built for Rob Plowman | GORUNFREEX1000
+# ═══════════════════════════════════════════════════════════
+
+name = "gabriel"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Account
+account_id = "2446d788cc4280f5ea22a9948410c355"
+
+# D1 Database - agent-memory
+[[d1_databases]]
+binding = "DB"
+database_name = "agent-memory"
+database_id = "7b813205-fd12-4a23-84a6-ce83bc49ec70"
+
+# KV Namespace - agent-state (for fast lookups)
+[[kv_namespaces]]
+binding = "MEMORY_KV"
+id = "150a3c324a204ff0b9a7959b1804c1d0"
+
+# Custom domain (optional)
+# routes = [
+#   { pattern = "gabriel.noizy.ai", custom_domain = true }
+# ]
+
+[vars]
+ENVIRONMENT = "production"
+OWNER = "Rob Plowman"
+VERSION = "1.0.0"

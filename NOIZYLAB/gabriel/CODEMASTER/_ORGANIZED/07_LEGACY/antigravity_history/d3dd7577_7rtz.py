@@ -1,0 +1,223 @@
+"""
+GABRIEL HYPERVELOCITY MULTI-VOICE v3.1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Zero Latency • uvloop • orjson • GC Frozen
+Multi-Voice: Gemini Live + OpenAI Realtime + macOS TTS
+"""
+
+import os
+import gc
+import sys
+import asyncio
+import base64
+import logging
+from pathlib import Path
+from datetime import datetime, timezone
+from contextlib import asynccontextmanager
+from typing import Optional
+
+# Add parent to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# --- HYPERVELOCITY IMPORTS ---
+try:
+    import uvloop
+    uvloop.install()
+    UVLOOP_ACTIVE = True
+except ImportError:
+    UVLOOP_ACTIVE = False
+
+try:
+    import orjson
+    def json_dumps(obj): return orjson.dumps(obj).decode()
+    def json_loads(s): return orjson.loads(s)
+    ORJSON_ACTIVE = True
+except ImportError:
+    import json
+    json_dumps = json.dumps
+    json_loads = json.loads
+    ORJSON_ACTIVE = False
+
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+
+# Import multi-voice
+from audio.multi_voice import MultiVoiceManager
+
+# --- CONFIGURATION ---
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
+MODEL_ID = "gemini-2.0-flash-exp"
+PORT = 8000
+
+# Global Clients (Connection Pooling)
+GLOBAL_GEMINI_CLIENT = None
+
+# Logging
+logging.basicConfig(
+    level=logging.INFO, 
+    format='%(asctime)s | %(levelname)s | %(message)s'
+)
+logger = logging.getLogger("HYPERVELOCITY_MV")
+
+# ... (GC Controller omitted, not changed) ...
+
+# --- LIFESPAN ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global GLOBAL_GEMINI_CLIENT
+    
+    # Initialize Global Gemini Client (Pool)
+    if GEMINI_KEY:
+        try:
+            from google import genai
+            GLOBAL_GEMINI_CLIENT = genai.Client(
+                api_key=GEMINI_KEY, 
+                http_options={"api_version": "v1alpha"}
+            )
+            logger.info("✅ GLOBAL GEMINI CLIENT INITIALIZED")
+        except Exception as e:
+            logger.error(f"❌ GLOBAL CLIENT INIT FAILED: {e}")
+
+    gc_controller.freeze()
+    
+    has_gemini = "✅" if GEMINI_KEY else "❌"
+    has_openai = "✅" if OPENAI_KEY else "❌"
+    
+    print(f"""
+    ╔══════════════════════════════════════════════════════════════╗
+    ║                                                              ║
+    ║         ██████╗  █████╗ ██████╗ ██████╗ ██╗███████╗██╗       ║
+    ║        ██╔════╝ ██╔══██╗██╔══██╗██╔══██╗██║██╔════╝██║       ║
+    ║        ██║  ███╗███████║██████╔╝██████╔╝██║█████╗  ██║       ║
+    ║        ██║   ██║██╔══██║██╔══██╗██╔══██╗██║██╔══╝  ██║       ║
+    ║        ╚██████╔╝██║  ██║██████╔╝██║  ██║██║███████╗███████╗  ║
+    ║         ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝  ║
+    ║                                                              ║
+    ║           ⚡ HYPERVELOCITY MULTI-VOICE v3.1 ⚡                ║
+    ║                                                              ║
+    ║  Optimizations:                                              ║
+    ║    uvloop:   {"✅ ACTIVE" if UVLOOP_ACTIVE else "❌ FALLBACK":12}                                   ║
+    ║    orjson:   {"✅ ACTIVE" if ORJSON_ACTIVE else "❌ FALLBACK":12}                                   ║
+    ║    GC:       ❄️  FROZEN                                      ║
+    ║                                                              ║
+    ║  Voice Providers:                                            ║
+    ║    Gemini:   {has_gemini} (Puck)                                      ║
+    ║    OpenAI:   {has_openai} (alloy/shimmer/echo)                        ║
+    ║    macOS:    ✅ (Neural TTS)                                  ║
+    ║                                                              ║
+    ║              http://localhost:{PORT}                           ║
+    ║                                                              ║
+    ╚══════════════════════════════════════════════════════════════╝
+    """)
+    
+    yield
+    
+    gc_controller.full_collect()
+    logger.info("🔴 HYPERVELOCITY SHUTDOWN")
+
+# ... (App definition omitted) ...
+
+# --- WEBSOCKET WITH MULTI-VOICE ---
+
+@app.websocket("/ws/hypervelocity")
+async def hypervelocity_socket(websocket: WebSocket):
+    await websocket.accept()
+    logger.info("⚡ HYPERVELOCITY MULTI-VOICE: CLIENT CONNECTED")
+    
+    gc_controller.freeze()
+    
+    # Initialize multi-voice manager with SHARED POOL
+    voice_manager = MultiVoiceManager(
+        gemini_key=GEMINI_KEY,
+        openai_key=OPENAI_KEY,
+        system_prompt=SYSTEM_PROMPT,
+        gemini_client=GLOBAL_GEMINI_CLIENT  # Pass global client
+    )
+    
+    # Connect to best available provider
+    connected = await voice_manager.connect()
+    
+    if connected:
+        status = voice_manager.get_status()
+        await websocket.send_text(json_dumps({
+            "type": "system",
+            "status": "connected",
+            "provider": status["active_provider"]
+        }))
+    else:
+        await websocket.send_text(json_dumps({
+            "type": "system",
+            "status": "fallback",
+            "provider": "macOS TTS"
+        }))
+
+    try:
+        async def upstream():
+            """Browser -> Voice Provider"""
+            try:
+                while True:
+                    raw_msg = await websocket.receive_text()
+                    msg = json_loads(raw_msg)
+                    
+                    if msg["type"] == "audio":
+                        audio_bytes = base64.b64decode(msg["data"])
+                        await voice_manager.send_audio(audio_bytes)
+                    
+                    elif msg["type"] == "image":
+                        img_bytes = base64.b64decode(msg["data"])
+                        await voice_manager.send_image(img_bytes)
+                    
+                    elif msg["type"] == "text":
+                        # For text input (fallback mode)
+                        text = msg.get("content", "")
+                        if text and not connected:
+                            # Use macOS TTS 
+                            await voice_manager.speak_fallback(text)
+                    
+                    gc_controller.thaw()
+                        
+            except WebSocketDisconnect:
+                logger.warning("🔴 CLIENT DISCONNECTED")
+            except Exception as e:
+                logger.error(f"⚠️ UPSTREAM ERROR: {e}")
+
+        async def downstream():
+            """Voice Provider -> Browser"""
+            try:
+                async for response in voice_manager.receive():
+                    if response["type"] == "audio":
+                        b64_audio = base64.b64encode(response["data"]).decode("utf-8")
+                        await websocket.send_text(json_dumps({"type": "audio", "data": b64_audio}))
+                    
+                    elif response["type"] == "text":
+                        await websocket.send_text(json_dumps({"type": "text", "data": response["data"]}))
+                        
+            except Exception as e:
+                logger.error(f"⚠️ DOWNSTREAM ERROR: {e}")
+
+        await asyncio.gather(upstream(), downstream())
+
+    except Exception as e:
+        logger.critical(f"❌ ENGINE ERROR: {e}")
+    finally:
+        await voice_manager.disconnect()
+        await websocket.close()
+
+
+# --- MAIN ---
+if __name__ == "__main__":
+    import uvicorn
+    
+    if UVLOOP_ACTIVE:
+        uvicorn.run(
+            app, 
+            host="0.0.0.0", 
+            port=PORT,
+            loop="uvloop",
+            http="httptools",
+            access_log=False
+        )
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=PORT, access_log=False)

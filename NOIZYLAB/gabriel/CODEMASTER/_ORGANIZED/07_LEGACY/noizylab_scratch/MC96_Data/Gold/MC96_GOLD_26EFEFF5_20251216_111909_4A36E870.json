@@ -1,0 +1,25 @@
+{
+  "GOLD_ID": "GOLD_26efeff5",
+  "Title": "[TESTER] FastRoleCheck",
+  "Body": "Checking the velocity of the delta sweep.",
+  "Tags": [
+    "TEST",
+    "VELOCITY"
+  ],
+  "Provenance": [
+    {
+      "id": "TEST_ITEM_1H",
+      "source": "MEMCELL_CORE",
+      "timestamp": "2025-12-16T10:19:09.300829-05:00"
+    }
+  ],
+  "Meta": {
+    "Confidence": 80,
+    "LastVerified": "2025-12-16T11:19:09.374168-05:00",
+    "DriftRisk": "LOW",
+    "DriftTypes": [],
+    "GateStatus": "ACTIVE",
+    "Actionability": "WATCH",
+    "Trigger": "Confidence: 80"
+  }
+}

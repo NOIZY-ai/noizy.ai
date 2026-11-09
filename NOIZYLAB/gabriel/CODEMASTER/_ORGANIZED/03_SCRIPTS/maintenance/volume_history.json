@@ -1,0 +1,198 @@
+{
+  "19 11G 0% /SystemVM": [
+    {
+      "timestamp": "2025-12-24T23:13:56.731200",
+      "usage_percent": 2,
+      "size_bytes": 0
+    }
+  ],
+  "1.5k 11G 0% /SystemPreboot": [
+    {
+      "timestamp": "2025-12-24T23:13:56.731582",
+      "usage_percent": 1,
+      "size_bytes": 0
+    }
+  ],
+  "121 11G 0% /SystemUpdate": [
+    {
+      "timestamp": "2025-12-24T23:13:56.732202",
+      "usage_percent": 1,
+      "size_bytes": 0
+    }
+  ],
+  "1 4.0M 0% /Systemxarts": [
+    {
+      "timestamp": "2025-12-24T23:13:56.732431",
+      "usage_percent": 2,
+      "size_bytes": 0
+    }
+  ],
+  "72 4.0M 0% /SystemiSCPreboot": [
+    {
+      "timestamp": "2025-12-24T23:13:56.732608",
+      "usage_percent": 12,
+      "size_bytes": 0
+    }
+  ],
+  "64 4.0M 0% /SystemHardware": [
+    {
+      "timestamp": "2025-12-24T23:13:56.732764",
+      "usage_percent": 2,
+      "size_bytes": 0
+    }
+  ],
+  "4.6M 11G 0% /SystemData": [
+    {
+      "timestamp": "2025-12-24T23:13:56.733167",
+      "usage_percent": 42,
+      "size_bytes": 0
+    }
+  ],
+  "1.0k 4.3G 0% SIDNEY": [
+    {
+      "timestamp": "2025-12-24T23:13:56.733457",
+      "usage_percent": 89,
+      "size_bytes": 0
+    }
+  ],
+  "150k 4.3G 0% 4TBSG": [
+    {
+      "timestamp": "2025-12-24T23:13:56.733609",
+      "usage_percent": 25,
+      "size_bytes": 0
+    }
+  ],
+  "2.4M 4.3G 0% 6TB": [
+    {
+      "timestamp": "2025-12-24T23:13:56.733758",
+      "usage_percent": 86,
+      "size_bytes": 0
+    }
+  ],
+  "234 19G 0% SOUND_DESIGN": [
+    {
+      "timestamp": "2025-12-24T23:13:56.733933",
+      "usage_percent": 1,
+      "size_bytes": 0
+    }
+  ],
+  "6.8k 4.3G 0% JOE": [
+    {
+      "timestamp": "2025-12-24T23:13:56.734090",
+      "usage_percent": 39,
+      "size_bytes": 0
+    }
+  ],
+  "2.0M 4.3G 0% 4TB BLK": [
+    {
+      "timestamp": "2025-12-24T23:13:56.734242",
+      "usage_percent": 84,
+      "size_bytes": 0
+    }
+  ],
+  "311k 4.3G 0% RED DRAGON": [
+    {
+      "timestamp": "2025-12-24T23:13:56.734580",
+      "usage_percent": 10,
+      "size_bytes": 0
+    }
+  ],
+  "26k 19G 0% SAMPLE_MASTER": [
+    {
+      "timestamp": "2025-12-24T23:13:56.734803",
+      "usage_percent": 4,
+      "size_bytes": 0
+    }
+  ],
+  "2.9M 4.3G 0% 12TB": [
+    {
+      "timestamp": "2025-12-24T23:13:56.735143",
+      "usage_percent": 78,
+      "size_bytes": 0
+    }
+  ],
+  "4.5M 4.3G 0% MAG 4TB": [
+    {
+      "timestamp": "2025-12-24T23:13:56.735341",
+      "usage_percent": 93,
+      "size_bytes": 0
+    }
+  ],
+  "607k 4.5M 12% /Library/Developer/CoreSimulatoriOS_23C54": [
+    {
+      "timestamp": "2025-12-24T23:13:56.735551",
+      "usage_percent": 98,
+      "size_bytes": 0
+    }
+  ],
+  "232M 256M 48% 4TB Big Fish": [
+    {
+      "timestamp": "2025-12-24T23:13:56.735735",
+      "usage_percent": 48,
+      "size_bytes": 0
+    }
+  ],
+  "480M 8.4M 98% 4TB Blue Fish": [
+    {
+      "timestamp": "2025-12-24T23:13:56.735922",
+      "usage_percent": 99,
+      "size_bytes": 0
+    }
+  ],
+  "395M 93M 81% 4TB FISH SG": [
+    {
+      "timestamp": "2025-12-24T23:13:56.736097",
+      "usage_percent": 81,
+      "size_bytes": 0
+    }
+  ],
+  "227M 17M 93% EW": [
+    {
+      "timestamp": "2025-12-24T23:13:56.736273",
+      "usage_percent": 93,
+      "size_bytes": 0
+    }
+  ],
+  "450M 38M 92% FISH": [
+    {
+      "timestamp": "2025-12-24T23:13:56.736451",
+      "usage_percent": 93,
+      "size_bytes": 0
+    }
+  ],
+  "450M 38M 92% RSP": [
+    {
+      "timestamp": "2025-12-24T23:13:56.736640",
+      "usage_percent": 93,
+      "size_bytes": 0
+    }
+  ],
+  "450M 38M 92% RSP_Fish\u2019s Public Folder": [
+    {
+      "timestamp": "2025-12-24T23:13:56.736846",
+      "usage_percent": 93,
+      "size_bytes": 0
+    }
+  ],
+  "450M 38M 92% RSP\u2019s Public Folder": [
+    {
+      "timestamp": "2025-12-24T23:13:56.737056",
+      "usage_percent": 93,
+      "size_bytes": 0
+    }
+  ],
+  "134k 4.3G 0% 4TB Lacie": [
+    {
+      "timestamp": "2025-12-24T23:13:56.737249",
+      "usage_percent": 14,
+      "size_bytes": 0
+    }
+  ],
+  "45 4.3G 0% Techtool Pro 21.0.6 Installer": [
+    {
+      "timestamp": "2025-12-24T23:13:56.737450",
+      "usage_percent": 43,
+      "size_bytes": 0
+    }
+  ]
+}

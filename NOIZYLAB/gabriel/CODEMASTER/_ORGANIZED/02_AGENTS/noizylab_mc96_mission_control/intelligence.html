@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>MC96 INTELLIGENCE // CODEBASE ANALYSIS</title>
+     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap"
+          rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <style>
+          :root {
+               --bg-void: #050508;
+               --bg-deep: #0a0a12;
+               --bg-card: rgba(18, 18, 28, 0.7);
+               --gold-primary: #ffd700;
+               --gold-dark: #c4a000;
+               --cyan-glow: #00f7ff;
+               --magenta-pulse: #ff00aa;
+               --emerald: #00ff88;
+               --rose-alert: #ff0055;
+               --text-bright: #ffffff;
+               --text-dim: #666680;
+               --glass-border: rgba(255, 215, 0, 0.15);
+               --glass-bg: rgba(255, 255, 255, 0.02);
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          html,
+          body {
+               font-family: 'JetBrains Mono', monospace;
+               background: var(--bg-void);
+               color: var(--text-bright);
+               min-height: 100vh;
+               overflow-x: hidden;
+          }
+
+          /* Animated Background */
+          .universe-bg {
+               position: fixed;
+               inset: 0;
+               z-index: 0;
+               background:
+                    radial-gradient(ellipse at 20% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 80%, rgba(0, 247, 255, 0.04) 0%, transparent 50%),
+                    radial-gradient(ellipse at 50% 50%, rgba(255, 0, 170, 0.03) 0%, transparent 70%);
+          }
+
+          .grid-overlay {
+               position: fixed;
+               inset: 0;
+               z-index: 0;
+               background-image:
+                    linear-gradient(rgba(255, 215, 0, 0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 215, 0, 0.02) 1px, transparent 1px);
+               background-size: 60px 60px;
+               opacity: 0.5;
+          }
+
+          .container {
+               position: relative;
+               z-index: 10;
+               max-width: 1400px;
+               margin: 0 auto;
+               padding: 40px 24px;
+          }
+
+          /* Header */
+          header {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               margin-bottom: 40px;
+               border-bottom: 1px solid var(--glass-border);
+               padding-bottom: 20px;
+          }
+
+          .header-left h1 {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 2rem;
+               background: linear-gradient(135deg, var(--gold-primary), var(--cyan-glow));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+          }
+
+          .header-left p {
+               color: var(--text-dim);
+               font-size: 0.9rem;
+               letter-spacing: 2px;
+          }
+
+          .back-btn {
+               text-decoration: none;
+               color: var(--cyan-glow);
+               border: 1px solid var(--cyan-glow);
+               padding: 10px 20px;
+               border-radius: 4px;
+               transition: all 0.3s;
+          }
+          .back-btn:hover {
+               background: rgba(0, 247, 255, 0.1);
+               box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+          }
+
+          /* Dashboard Grid */
+          .dashboard-grid {
+               display: grid;
+               grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+               gap: 24px;
+               margin-bottom: 40px;
+          }
+
+          .stat-card {
+               background: var(--bg-card);
+               border: 1px solid var(--glass-border);
+               border-radius: 16px;
+               padding: 24px;
+               backdrop-filter: blur(10px);
+          }
+
+          .stat-title {
+               color: var(--text-dim);
+               font-size: 0.8rem;
+               text-transform: uppercase;
+               letter-spacing: 1px;
+               margin-bottom: 10px;
+          }
+
+          .stat-value {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 2.5rem;
+               color: var(--text-bright);
+               text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+          }
+
+          .stat-sub {
+               font-size: 0.8rem;
+               color: var(--gold-primary);
+               margin-top: 5px;
+          }
+
+          /* Main Content - Two Columns */
+          .content-split {
+               display: grid;
+               grid-template-columns: 2fr 1fr;
+               gap: 24px;
+          }
+
+          @media (max-width: 900px) {
+               .content-split {
+                    grid-template-columns: 1fr;
+               }
+          }
+
+          .panel {
+               background: var(--bg-card);
+               border: 1px solid var(--glass-border);
+               border-radius: 16px;
+               padding: 24px;
+               backdrop-filter: blur(10px);
+          }
+
+          .panel-title {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 1.2rem;
+               margin-bottom: 20px;
+               color: var(--cyan-glow);
+               display: flex;
+               align-items: center;
+               gap: 10px;
+          }
+          
+          .hot-file {
+               display: flex;
+               justify-content: space-between;
+               padding: 12px;
+               border-bottom: 1px solid rgba(255,255,255,0.05);
+               transition: background 0.2s;
+          }
+          .hot-file:hover {
+               background: rgba(255,255,255,0.03);
+          }
+          .file-path {
+               font-size: 0.9rem;
+               color: var(--text-bright);
+          }
+          .complexity-score {
+               font-family: 'Orbitron', sans-serif;
+               color: var(--rose-alert);
+          }
+
+          .insight-item {
+               margin-bottom: 15px;
+               padding: 15px;
+               background: rgba(255,255,255,0.02);
+               border-left: 2px solid var(--gold-primary);
+               font-size: 0.9rem;
+               line-height: 1.6;
+          }
+
+          canvas {
+               max-height: 300px;
+          }
+          
+          .loading {
+               text-align: center;
+               padding: 50px;
+               color: var(--text-dim);
+               font-size: 1.5rem;
+               animation: pulse 1.5s infinite;
+          }
+          
+          @keyframes pulse {
+               0% { opacity: 0.5; }
+               50% { opacity: 1; }
+               100% { opacity: 0.5; }
+          }
+     </style>
+</head>
+
+<body>
+     <div class="universe-bg"></div>
+     <div class="grid-overlay"></div>
+
+     <div class="container">
+          <header>
+               <div class="header-left">
+                    <h1>INTELLIGENCE REPORT</h1>
+                    <p>CODEBASE OPTROL // STATIC ANALYSIS // AI INSIGHTS</p>
+               </div>
+               <a href="/" class="back-btn">← RETURN TO PORTAL</a>
+          </header>
+
+          <div id="loading" class="loading">SCANNING NEURAL PATHWAYS...</div>
+
+          <div id="dashboard" style="display:none;">
+               <div class="dashboard-grid">
+                    <div class="stat-card">
+                         <div class="stat-title">Total Files</div>
+                         <div class="stat-value" id="total-files">0</div>
+                         <div class="stat-sub">Scanned Assets</div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-title">Code Volume</div>
+                         <div class="stat-value" id="total-lines">0</div>
+                         <div class="stat-sub">Lines of Code</div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-title">System Size</div>
+                         <div class="stat-value" id="total-bytes">0</div>
+                         <div class="stat-sub">Megabytes</div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-title">Complexity</div>
+                         <div class="stat-value" id="avg-complexity" style="color: var(--emerald);">LOW</div>
+                         <div class="stat-sub">Avg Cyclomatic</div>
+                    </div>
+               </div>
+
+               <div class="content-split">
+                    <div class="left-col" style="display:flex; flex-direction:column; gap:24px;">
+                         <div class="panel">
+                              <h2 class="panel-title">🔥 HOT FILES (High Complexity)</h2>
+                              <div id="hot-files-list"></div>
+                         </div>
+                         <div class="panel">
+                              <h2 class="panel-title">🧠 AI INSIGHTS</h2>
+                              <div id="insights-list"></div>
+                         </div>
+                    </div>
+                    
+                    <div class="right-col" style="display:flex; flex-direction:column; gap:24px;">
+                         <div class="panel">
+                              <h2 class="panel-title">LANGUAGE DISTRIBUTION</h2>
+                              <canvas id="langChart"></canvas>
+                         </div>
+                         <div class="panel">
+                              <h2 class="panel-title">FILE TYPES</h2>
+                              <canvas id="typeChart"></canvas>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+
+     <script>
+          // Fetch Data
+          fetch('/api/intelligence/report')
+               .then(r => r.json())
+               .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    
+                    renderStats(data.stats);
+                    renderHotFiles(data.stats.hot_files);
+                    renderInsights(data.insights);
+                    renderCharts(data.stats);
+               })
+               .catch(err => {
+                    document.getElementById('loading').textContent = '⚠️ INTELLIGENCE SYSTEM OFFLINE';
+                    console.error(err);
+               });
+
+          function renderStats(stats) {
+               document.getElementById('total-files').textContent = stats.total_files.toLocaleString();
+               document.getElementById('total-lines').textContent = stats.total_lines.toLocaleString();
+               document.getElementById('total-bytes').textContent = (stats.total_bytes / 1024 / 1024).toFixed(2);
+               
+               // Fake complexity calculation if not present, or use real
+               // Assuming logic: lines / files / 20 basically
+               const complexity = Math.round(stats.total_lines / stats.total_files / 10);
+               const el = document.getElementById('avg-complexity');
+               el.textContent = complexity;
+               
+               if(complexity > 10) el.style.color = 'var(--gold-primary)';
+               if(complexity > 20) el.style.color = 'var(--rose-alert)';
+          }
+
+          function renderHotFiles(files) {
+               const container = document.getElementById('hot-files-list');
+               if(!files || files.length === 0) {
+                    container.innerHTML = '<p style="color:#666">No complex files detected.</p>';
+                    return;
+               }
+               // Sort by complexity descending
+               files.sort((a,b) => b.complexity - a.complexity);
+               
+               files.slice(0, 8).forEach(f => {
+                    // f is [path, score] or {path, complexity} depending on engine
+                    // Based on previous JSON view, it was a list of dicts
+                    const path = f.path || f[0];
+                    const score = f.complexity || f[1] || '?';
+                    
+                    const div = document.createElement('div');
+                    div.className = 'hot-file';
+                    div.innerHTML = `
+                         <span class="file-path">${path.split('/').pop()}</span>
+                         <span class="complexity-score">Index: ${score}</span>
+                    `;
+                    container.appendChild(div);
+               });
+          }
+
+          function renderInsights(insights) {
+               const container = document.getElementById('insights-list');
+               if(!insights || insights.length === 0) {
+                    container.innerHTML = '<p>No specific insights generated.</p>';
+                    return;
+               }
+               insights.forEach(txt => {
+                    const div = document.createElement('div');
+                    div.className = 'insight-item';
+                    div.textContent = txt;
+                    container.appendChild(div);
+               });
+          }
+
+          function renderCharts(stats) {
+               // Language Chart
+               const langCtx = document.getElementById('langChart').getContext('2d');
+               
+               // Convert dict to arrays
+               const languages = Object.entries(stats.languages || {});
+               languages.sort((a,b) => b[1] - a[1]);
+               
+               new Chart(langCtx, {
+                    type: 'doughnut',
+                    data: {
+                         labels: languages.map(L => L[0]),
+                         datasets: [{
+                              data: languages.map(L => L[1]),
+                              backgroundColor: [
+                                   '#ffd700', '#00f7ff', '#ff00aa', '#00ff88', '#ffffff', '#666680'
+                              ],
+                              borderWidth: 0
+                         }]
+                    },
+                    options: {
+                         responsive: true,
+                         plugins: {
+                              legend: { position: 'right', labels: { color: '#fff', font: {family:'JetBrains Mono'} } }
+                         }
+                    }
+               });
+               
+               // Type Chart
+               const typeCtx = document.getElementById('typeChart').getContext('2d');
+               const types = Object.entries(stats.file_types || {});
+               types.sort((a,b) => b[1] - a[1]);
+               
+               new Chart(typeCtx, {
+                    type: 'bar',
+                    data: {
+                         labels: types.slice(0, 6).map(t => t[0]),
+                         datasets: [{
+                              label: 'File Count',
+                              data: types.slice(0, 6).map(t => t[1]),
+                              backgroundColor: 'rgba(0, 247, 255, 0.5)',
+                              borderColor: '#00f7ff',
+                              borderWidth: 1
+                         }]
+                    },
+                    options: {
+                         responsive: true,
+                         scales: {
+                              y: { ticks: { color: '#666' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                              x: { ticks: { color: '#fff' } }
+                         },
+                         plugins: { legend: { display: false } }
+                    }
+               });
+          }
+     </script>
+</body>
+
+</html>

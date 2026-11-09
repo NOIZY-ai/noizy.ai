@@ -1,0 +1,21 @@
+[
+    {
+        "action": "llm",
+        "params": {
+            "prompt": "Write a 30-second script for a promotional video about AI automation"
+        },
+        "output_var": "script"
+    },
+    {
+        "action": "video",
+        "params": {
+            "prompt": "$script"
+        }
+    },
+    {
+        "action": "audio",
+        "params": {
+            "prompt": "upbeat corporate background music, modern, tech vibes"
+        }
+    }
+]

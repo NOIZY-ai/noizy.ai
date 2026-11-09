@@ -1,0 +1,19 @@
+{
+  "name": "gabriel-mcp",
+  "version": "2.0.0",
+  "description": "GABRIEL AI Model Context Protocol Server",
+  "main": "server.py",
+  "scripts": {
+    "start": "python server.py",
+    "dev": "python server.py 2>&1 | tee ../logs/mcp.log"
+  },
+  "mcp": {
+    "name": "gabriel-mcp",
+    "version": "2.0.0"
+  },
+  "dependencies": {
+    "mcp": ">=1.0.0"
+  },
+  "author": "NOIZYLAB",
+  "license": "MIT"
+}

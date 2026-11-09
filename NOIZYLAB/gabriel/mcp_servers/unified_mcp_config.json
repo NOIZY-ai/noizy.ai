@@ -1,0 +1,64 @@
+{
+  "mcpServers": {
+    "gabriel": {
+      "command": "python3",
+      "args": ["/Users/m2ultra/NOIZYLAB/GABRIEL/mcp_servers/gabriel_mcp/server.py"],
+      "env": {
+        "PYTHONPATH": "/Users/m2ultra/NOIZYLAB/GABRIEL"
+      }
+    },
+    "cloudflare": {
+      "command": "npx",
+      "args": ["-y", "@cloudflare/mcp-server-cloudflare"],
+      "env": {
+        "CLOUDFLARE_ACCOUNT_ID": "${CLOUDFLARE_ACCOUNT_ID}",
+        "CLOUDFLARE_API_TOKEN": "${CLOUDFLARE_API_TOKEN}"
+      }
+    },
+    "stripe": {
+      "command": "npx",
+      "args": ["-y", "@stripe/mcp-server"],
+      "env": {
+        "STRIPE_SECRET_KEY": "${STRIPE_SECRET_KEY}"
+      }
+    },
+    "canva": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-canva"],
+      "env": {
+        "CANVA_ACCESS_TOKEN": "${CANVA_ACCESS_TOKEN}"
+      }
+    },
+    "ekkos": {
+      "command": "node",
+      "args": ["/Users/m2ultra/NOIZYLAB/GABRIEL/mcp_servers/ekkos_bridge/server.js"],
+      "env": {
+        "EKKOS_API_URL": "https://mcp.ekkos.dev",
+        "EKKOS_USER_ID": "${EKKOS_USER_ID}"
+      }
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-memory"],
+      "env": {}
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-filesystem", "/Users/m2ultra/NOIZYLAB", "/Users/m2ultra/Documents"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-postgres"],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}"
+      }
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "name": "SuperSonic Prompt Codes",
+  "description": "Lightning-fast Claude prompts for iPad & iPhone",
+  "version": "1.0.0",
+  "author": "NOIZYLAB",
+
+  "shortcuts": [
+    {
+      "name": "SS Voice Script",
+      "icon": "🎙️",
+      "code": "/SS-VOX-SCRIPT",
+      "input_prompt": "What do you want to script?",
+      "shortcut_actions": [
+        {"action": "ask_for_input", "prompt": "Describe the voice script you need:"},
+        {"action": "set_variable", "name": "user_input"},
+        {"action": "text", "content": "/SS-VOX-SCRIPT\n\nYou are a professional voice-over script writer. Create a script optimized for voice performance with:\n- Natural speech patterns and breath marks\n- Emphasis indicators [EMPHASIS] for key words\n- Pause markers ... for timing\n- Pronunciation guides (WORD: pro-NUN-see-AY-shun)\n- Emotional direction in [brackets]\n\nContent to script:\n{user_input}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS Quick Code",
+      "icon": "💻",
+      "code": "/SS-DEV-CODE",
+      "input_prompt": "What code do you need?",
+      "shortcut_actions": [
+        {"action": "ask_for_input", "prompt": "Describe the code you need:"},
+        {"action": "set_variable", "name": "user_input"},
+        {"action": "text", "content": "/SS-DEV-CODE\n\nGenerate production-ready code. Requirements:\n- Clean, readable, well-commented\n- Follow language best practices\n- Include error handling\n- Type hints where applicable\n- Ready to use immediately\n\nGenerate:\n{user_input}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS Pro Email",
+      "icon": "📧",
+      "code": "/SS-BIZ-EMAIL",
+      "shortcut_actions": [
+        {"action": "ask_for_input", "prompt": "Describe the email you need:"},
+        {"action": "set_variable", "name": "user_input"},
+        {"action": "text", "content": "/SS-BIZ-EMAIL\n\nWrite a professional email. Make it:\n- Clear and concise\n- Appropriate tone for the context\n- Action-oriented with clear next steps\n- Properly formatted\n\nInclude subject line. Ready to send.\n\nEmail details:\n{user_input}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS Summarize",
+      "icon": "📋",
+      "code": "/SS-SYS-SUM",
+      "shortcut_actions": [
+        {"action": "get_clipboard"},
+        {"action": "set_variable", "name": "content"},
+        {"action": "text", "content": "/SS-SYS-SUM\n\nSummarize this content. Provide:\n\n1. ONE-LINER: The core message in one sentence\n2. KEY POINTS: 3-5 bullet points\n3. ACTION ITEMS: What to do next (if applicable)\n\nBe concise. Preserve critical information.\n\nContent:\n{content}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS Debug Code",
+      "icon": "🐛",
+      "code": "/SS-DEV-DEBUG",
+      "shortcut_actions": [
+        {"action": "get_clipboard"},
+        {"action": "set_variable", "name": "code"},
+        {"action": "text", "content": "/SS-DEV-DEBUG\n\nDebug this code. Provide:\n1. THE BUG: What's wrong (1 sentence)\n2. THE FIX: Corrected code\n3. WHY: Brief explanation\n\nBe concise. Code first, explanations minimal.\n\nCode to debug:\n{code}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS NOIZYFISH Consent",
+      "icon": "🐟",
+      "code": "/SS-NOI-FISH",
+      "shortcut_actions": [
+        {"action": "ask_for_input", "prompt": "Describe your consent needs:"},
+        {"action": "set_variable", "name": "user_input"},
+        {"action": "text", "content": "/SS-NOI-FISH\n\nYou are the NOIZYFISH consent registry assistant. Help create a consent record.\n\nGather or confirm:\n1. Creator identity (name, ID)\n2. Content being protected (description, type)\n3. Consent decisions:\n   - AI training: YES / NO / LIMITED (specify)\n   - Synthetic generation: YES / NO / LIMITED\n   - Commercial use: YES / NO / TERMS\n4. Duration and territory\n5. Compensation requirements\n6. Revocation terms\n\nConsent details:\n{user_input}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS Quick Plan",
+      "icon": "📅",
+      "code": "/SS-SYS-PLAN",
+      "shortcut_actions": [
+        {"action": "ask_for_input", "prompt": "What do you need to plan?"},
+        {"action": "set_variable", "name": "user_input"},
+        {"action": "text", "content": "/SS-SYS-PLAN\n\nCreate an action plan. Include:\n\n1. GOAL: Clear objective\n2. STEPS: Numbered action items\n3. TIMELINE: When to do each step\n4. RESOURCES: What's needed\n5. FIRST ACTION: What to do RIGHT NOW\n\nMake it actionable and specific.\n\nPlan for:\n{user_input}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS Voice Transcribe",
+      "icon": "🎤",
+      "code": "/SS-VOX-TRANS",
+      "shortcut_actions": [
+        {"action": "dictate_text"},
+        {"action": "set_variable", "name": "speech"},
+        {"action": "text", "content": "/SS-VOX-TRANS\n\nClean this raw transcription into professional format:\n- Fix obvious speech-to-text errors\n- Add proper punctuation and paragraphs\n- Remove filler words (um, uh, like, you know) unless important\n- Format for readability\n\nRaw transcription:\n{speech}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS Story Mode",
+      "icon": "📖",
+      "code": "/SS-CRE-STORY",
+      "shortcut_actions": [
+        {"action": "ask_for_input", "prompt": "What story do you want to create?"},
+        {"action": "set_variable", "name": "user_input"},
+        {"action": "text", "content": "/SS-CRE-STORY\n\nWrite compelling story content. Focus on:\n- Vivid, sensory language\n- Strong character voice\n- Engaging pacing\n- Show, don't tell\n\nMatch the tone and style to the request. Write with confidence.\n\nStory request:\n{user_input}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    },
+    {
+      "name": "SS NOIZY Studio",
+      "icon": "🎚️",
+      "code": "/SS-NOI-STUDIO",
+      "shortcut_actions": [
+        {"action": "ask_for_input", "prompt": "What studio operation do you need?"},
+        {"action": "set_variable", "name": "user_input"},
+        {"action": "text", "content": "/SS-NOI-STUDIO\n\nYou are the NOIZY Studio assistant. Help with:\n\nHARDWARE:\n- M2 Ultra God (192GB) - Master Hub\n- MacBook Pro (16GB) - Windsurf/Cascade\n- iPad Pro 12.9\" - Satellite\n- iPhone 15 Pro Max - Satellite\n- Neumann Microphone\n\nWhat studio operation do you need?\n\nRequest:\n{user_input}"},
+        {"action": "copy_to_clipboard"},
+        {"action": "open_app", "app": "Claude"}
+      ]
+    }
+  ],
+
+  "siri_phrases": [
+    {"phrase": "SuperSonic script", "shortcut": "SS Voice Script"},
+    {"phrase": "SuperSonic code", "shortcut": "SS Quick Code"},
+    {"phrase": "SuperSonic email", "shortcut": "SS Pro Email"},
+    {"phrase": "SuperSonic summarize", "shortcut": "SS Summarize"},
+    {"phrase": "SuperSonic debug", "shortcut": "SS Debug Code"},
+    {"phrase": "SuperSonic plan", "shortcut": "SS Quick Plan"},
+    {"phrase": "SuperSonic story", "shortcut": "SS Story Mode"},
+    {"phrase": "Hey Claude", "shortcut": "SS Voice Transcribe"}
+  ],
+
+  "installation_instructions": "1. Open Shortcuts app on iPad/iPhone\n2. Create new shortcut for each entry\n3. Follow the action sequence\n4. Set Siri phrase for voice activation\n5. Add to Home Screen for quick access"
+}

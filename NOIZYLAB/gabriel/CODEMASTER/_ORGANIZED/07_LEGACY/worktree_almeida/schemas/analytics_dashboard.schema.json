@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/analytics_dashboard.schema.json",
+  "title": "NOIZYVOX Analytics Dashboard",
+  "description": "Real-time analytics for artists and platform",
+  "type": "object",
+  "required": ["dashboard_id", "owner_type", "owner_id"],
+  "properties": {
+    "dashboard_id": {
+      "type": "string",
+      "pattern": "^dash_[a-z0-9]{16}$",
+      "description": "Unique dashboard identifier"
+    },
+    "owner_type": {
+      "enum": ["artist", "licensee", "platform", "guild"],
+      "description": "Type of dashboard owner"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "ID of the dashboard owner"
+    },
+    "time_range": {
+      "type": "object",
+      "properties": {
+        "preset": { 
+          "enum": ["today", "yesterday", "last_7_days", "last_30_days", "last_90_days", "this_month", "last_month", "this_year", "all_time", "custom"],
+          "default": "last_30_days"
+        },
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" },
+        "timezone": { "type": "string", "default": "UTC" },
+        "granularity": { 
+          "enum": ["minute", "hour", "day", "week", "month"],
+          "default": "day"
+        }
+      }
+    },
+    "artist_metrics": {
+      "type": "object",
+      "description": "Metrics for artist dashboard",
+      "properties": {
+        "revenue": {
+          "type": "object",
+          "properties": {
+            "total_earnings_usd": { "type": "number", "minimum": 0 },
+            "pending_payout_usd": { "type": "number", "minimum": 0 },
+            "last_payout_usd": { "type": "number", "minimum": 0 },
+            "last_payout_date": { "type": "string", "format": "date" },
+            "earnings_by_tier": {
+              "type": "object",
+              "properties": {
+                "micro": { "type": "number", "minimum": 0 },
+                "non_exclusive": { "type": "number", "minimum": 0 },
+                "exclusive": { "type": "number", "minimum": 0 },
+                "enterprise": { "type": "number", "minimum": 0 }
+              }
+            },
+            "earnings_trend": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "period": { "type": "string" },
+                  "amount": { "type": "number", "minimum": 0 }
+                }
+              }
+            },
+            "top_earning_personas": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "persona_id": { "type": "string" },
+                  "earnings_usd": { "type": "number", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "total_generations": { "type": "integer", "minimum": 0 },
+            "total_audio_minutes": { "type": "number", "minimum": 0 },
+            "total_characters_synthesized": { "type": "integer", "minimum": 0 },
+            "unique_licensees": { "type": "integer", "minimum": 0 },
+            "generations_trend": { 
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "period": { "type": "string" },
+                  "count": { "type": "integer", "minimum": 0 }
+                }
+              }
+            },
+            "usage_by_persona": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "persona_id": { "type": "string" },
+                  "generations": { "type": "integer", "minimum": 0 },
+                  "minutes": { "type": "number", "minimum": 0 }
+                }
+              }
+            },
+            "usage_by_geography": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "country": { "type": "string" },
+                  "generations": { "type": "integer", "minimum": 0 }
+                }
+              }
+            },
+            "usage_by_use_case": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "use_case": { 
+                    "enum": ["narration", "gaming", "animation", "advertising", "education", "podcast", "other"]
+                  },
+                  "generations": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "licensing": {
+          "type": "object",
+          "properties": {
+            "active_licenses": { "type": "integer", "minimum": 0 },
+            "new_licenses_period": { "type": "integer", "minimum": 0 },
+            "churned_licenses_period": { "type": "integer", "minimum": 0 },
+            "license_renewal_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+            "licenses_by_tier": {
+              "type": "object",
+              "properties": {
+                "micro": { "type": "integer", "minimum": 0 },
+                "non_exclusive": { "type": "integer", "minimum": 0 },
+                "exclusive": { "type": "integer", "minimum": 0 },
+                "enterprise": { "type": "integer", "minimum": 0 }
+              }
+            }
+          }
+        },
+        "quality": {
+          "type": "object",
+          "properties": {
+            "average_rating": { "type": "number", "minimum": 1, "maximum": 5 },
+            "total_ratings": { "type": "integer", "minimum": 0 },
+            "rating_distribution": {
+              "type": "object",
+              "properties": {
+                "5_star": { "type": "integer", "minimum": 0 },
+                "4_star": { "type": "integer", "minimum": 0 },
+                "3_star": { "type": "integer", "minimum": 0 },
+                "2_star": { "type": "integer", "minimum": 0 },
+                "1_star": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "feedback_themes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "theme": { "type": "string" },
+                  "sentiment": { "enum": ["positive", "neutral", "negative"] },
+                  "count": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "marketplace": {
+          "type": "object",
+          "properties": {
+            "profile_views": { "type": "integer", "minimum": 0 },
+            "sample_plays": { "type": "integer", "minimum": 0 },
+            "conversion_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+            "search_appearances": { "type": "integer", "minimum": 0 },
+            "search_ranking_avg": { "type": "number", "minimum": 0 },
+            "competitor_comparison": {
+              "type": "object",
+              "properties": {
+                "archetype": { "type": "string" },
+                "your_rank": { "type": "integer", "minimum": 1 },
+                "total_in_category": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "platform_metrics": {
+      "type": "object",
+      "description": "Platform-wide metrics (admin only)",
+      "properties": {
+        "total_revenue_usd": { "type": "number", "minimum": 0 },
+        "total_artist_payouts_usd": { "type": "number", "minimum": 0 },
+        "platform_revenue_usd": { "type": "number", "minimum": 0 },
+        "total_generations": { "type": "integer", "minimum": 0 },
+        "total_audio_hours": { "type": "number", "minimum": 0 },
+        "active_artists": { "type": "integer", "minimum": 0 },
+        "active_licensees": { "type": "integer", "minimum": 0 },
+        "new_artists_period": { "type": "integer", "minimum": 0 },
+        "new_licensees_period": { "type": "integer", "minimum": 0 },
+        "churn_rate_artists": { "type": "number", "minimum": 0, "maximum": 1 },
+        "churn_rate_licensees": { "type": "number", "minimum": 0, "maximum": 1 },
+        "api_requests": { "type": "integer", "minimum": 0 },
+        "api_error_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "average_latency_ms": { "type": "number", "minimum": 0 },
+        "p99_latency_ms": { "type": "number", "minimum": 0 },
+        "uptime_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "moderation_queue_size": { "type": "integer", "minimum": 0 },
+        "takedowns_period": { "type": "integer", "minimum": 0 },
+        "disputes_period": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["alert_id", "type", "severity", "message"],
+        "properties": {
+          "alert_id": { "type": "string" },
+          "type": { 
+            "enum": ["revenue_milestone", "usage_spike", "rating_drop", "license_expiring", "payout_ready", "moderation_action", "system_issue"]
+          },
+          "severity": { "enum": ["info", "warning", "critical"] },
+          "message": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "acknowledged": { "type": "boolean", "default": false },
+          "action_url": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "exports": {
+      "type": "object",
+      "properties": {
+        "available_formats": { 
+          "type": "array", 
+          "items": { "enum": ["csv", "xlsx", "json", "pdf"] }
+        },
+        "scheduled_reports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "report_name": { "type": "string" },
+              "frequency": { "enum": ["daily", "weekly", "monthly"] },
+              "format": { "type": "string" },
+              "recipients": { 
+                "type": "array", 
+                "items": { "type": "string", "format": "email" }
+              }
+            }
+          }
+        },
+        "audit_export": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "includes_manifests": { "type": "boolean", "default": true },
+            "includes_usage_logs": { "type": "boolean", "default": true },
+            "retention_days": { "type": "integer", "default": 365, "minimum": 1 }
+          }
+        }
+      }
+    }
+  }
+}

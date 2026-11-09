@@ -1,0 +1,51 @@
+{
+  "General": [
+    {
+      "content": "Work Packs are the execution unit: Single unit of work = WP-ID + goal + P0\u2013P3 tasks + deps + done-definition + risk band.",
+      "score": 1,
+      "id": "DOCTRINE_GOLD-01"
+    },
+    {
+      "content": "Drift is tripwired and escalated: Detect semantic/structural/behavior drift -> auto-correct/log -> P1 stabilize -> P0 if repeated.",
+      "score": 1,
+      "id": "DOCTRINE_GOLD-02"
+    },
+    {
+      "content": "Artifact state machine prevents chaos: Every artifact lives in Active / Quarantine / Archive / Trash Candidate; deletion is deferred until proven safe.",
+      "score": 1,
+      "id": "DOCTRINE_GOLD-03"
+    },
+    {
+      "content": "Tiering is the universal output contract: Tier A exec summary; Tier B operator actions + overlap; Tier C archival/provenance.",
+      "score": 1,
+      "id": "DOCTRINE_GOLD-04"
+    },
+    {
+      "content": "TruthScan produces a safe fix queue: Duplicates + canonical plan + Safe-Auto/Safe-Confirm/Manual actions; 'do-no-harm' checklist always emitted.",
+      "score": 1,
+      "id": "DOCTRINE_GOLD-05"
+    },
+    {
+      "content": "Prompt Stack enforces the machine: FAST (delta), STRONG (canon), BUILDER (packs), AUDITOR (proof/closure). No free-form wandering.",
+      "score": 1,
+      "id": "DOCTRINE_GOLD-06"
+    },
+    {
+      "content": "Visibility matters: dashboard is the control plane: Heatmaps + drift radar + action queue + scan status + session outcomes.",
+      "score": 1,
+      "id": "DOCTRINE_GOLD-07"
+    }
+  ],
+  "SkyColor": [
+    {
+      "content": "The sky is blue.",
+      "score": 3,
+      "id": "2d353f56-5e9e-4f5e-a802-611b5c84a61c"
+    },
+    {
+      "content": "I see the azure hue.",
+      "score": 2,
+      "id": "f5e3623a-9857-4409-890b-46ec8a36394d"
+    }
+  ]
+}

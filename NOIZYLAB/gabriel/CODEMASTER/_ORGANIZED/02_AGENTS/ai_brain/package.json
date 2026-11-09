@@ -1,0 +1,43 @@
+{
+  "name": "ai-complete-brain",
+  "version": "1.0.0",
+  "description": "GABRIEL AI System - Unified AI Worker, Pattern Intelligence, and Knowledge Graph",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "tsx GABRIEL_TEST_SUITE.ts",
+    "doctor": "tsx GABRIEL_DOCTOR.ts",
+    "verify": "tsx verify_god_mode.ts",
+    "lint": "eslint . --ext .ts",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "ai",
+    "gabriel",
+    "knowledge-graph",
+    "pattern-intelligence",
+    "orchestration"
+  ],
+  "author": "NOIZYLAB",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

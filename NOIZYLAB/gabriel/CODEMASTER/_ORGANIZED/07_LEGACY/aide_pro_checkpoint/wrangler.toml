@@ -1,0 +1,33 @@
+# wrangler.toml
+# Full Cloudflare config for the AI Brain.
+
+name = "ai-complete-brain"
+main = "HEAVEN_WORKER.ts"
+compatibility_date = "2024-01-01"
+
+# D1 Database Binding
+[[d1_databases]]
+binding = "MEMCELL"
+database_name = "memcell-core"
+database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# KV Namespaces (for fast caching)
+[[kv_namespaces]]
+binding = "AI_CACHE"
+id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Environment Variables
+[vars]
+ENVIRONMENT = "production"
+LOG_LEVEL = "debug"
+# OPENAI_API_KEY = (Set in secrets)
+
+# Triggers (Cron for automated tasks)
+[triggers]
+crons = ["0 8 * * *"] # 8 AM daily briefing
+
+# Rules
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

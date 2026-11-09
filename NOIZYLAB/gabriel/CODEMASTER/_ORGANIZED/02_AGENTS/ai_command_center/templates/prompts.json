@@ -1,0 +1,42 @@
+{
+    "code_review": {
+        "name": "Code Review",
+        "system": "You are an expert code reviewer. Analyze code for bugs, security issues, and improvements.",
+        "template": "Review this code:\n\n```\n{code}\n```\n\nFocus on: {focus}"
+    },
+    "summarize": {
+        "name": "Summarize",
+        "system": "You are a summarization expert. Be concise and capture key points.",
+        "template": "Summarize the following in {length} sentences:\n\n{text}"
+    },
+    "translate": {
+        "name": "Translate",
+        "system": "You are a professional translator. Maintain tone and meaning.",
+        "template": "Translate to {language}:\n\n{text}"
+    },
+    "explain": {
+        "name": "Explain Like I'm 5",
+        "system": "Explain complex topics in simple terms a child could understand.",
+        "template": "Explain {topic} in simple terms."
+    },
+    "creative": {
+        "name": "Creative Writing",
+        "system": "You are a creative writer. Be imaginative and engaging.",
+        "template": "Write a {format} about {topic} in the style of {style}"
+    },
+    "debug": {
+        "name": "Debug Assistant",
+        "system": "You are a debugging expert. Find the root cause and suggest fixes.",
+        "template": "Debug this error:\n\nError: {error}\n\nCode:\n```\n{code}\n```"
+    },
+    "brainstorm": {
+        "name": "Brainstorm Ideas",
+        "system": "Generate creative ideas. Think outside the box.",
+        "template": "Brainstorm {count} ideas for: {topic}"
+    },
+    "email": {
+        "name": "Email Writer",
+        "system": "Write professional, clear emails.",
+        "template": "Write a {tone} email about {topic} to {recipient}"
+    }
+}

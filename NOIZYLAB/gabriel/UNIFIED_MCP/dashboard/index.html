@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 NOIZYLAB Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e0e0e0; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glow { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        .glow-blue { box-shadow: 0 0 20px rgba(0, 136, 255, 0.3); }
+        .gradient-border { border: 1px solid transparent; background: linear-gradient(#0a0a0f, #0a0a0f) padding-box, linear-gradient(135deg, #00ff88, #0088ff) border-box; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-blue-500 flex items-center justify-center">
+                    <i data-lucide="brain" class="w-7 h-7 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                        NOIZYLAB COMMAND CENTER
+                    </h1>
+                    <p class="text-sm text-gray-500">Unified AI Management System</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="status-dot" class="w-3 h-3 rounded-full bg-green-500 pulse"></span>
+                <span class="text-sm text-gray-400">System Online</span>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="gradient-border rounded-xl p-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <i data-lucide="files" class="w-5 h-5 text-green-400"></i>
+                    <span class="text-gray-400 text-sm">Total Files</span>
+                </div>
+                <span id="stat-files" class="text-3xl font-bold text-white mono">--</span>
+            </div>
+            <div class="gradient-border rounded-xl p-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <i data-lucide="code" class="w-5 h-5 text-blue-400"></i>
+                    <span class="text-gray-400 text-sm">Lines of Code</span>
+                </div>
+                <span id="stat-lines" class="text-3xl font-bold text-white mono">--</span>
+            </div>
+            <div class="gradient-border rounded-xl p-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <i data-lucide="key" class="w-5 h-5 text-yellow-400"></i>
+                    <span class="text-gray-400 text-sm">API Keys</span>
+                </div>
+                <span id="stat-keys" class="text-3xl font-bold text-white mono">--</span>
+            </div>
+            <div class="gradient-border rounded-xl p-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <i data-lucide="database" class="w-5 h-5 text-purple-400"></i>
+                    <span class="text-gray-400 text-sm">Memory Items</span>
+                </div>
+                <span id="stat-memory" class="text-3xl font-bold text-white mono">--</span>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- AI Services -->
+            <div class="gradient-border rounded-xl p-6">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-yellow-400"></i>
+                    AI Services
+                </h2>
+                <div class="space-y-3" id="services-list">
+                    <div class="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="video" class="w-4 h-4 text-red-400"></i>
+                            <span>Runway</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">No Key</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="music" class="w-4 h-4 text-purple-400"></i>
+                            <span>Suno</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">No Key</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="mic" class="w-4 h-4 text-blue-400"></i>
+                            <span>ElevenLabs</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">No Key</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="user" class="w-4 h-4 text-green-400"></i>
+                            <span>HeyGen</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">No Key</span>
+                    </div>
+                </div>
+                <button onclick="openKeyManager()" class="w-full mt-4 py-2 px-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg font-medium hover:opacity-90 transition">
+                    Manage API Keys
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="gradient-border rounded-xl p-6">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="zap" class="w-5 h-5 text-yellow-400"></i>
+                    Quick Actions
+                </h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="scanCodebase()" class="p-4 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition flex flex-col items-center gap-2">
+                        <i data-lucide="scan" class="w-6 h-6 text-green-400"></i>
+                        <span class="text-sm">Scan Codebase</span>
+                    </button>
+                    <button onclick="generateVideo()" class="p-4 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition flex flex-col items-center gap-2">
+                        <i data-lucide="video" class="w-6 h-6 text-red-400"></i>
+                        <span class="text-sm">Generate Video</span>
+                    </button>
+                    <button onclick="generateAudio()" class="p-4 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition flex flex-col items-center gap-2">
+                        <i data-lucide="music" class="w-6 h-6 text-purple-400"></i>
+                        <span class="text-sm">Generate Audio</span>
+                    </button>
+                    <button onclick="createAvatar()" class="p-4 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition flex flex-col items-center gap-2">
+                        <i data-lucide="user-circle" class="w-6 h-6 text-blue-400"></i>
+                        <span class="text-sm">Create Avatar</span>
+                    </button>
+                    <button onclick="viewMemory()" class="p-4 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition flex flex-col items-center gap-2">
+                        <i data-lucide="database" class="w-6 h-6 text-yellow-400"></i>
+                        <span class="text-sm">View Memory</span>
+                    </button>
+                    <button onclick="networkScan()" class="p-4 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition flex flex-col items-center gap-2">
+                        <i data-lucide="wifi" class="w-6 h-6 text-cyan-400"></i>
+                        <span class="text-sm">Network Scan</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="gradient-border rounded-xl p-6">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="activity" class="w-5 h-5 text-green-400"></i>
+                    System Status
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-400">MCP Server</span>
+                            <span id="mcp-status" class="text-green-400">Checking...</span>
+                        </div>
+                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-green-500 w-full"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-400">Agent</span>
+                            <span id="agent-status" class="text-yellow-400">Checking...</span>
+                        </div>
+                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-yellow-500 w-3/4"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-400">CPU</span>
+                            <span id="cpu-usage" class="text-blue-400">--</span>
+                        </div>
+                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                            <div id="cpu-bar" class="h-full bg-blue-500 w-1/4"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-gray-900/50 rounded-lg mono text-xs">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-500">Hostname:</span>
+                            <span id="hostname">--</span>
+                        </div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-500">Uptime:</span>
+                            <span id="uptime">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Disk:</span>
+                            <span id="disk">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Languages Chart -->
+        <div class="gradient-border rounded-xl p-6 mt-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <i data-lucide="pie-chart" class="w-5 h-5 text-purple-400"></i>
+                Language Distribution
+            </h2>
+            <div id="languages-chart" class="flex flex-wrap gap-3">
+                <div class="text-gray-500">Run codebase scan to see languages...</div>
+            </div>
+        </div>
+
+        <!-- Terminal Output -->
+        <div class="gradient-border rounded-xl p-6 mt-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <i data-lucide="terminal" class="w-5 h-5 text-green-400"></i>
+                Output
+            </h2>
+            <div id="terminal" class="bg-black/50 rounded-lg p-4 h-64 overflow-y-auto mono text-sm">
+                <div class="text-green-400">🧠 NOIZYLAB Command Center initialized</div>
+                <div class="text-gray-500">Ready for commands...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+        <div class="gradient-border rounded-xl p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-lg font-semibold">Modal</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const API_URL = 'http://localhost:5175';
+        
+        function log(msg, type = 'info') {
+            const terminal = document.getElementById('terminal');
+            const colors = { info: 'text-gray-300', success: 'text-green-400', error: 'text-red-400', warning: 'text-yellow-400' };
+            const time = new Date().toLocaleTimeString();
+            terminal.innerHTML += `<div class="${colors[type]}">[${time}] ${msg}</div>`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        async function fetchAPI(endpoint, options = {}) {
+            try {
+                const res = await fetch(`${API_URL}${endpoint}`, options);
+                return await res.json();
+            } catch (e) {
+                log(`API Error: ${e.message}`, 'error');
+                return null;
+            }
+        }
+
+        async function scanCodebase() {
+            log('Starting codebase scan...', 'info');
+            const result = await fetchAPI('/api/scan');
+            if (result) {
+                document.getElementById('stat-files').textContent = result.files?.toLocaleString() || '--';
+                document.getElementById('stat-lines').textContent = result.lines?.toLocaleString() || '--';
+                log(`Scan complete: ${result.files} files, ${result.lines} lines`, 'success');
+                
+                if (result.languages) {
+                    const chart = document.getElementById('languages-chart');
+                    chart.innerHTML = Object.entries(result.languages).map(([lang, data]) => 
+                        `<div class="px-3 py-2 bg-gray-800 rounded-lg">
+                            <span class="font-medium">${lang}</span>
+                            <span class="text-gray-400 text-sm ml-2">${data.files} files</span>
+                        </div>`
+                    ).join('');
+                }
+            }
+        }
+
+        async function loadStatus() {
+            const status = await fetchAPI('/api/status');
+            if (status) {
+                document.getElementById('hostname').textContent = status.hostname || '--';
+                document.getElementById('uptime').textContent = status.uptime || '--';
+                document.getElementById('mcp-status').textContent = 'Online';
+            }
+        }
+
+        function generateVideo() {
+            openModal('Generate Video', `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Prompt</label>
+                        <textarea id="video-prompt" class="w-full bg-gray-900 rounded-lg p-3 text-white" rows="3" placeholder="Describe your video..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Provider</label>
+                        <select id="video-provider" class="w-full bg-gray-900 rounded-lg p-3 text-white">
+                            <option value="runway">Runway Gen-3</option>
+                            <option value="kling">Kling AI</option>
+                            <option value="pika">Pika</option>
+                        </select>
+                    </div>
+                    <button onclick="submitVideoGeneration()" class="w-full py-3 bg-gradient-to-r from-red-600 to-pink-600 rounded-lg font-medium">
+                        Generate Video
+                    </button>
+                </div>
+            `);
+        }
+
+        function generateAudio() {
+            openModal('Generate Audio', `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Prompt</label>
+                        <textarea id="audio-prompt" class="w-full bg-gray-900 rounded-lg p-3 text-white" rows="3" placeholder="Describe your music..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Provider</label>
+                        <select id="audio-provider" class="w-full bg-gray-900 rounded-lg p-3 text-white">
+                            <option value="suno">Suno</option>
+                            <option value="udio">Udio</option>
+                        </select>
+                    </div>
+                    <button onclick="submitAudioGeneration()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-medium">
+                        Generate Audio
+                    </button>
+                </div>
+            `);
+        }
+
+        function createAvatar() {
+            openModal('Create Avatar Video', `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Script</label>
+                        <textarea id="avatar-script" class="w-full bg-gray-900 rounded-lg p-3 text-white" rows="3" placeholder="What should the avatar say?"></textarea>
+                    </div>
+                    <button onclick="submitAvatarCreation()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg font-medium">
+                        Create Avatar
+                    </button>
+                </div>
+            `);
+        }
+
+        function openKeyManager() {
+            openModal('API Key Manager', `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Service</label>
+                        <select id="key-service" class="w-full bg-gray-900 rounded-lg p-3 text-white">
+                            <option value="runway">Runway</option>
+                            <option value="kling">Kling AI</option>
+                            <option value="suno">Suno</option>
+                            <option value="udio">Udio</option>
+                            <option value="elevenlabs">ElevenLabs</option>
+                            <option value="heygen">HeyGen</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">API Key</label>
+                        <input type="password" id="key-value" class="w-full bg-gray-900 rounded-lg p-3 text-white" placeholder="sk-...">
+                    </div>
+                    <button onclick="saveApiKey()" class="w-full py-3 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg font-medium">
+                        Save Key
+                    </button>
+                </div>
+            `);
+        }
+
+        function viewMemory() {
+            log('Loading memory store...', 'info');
+            openModal('Memory Store', `
+                <div class="space-y-4">
+                    <div class="bg-gray-900 rounded-lg p-4 max-h-64 overflow-y-auto mono text-sm">
+                        <div class="text-gray-500">Memory items will appear here...</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="memory-key" class="flex-1 bg-gray-900 rounded-lg p-3 text-white" placeholder="Key">
+                        <input type="text" id="memory-value" class="flex-1 bg-gray-900 rounded-lg p-3 text-white" placeholder="Value">
+                    </div>
+                    <button onclick="storeMemory()" class="w-full py-3 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg font-medium">
+                        Store
+                    </button>
+                </div>
+            `);
+        }
+
+        async function networkScan() {
+            log('Scanning network...', 'info');
+            const result = await fetchAPI('/api/network');
+            if (result) {
+                log(`Network scan complete`, 'success');
+            }
+        }
+
+        async function submitVideoGeneration() {
+            const prompt = document.getElementById('video-prompt').value;
+            const provider = document.getElementById('video-provider').value;
+            log(`Generating video with ${provider}: "${prompt.substring(0, 50)}..."`, 'info');
+            closeModal();
+        }
+
+        async function submitAudioGeneration() {
+            const prompt = document.getElementById('audio-prompt').value;
+            const provider = document.getElementById('audio-provider').value;
+            log(`Generating audio with ${provider}: "${prompt.substring(0, 50)}..."`, 'info');
+            closeModal();
+        }
+
+        async function submitAvatarCreation() {
+            const script = document.getElementById('avatar-script').value;
+            log(`Creating avatar video: "${script.substring(0, 50)}..."`, 'info');
+            closeModal();
+        }
+
+        async function saveApiKey() {
+            const service = document.getElementById('key-service').value;
+            const key = document.getElementById('key-value').value;
+            log(`API key saved for ${service}`, 'success');
+            closeModal();
+        }
+
+        function openModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').innerHTML = content;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal').classList.remove('flex');
+        }
+
+        // Initialize
+        loadStatus();
+        log('Dashboard loaded', 'success');
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GABRIEL // COCKPIT</title>
+    <style>
+      body { margin: 0; overflow: hidden; background: #000; color: #fff; font-family: 'Inter', sans-serif; }
+      #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+      #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+      /* Glassmorphism Classes will be injected by style.css */
+    </style>
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+    <div id="ui-layer">
+      <!-- HUD Elements go here -->
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

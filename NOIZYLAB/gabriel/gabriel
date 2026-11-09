@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+"""
+GABRIEL MASTER CONTROL - ONE COMMAND TO RULE THEM ALL
+Usage: gabriel [command]
+
+Commands:
+    status     - Full system status dashboard
+    perfect    - Full system check
+    turbo      - Optimize system
+    scan       - Scan all volumes
+    inhale     - Deep code absorption
+    ai         - AI model interface
+    speak      - Text to speech
+    activate   - Full activation
+    help       - This help
+"""
+
+import sys
+import os
+import subprocess
+from pathlib import Path
+
+GABRIEL_ROOT = Path.home() / "NOIZYLAB" / "GABRIEL"
+PYTHON = sys.executable
+
+
+def run_script(script_name: str, args: list = None):
+    """Run a Gabriel script"""
+    script = GABRIEL_ROOT / script_name
+    if script.exists():
+        cmd = [PYTHON, str(script)]
+        if args:
+            cmd.extend(args)
+        subprocess.run(cmd)
+    else:
+        print(f"Script not found: {script}")
+
+
+def cmd_status():
+    """Quick status"""
+    run_script("gabriel_status.py")
+
+
+def cmd_perfect():
+    """Perfect system check"""
+    run_script("GABRIEL_PERFECT.py")
+
+
+def cmd_turbo():
+    """Turbo optimization"""
+    run_script("GABRIEL_TURBO.py")
+
+
+def cmd_scan():
+    """Scan all volumes"""
+    run_script("GABRIEL_SCANNER.py")
+
+
+def cmd_inhale():
+    """Deep code inhale"""
+    run_script("GABRIEL_INHALE.py")
+
+
+def cmd_ai(args: list = None):
+    """AI interface"""
+    if args:
+        run_script("GABRIEL_AI.py", args)
+    else:
+        run_script("GABRIEL_AI.py")
+
+
+def cmd_speak(text: str):
+    """Text to speech"""
+    subprocess.run(["say", "-v", "Oliver", text])
+
+
+def cmd_activate():
+    """Full activation"""
+    run_script("MASTER_ACTIVATE.sh", ["--full"])
+
+
+def cmd_help():
+    """Help"""
+    print(__doc__)
+
+
+def main():
+    if len(sys.argv) < 2:
+        cmd_status()
+        return
+
+    command = sys.argv[1].lower()
+    args = sys.argv[2:]
+
+    commands = {
+        "status": cmd_status,
+        "perfect": cmd_perfect,
+        "turbo": cmd_turbo,
+        "scan": cmd_scan,
+        "inhale": cmd_inhale,
+        "activate": cmd_activate,
+        "help": cmd_help,
+        "-h": cmd_help,
+        "--help": cmd_help,
+    }
+
+    if command == "ai":
+        cmd_ai(args)
+        return
+
+    if command == "speak" and args:
+        cmd_speak(" ".join(args))
+    elif command in commands:
+        commands[command]()
+    else:
+        print(f"Unknown command: {command}")
+        cmd_help()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>MC96 DIGIUNIVERSE // NOIZYLAB PORTAL</title>
+     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap"
+          rel="stylesheet">
+     <style>
+          :root {
+               --bg-void: #050508;
+               --bg-deep: #0a0a12;
+               --bg-card: rgba(18, 18, 28, 0.7);
+               --gold-primary: #ffd700;
+               --gold-dark: #c4a000;
+               --cyan-glow: #00f7ff;
+               --magenta-pulse: #ff00aa;
+               --emerald: #00ff88;
+               --text-bright: #ffffff;
+               --text-dim: #666680;
+               --glass-border: rgba(255, 215, 0, 0.15);
+               --glass-bg: rgba(255, 255, 255, 0.02);
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          html,
+          body {
+               font-family: 'JetBrains Mono', monospace;
+               background: var(--bg-void);
+               color: var(--text-bright);
+               min-height: 100vh;
+               overflow-x: hidden;
+          }
+
+          /* Animated Background */
+          .universe-bg {
+               position: fixed;
+               inset: 0;
+               z-index: 0;
+               background:
+                    radial-gradient(ellipse at 20% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 80%, rgba(0, 247, 255, 0.06) 0%, transparent 50%),
+                    radial-gradient(ellipse at 50% 50%, rgba(255, 0, 170, 0.04) 0%, transparent 70%);
+          }
+
+          .stars {
+               position: fixed;
+               inset: 0;
+               z-index: 0;
+          }
+
+          .star {
+               position: absolute;
+               width: 2px;
+               height: 2px;
+               background: white;
+               border-radius: 50%;
+               animation: twinkle 3s infinite;
+          }
+
+          @keyframes twinkle {
+
+               0%,
+               100% {
+                    opacity: 0.3;
+                    transform: scale(1);
+               }
+
+               50% {
+                    opacity: 1;
+                    transform: scale(1.2);
+               }
+          }
+
+          .grid-overlay {
+               position: fixed;
+               inset: 0;
+               z-index: 0;
+               background-image:
+                    linear-gradient(rgba(255, 215, 0, 0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 215, 0, 0.02) 1px, transparent 1px);
+               background-size: 80px 80px;
+               animation: gridMove 20s linear infinite;
+          }
+
+          @keyframes gridMove {
+               0% {
+                    transform: perspective(500px) rotateX(60deg) translateY(0);
+               }
+
+               100% {
+                    transform: perspective(500px) rotateX(60deg) translateY(80px);
+               }
+          }
+
+          /* Main Container */
+          .container {
+               position: relative;
+               z-index: 10;
+               max-width: 1400px;
+               margin: 0 auto;
+               padding: 40px 24px;
+          }
+
+          /* Header */
+          header {
+               text-align: center;
+               margin-bottom: 60px;
+          }
+
+          .logo-container {
+               position: relative;
+               display: inline-block;
+          }
+
+          .logo {
+               font-family: 'Orbitron', sans-serif;
+               font-size: clamp(2.5rem, 8vw, 5rem);
+               font-weight: 900;
+               background: linear-gradient(135deg, var(--gold-primary) 0%, var(--cyan-glow) 50%, var(--magenta-pulse) 100%);
+               background-size: 200% 200%;
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+               animation: gradientShift 5s ease infinite;
+               letter-spacing: 6px;
+               text-transform: uppercase;
+          }
+
+          @keyframes gradientShift {
+
+               0%,
+               100% {
+                    background-position: 0% 50%;
+               }
+
+               50% {
+                    background-position: 100% 50%;
+               }
+          }
+
+          .logo-glow {
+               position: absolute;
+               inset: -20px;
+               background: radial-gradient(ellipse, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+               filter: blur(30px);
+               z-index: -1;
+               animation: pulseGlow 3s ease-in-out infinite;
+          }
+
+          @keyframes pulseGlow {
+
+               0%,
+               100% {
+                    opacity: 0.5;
+                    transform: scale(1);
+               }
+
+               50% {
+                    opacity: 0.8;
+                    transform: scale(1.1);
+               }
+          }
+
+          .tagline {
+               font-size: 1rem;
+               color: var(--cyan-glow);
+               margin-top: 15px;
+               letter-spacing: 8px;
+               text-transform: uppercase;
+               text-shadow: 0 0 20px var(--cyan-glow);
+          }
+
+          .subtitle {
+               font-size: 0.8rem;
+               color: var(--text-dim);
+               margin-top: 10px;
+               letter-spacing: 3px;
+          }
+
+          /* Status Ring */
+          .status-ring {
+               display: flex;
+               justify-content: center;
+               gap: 40px;
+               margin-top: 30px;
+               flex-wrap: wrap;
+          }
+
+          .status-item {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 20px;
+               background: var(--glass-bg);
+               border: 1px solid var(--glass-border);
+               border-radius: 50px;
+               backdrop-filter: blur(10px);
+          }
+
+          .status-orb {
+               width: 10px;
+               height: 10px;
+               border-radius: 50%;
+               background: var(--emerald);
+               box-shadow: 0 0 15px var(--emerald), 0 0 30px var(--emerald);
+               animation: orbPulse 1.5s ease-in-out infinite;
+          }
+
+          @keyframes orbPulse {
+
+               0%,
+               100% {
+                    box-shadow: 0 0 15px var(--emerald), 0 0 30px var(--emerald);
+               }
+
+               50% {
+                    box-shadow: 0 0 25px var(--emerald), 0 0 50px var(--emerald);
+               }
+          }
+
+          .status-label {
+               font-size: 0.75rem;
+               letter-spacing: 2px;
+               text-transform: uppercase;
+          }
+
+          /* Portal Grid */
+          .portal-grid {
+               display: grid;
+               grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+               gap: 28px;
+               margin-top: 50px;
+          }
+
+          .portal-card {
+               position: relative;
+               background: var(--bg-card);
+               border: 1px solid var(--glass-border);
+               border-radius: 24px;
+               padding: 35px;
+               backdrop-filter: blur(20px);
+               transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+               cursor: pointer;
+               text-decoration: none;
+               color: inherit;
+               overflow: hidden;
+          }
+
+          .portal-card::before {
+               content: '';
+               position: absolute;
+               top: 0;
+               left: 0;
+               right: 0;
+               height: 2px;
+               background: linear-gradient(90deg, transparent, var(--gold-primary), var(--cyan-glow), transparent);
+               opacity: 0;
+               transition: opacity 0.4s;
+          }
+
+          .portal-card::after {
+               content: '';
+               position: absolute;
+               inset: 0;
+               background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+               opacity: 0;
+               transition: opacity 0.4s;
+               pointer-events: none;
+          }
+
+          .portal-card:hover {
+               transform: translateY(-10px) scale(1.02);
+               border-color: var(--gold-primary);
+               box-shadow:
+                    0 20px 40px rgba(0, 0, 0, 0.4),
+                    0 0 40px rgba(255, 215, 0, 0.2),
+                    inset 0 0 60px rgba(255, 215, 0, 0.03);
+          }
+
+          .portal-card:hover::before,
+          .portal-card:hover::after {
+               opacity: 1;
+          }
+
+          .card-icon {
+               font-size: 3rem;
+               margin-bottom: 20px;
+               display: block;
+               filter: drop-shadow(0 0 10px currentColor);
+          }
+
+          .card-title {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 1.3rem;
+               font-weight: 700;
+               margin-bottom: 12px;
+               background: linear-gradient(135deg, var(--gold-primary), var(--cyan-glow));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .card-desc {
+               font-size: 0.85rem;
+               color: var(--text-dim);
+               line-height: 1.7;
+               margin-bottom: 20px;
+          }
+
+          .card-badge {
+               display: inline-flex;
+               align-items: center;
+               gap: 6px;
+               padding: 6px 14px;
+               background: rgba(0, 247, 255, 0.1);
+               border: 1px solid rgba(0, 247, 255, 0.3);
+               border-radius: 30px;
+               font-size: 0.7rem;
+               color: var(--cyan-glow);
+               text-transform: uppercase;
+               letter-spacing: 1.5px;
+          }
+
+          .card-badge::before {
+               content: '●';
+               font-size: 0.5rem;
+               animation: badgePulse 1s infinite;
+          }
+
+          @keyframes badgePulse {
+
+               0%,
+               100% {
+                    opacity: 1;
+               }
+
+               50% {
+                    opacity: 0.3;
+               }
+          }
+
+          /* Featured Card */
+          .portal-card.featured {
+               grid-column: span 2;
+               background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(0, 247, 255, 0.03) 100%);
+               border-color: rgba(255, 215, 0, 0.3);
+          }
+
+          @media (max-width: 800px) {
+               .portal-card.featured {
+                    grid-column: span 1;
+               }
+          }
+
+          /* Footer */
+          footer {
+               text-align: center;
+               margin-top: 80px;
+               padding-top: 40px;
+               border-top: 1px solid var(--glass-border);
+          }
+
+          .footer-logo {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 1.2rem;
+               color: var(--gold-dark);
+               letter-spacing: 4px;
+               margin-bottom: 15px;
+          }
+
+          .device-badge {
+               display: inline-flex;
+               align-items: center;
+               gap: 10px;
+               padding: 12px 24px;
+               background: var(--glass-bg);
+               border: 1px solid var(--glass-border);
+               border-radius: 50px;
+               backdrop-filter: blur(10px);
+          }
+
+          .device-icon {
+               font-size: 1.5rem;
+          }
+
+          .device-text {
+               font-size: 0.8rem;
+               color: var(--cyan-glow);
+               letter-spacing: 1px;
+          }
+
+          .timestamp {
+               font-size: 0.7rem;
+               color: var(--text-dim);
+               margin-top: 20px;
+               letter-spacing: 2px;
+          }
+
+          /* Responsive */
+          @media (max-width: 600px) {
+               .logo {
+                    font-size: 2rem;
+                    letter-spacing: 3px;
+               }
+
+               .tagline {
+                    font-size: 0.75rem;
+                    letter-spacing: 4px;
+               }
+
+               .portal-card {
+                    padding: 25px;
+               }
+
+               .card-icon {
+                    font-size: 2.5rem;
+               }
+
+               .status-ring {
+                    gap: 15px;
+               }
+
+               .status-item {
+                    padding: 8px 15px;
+               }
+          }
+     </style>
+</head>
+
+<body>
+     <div class="universe-bg"></div>
+     <div class="stars" id="stars"></div>
+     <div class="grid-overlay"></div>
+
+     <div class="container">
+          <header>
+               <div class="logo-container">
+                    <div class="logo-glow"></div>
+                    <h1 class="logo">MC96</h1>
+               </div>
+               <p class="tagline">DIGIUNIVERSE</p>
+               <p class="subtitle">NOIZYLAB // UNIVERSAL PORTAL // GORUNFREE</p>
+
+               <div class="status-ring">
+                    <div class="status-item">
+                         <div class="status-orb"></div>
+                         <span class="status-label">GABRIEL ONLINE</span>
+                    </div>
+                    <div class="status-item">
+                         <div class="status-orb"></div>
+                         <span class="status-label">API ACTIVE</span>
+                    </div>
+                    <div class="status-item">
+                         <div class="status-orb"></div>
+                         <span class="status-label" id="latency-status">ULTRA-FAST</span>
+                    </div>
+               </div>
+          </header>
+
+          <main>
+               <div class="portal-grid">
+                    <a href="/mc96_mission_control" class="portal-card featured">
+                         <span class="card-icon">🎛️</span>
+                         <h2 class="card-title">MC96 MISSION CONTROL</h2>
+                         <p class="card-desc">3D Neural Visualization & System Dashboard. Explore your codebase as an
+                              interactive force-directed graph in real-time WebGL.</p>
+                         <span class="card-badge">3D WEBGL</span>
+                    </a>
+
+                    <a href="/api/status" class="portal-card" target="_blank">
+                         <span class="card-icon">📊</span>
+                         <h2 class="card-title">SYSTEM STATUS</h2>
+                         <p class="card-desc">Live CPU, RAM, disk usage and server health metrics with sub-millisecond
+                              response times.</p>
+                         <span class="card-badge">JSON API</span>
+                    </a>
+
+                    <a href="/intelligence" class="portal-card">
+                         <span class="card-icon">🧠</span>
+                         <h2 class="card-title">INTELLIGENCE</h2>
+                         <p class="card-desc">Codebase analysis, complexity metrics, language distribution and
+                              AI-powered insights.</p>
+                         <span class="card-badge">ANALYTICS</span>
+                    </a>
+
+                    <a href="/api/agents" class="portal-card" target="_blank">
+                         <span class="card-icon">🤖</span>
+                         <h2 class="card-title">AI AGENTS</h2>
+                         <p class="card-desc">GABRIEL, SHIRL, ENGR_KEITH — the AI family core, voice interface, and
+                              system engineer.</p>
+                         <span class="card-badge">AI CORE</span>
+                    </a>
+
+                    <a href="/api/memcell/graph/lite" class="portal-card" target="_blank">
+                         <span class="card-icon">🔗</span>
+                         <h2 class="card-title">MEMCELL GRAPH</h2>
+                         <p class="card-desc">Neural network node data for visualization. 34,000+ nodes indexed and
+                              ready.</p>
+                         <span class="card-badge">GRAPH DATA</span>
+                    </a>
+
+                    <a href="/api/feed" class="portal-card" target="_blank">
+                         <span class="card-icon">📡</span>
+                         <h2 class="card-title">LIVE FEED</h2>
+                         <p class="card-desc">Real-time event stream including voice commands, system messages, and
+                              activity logs.</p>
+                         <span class="card-badge">EVENTS</span>
+                    </a>
+               </div>
+          </main>
+
+          <footer>
+               <div class="footer-logo">AI LIFELUV FOREVER</div>
+               <div class="device-badge">
+                    <span class="device-icon" id="device-icon">🌐</span>
+                    <span class="device-text" id="client-info">Connecting...</span>
+               </div>
+               <p class="timestamp" id="timestamp"></p>
+          </footer>
+     </div>
+
+     <script>
+          // Generate stars
+          const starsContainer = document.getElementById('stars');
+          for (let i = 0; i < 100; i++) {
+               const star = document.createElement('div');
+               star.className = 'star';
+               star.style.left = Math.random() * 100 + '%';
+               star.style.top = Math.random() * 100 + '%';
+               star.style.animationDelay = Math.random() * 3 + 's';
+               star.style.opacity = Math.random() * 0.5 + 0.2;
+               starsContainer.appendChild(star);
+          }
+
+          // Mouse tracking for card glow
+          document.querySelectorAll('.portal-card').forEach(card => {
+               card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    card.style.setProperty('--mouse-x', x + '%');
+                    card.style.setProperty('--mouse-y', y + '%');
+               });
+          });
+
+          // Detect device type
+          const ua = navigator.userAgent;
+          let deviceType = 'Unknown Device';
+          let deviceIcon = '🌐';
+
+          if (/iPhone/.test(ua)) {
+               deviceType = 'iPhone'; deviceIcon = '📱';
+          } else if (/iPad/.test(ua)) {
+               deviceType = 'iPad'; deviceIcon = '📱';
+          } else if (/Mac/.test(ua) && !/like Mac/.test(ua)) {
+               deviceType = 'macOS'; deviceIcon = '🍎';
+          } else if (/Windows/.test(ua)) {
+               deviceType = 'Windows PC'; deviceIcon = '🖥️';
+          } else if (/Android/.test(ua)) {
+               deviceType = 'Android'; deviceIcon = '🤖';
+          } else if (/Linux/.test(ua)) {
+               deviceType = 'Linux'; deviceIcon = '🐧';
+          }
+
+          document.getElementById('client-info').textContent = deviceType + ' Connected';
+          document.getElementById('device-icon').textContent = deviceIcon;
+
+          // Timestamp
+          function updateTime() {
+               const now = new Date();
+               document.getElementById('timestamp').textContent =
+                    now.toISOString().replace('T', ' // ').split('.')[0] + ' UTC';
+          }
+          updateTime();
+          setInterval(updateTime, 1000);
+
+          // Check API health
+          const start = performance.now();
+          fetch('/api/health')
+               .then(r => r.json())
+               .then(data => {
+                    const latency = Math.round(performance.now() - start);
+                    document.getElementById('latency-status').textContent = latency + 'ms LATENCY';
+                    console.log('[PORTAL] ⚡ Server healthy, latency:', latency + 'ms');
+               })
+               .catch(err => {
+                    document.getElementById('latency-status').textContent = 'OFFLINE';
+                    console.log('[PORTAL] ⚠️ Server unreachable');
+               });
+
+          // Staggered card entrance animation
+          document.querySelectorAll('.portal-card').forEach((card, i) => {
+               card.style.opacity = '0';
+               card.style.transform = 'translateY(40px) scale(0.95)';
+               setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0) scale(1)';
+               }, 150 + i * 100);
+          });
+
+          console.log('%c⚡ MC96 DIGIUNIVERSE PORTAL ⚡', 'font-size: 20px; font-weight: bold; color: #ffd700; text-shadow: 0 0 10px #ffd700;');
+          console.log('%cGORUNFREE // NOIZYLAB // AI LIFELUV FOREVER', 'color: #00f7ff;');
+     </script>
+</body>
+
+</html>

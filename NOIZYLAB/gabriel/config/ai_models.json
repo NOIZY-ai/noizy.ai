@@ -1,0 +1,186 @@
+{
+  "ai_models": {
+    "claude": {
+      "name": "Claude (Anthropic)",
+      "models": [
+        "claude-opus-4-5-20251101",
+        "claude-sonnet-4-20250514",
+        "claude-3-5-haiku-20241022"
+      ],
+      "api_endpoint": "https://api.anthropic.com/v1",
+      "env_key": "ANTHROPIC_API_KEY",
+      "features": ["code", "reasoning", "vision", "tools"],
+      "status": "ACTIVE"
+    },
+    "openai": {
+      "name": "OpenAI GPT",
+      "models": [
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4-turbo",
+        "o1-preview",
+        "o1-mini"
+      ],
+      "api_endpoint": "https://api.openai.com/v1",
+      "env_key": "OPENAI_API_KEY",
+      "features": ["code", "reasoning", "vision", "tts", "whisper", "dalle"],
+      "status": "ACTIVE"
+    },
+    "gemini": {
+      "name": "Google Gemini",
+      "models": [
+        "gemini-2.0-flash-exp",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash",
+        "gemini-exp-1206"
+      ],
+      "api_endpoint": "https://generativelanguage.googleapis.com/v1beta",
+      "env_key": "GEMINI_API_KEY",
+      "features": ["code", "reasoning", "vision", "multimodal", "long_context"],
+      "status": "ACTIVE"
+    },
+    "deepseek": {
+      "name": "DeepSeek",
+      "models": [
+        "deepseek-chat",
+        "deepseek-coder",
+        "deepseek-v3"
+      ],
+      "api_endpoint": "https://api.deepseek.com/v1",
+      "env_key": "DEEPSEEK_API_KEY",
+      "features": ["code", "reasoning", "math"],
+      "status": "ACTIVE"
+    },
+    "mistral": {
+      "name": "Mistral AI",
+      "models": [
+        "mistral-large-latest",
+        "mistral-medium",
+        "codestral-latest",
+        "mistral-nemo"
+      ],
+      "api_endpoint": "https://api.mistral.ai/v1",
+      "env_key": "MISTRAL_API_KEY",
+      "features": ["code", "reasoning", "function_calling"],
+      "status": "ACTIVE"
+    },
+    "groq": {
+      "name": "Groq (Ultra Fast)",
+      "models": [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-70b-versatile",
+        "mixtral-8x7b-32768",
+        "gemma2-9b-it"
+      ],
+      "api_endpoint": "https://api.groq.com/openai/v1",
+      "env_key": "GROQ_API_KEY",
+      "features": ["code", "reasoning", "ultra_fast"],
+      "status": "ACTIVE"
+    },
+    "perplexity": {
+      "name": "Perplexity AI",
+      "models": [
+        "llama-3.1-sonar-large-128k-online",
+        "llama-3.1-sonar-small-128k-online"
+      ],
+      "api_endpoint": "https://api.perplexity.ai",
+      "env_key": "PERPLEXITY_API_KEY",
+      "features": ["search", "reasoning", "real_time"],
+      "status": "ACTIVE"
+    },
+    "xai": {
+      "name": "xAI Grok",
+      "models": [
+        "grok-2-1212",
+        "grok-2-vision-1212",
+        "grok-beta"
+      ],
+      "api_endpoint": "https://api.x.ai/v1",
+      "env_key": "XAI_API_KEY",
+      "features": ["code", "reasoning", "vision", "real_time"],
+      "status": "ACTIVE"
+    },
+    "cohere": {
+      "name": "Cohere",
+      "models": [
+        "command-r-plus",
+        "command-r",
+        "command-nightly"
+      ],
+      "api_endpoint": "https://api.cohere.ai/v1",
+      "env_key": "COHERE_API_KEY",
+      "features": ["code", "reasoning", "embeddings", "rag"],
+      "status": "ACTIVE"
+    },
+    "together": {
+      "name": "Together AI",
+      "models": [
+        "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+        "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        "Qwen/Qwen2.5-Coder-32B-Instruct"
+      ],
+      "api_endpoint": "https://api.together.xyz/v1",
+      "env_key": "TOGETHER_API_KEY",
+      "features": ["code", "reasoning", "open_source"],
+      "status": "ACTIVE"
+    }
+  },
+  "local_models": {
+    "ollama": {
+      "name": "Ollama (Local)",
+      "models": [
+        "llama3.2",
+        "codellama",
+        "mistral",
+        "qwen2.5-coder",
+        "deepseek-coder-v2"
+      ],
+      "api_endpoint": "http://localhost:11434/api",
+      "features": ["local", "private", "no_limits"],
+      "status": "AVAILABLE"
+    },
+    "lmstudio": {
+      "name": "LM Studio (Local)",
+      "models": ["loaded_model"],
+      "api_endpoint": "http://localhost:1234/v1",
+      "features": ["local", "private", "gpu"],
+      "status": "AVAILABLE"
+    }
+  },
+  "specialized": {
+    "elevenlabs": {
+      "name": "ElevenLabs TTS",
+      "env_key": "ELEVENLABS_API_KEY",
+      "features": ["voice_cloning", "tts", "voice_design"],
+      "status": "ACTIVE"
+    },
+    "replicate": {
+      "name": "Replicate",
+      "env_key": "REPLICATE_API_KEY",
+      "features": ["image_gen", "video_gen", "audio"],
+      "status": "ACTIVE"
+    },
+    "runway": {
+      "name": "Runway ML",
+      "env_key": "RUNWAY_API_KEY",
+      "features": ["video_gen", "image_edit"],
+      "status": "ACTIVE"
+    },
+    "stability": {
+      "name": "Stability AI",
+      "env_key": "STABILITY_API_KEY",
+      "features": ["image_gen", "upscale", "inpaint"],
+      "status": "ACTIVE"
+    }
+  },
+  "github_copilot": {
+    "name": "GitHub Copilot Pro+",
+    "features": ["code_completion", "chat", "agents", "workspace"],
+    "status": "ACTIVE"
+  },
+  "meta": {
+    "total_models": 40,
+    "categories": ["text", "code", "vision", "audio", "video"],
+    "updated": "2025-12-27"
+  }
+}

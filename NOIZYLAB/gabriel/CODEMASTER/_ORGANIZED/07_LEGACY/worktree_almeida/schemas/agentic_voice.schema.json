@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/agentic_voice.schema.json",
+  "title": "NOIZYVOX Agentic Voice",
+  "description": "Autonomous voice agents with conversational AI capabilities",
+  "type": "object",
+  "required": ["agent_id", "name", "agent_type"],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "pattern": "^agent_[a-z0-9]{16}$",
+      "description": "Unique agent identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable agent name"
+    },
+    "persona_id": {
+      "type": "string",
+      "description": "Associated voice persona ID"
+    },
+    "agent_type": {
+      "enum": ["conversational", "narrator", "assistant", "character", "interviewer", "educator", "entertainer", "custom"],
+      "description": "Type of agent behavior"
+    },
+    "llm_backbone": {
+      "type": "object",
+      "properties": {
+        "provider": { 
+          "enum": ["anthropic", "openai", "google", "mistral", "cohere", "custom"]
+        },
+        "model": { "type": "string" },
+        "temperature": { "type": "number", "default": 0.7, "minimum": 0, "maximum": 2 },
+        "max_tokens": { "type": "integer", "default": 1024, "minimum": 1 },
+        "system_prompt": { "type": "string" },
+        "few_shot_examples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "user": { "type": "string" },
+              "assistant": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "voice_interaction": {
+      "type": "object",
+      "properties": {
+        "speech_to_text": {
+          "type": "object",
+          "properties": {
+            "provider": { 
+              "enum": ["whisper", "deepgram", "assembly", "google", "azure", "aws", "custom"]
+            },
+            "model": { "type": "string" },
+            "language": { "type": "string" },
+            "real_time": { "type": "boolean", "default": true },
+            "endpointing": {
+              "type": "object",
+              "properties": {
+                "silence_threshold_ms": { "type": "integer", "default": 700, "minimum": 0 },
+                "max_speech_duration_seconds": { "type": "integer", "default": 30, "minimum": 1 }
+              }
+            },
+            "diarization": { "type": "boolean", "default": false }
+          }
+        },
+        "text_to_speech": {
+          "type": "object",
+          "properties": {
+            "persona_id": { "type": "string" },
+            "streaming": { "type": "boolean", "default": true },
+            "chunk_size_ms": { "type": "integer", "default": 50, "minimum": 1 },
+            "buffer_ms": { "type": "integer", "default": 100, "minimum": 0 }
+          }
+        },
+        "turn_taking": {
+          "type": "object",
+          "properties": {
+            "model": { 
+              "enum": ["silence_based", "semantic", "predictive", "hybrid"]
+            },
+            "barge_in_enabled": { "type": "boolean", "default": true },
+            "barge_in_sensitivity": { "type": "number", "default": 0.7, "minimum": 0, "maximum": 1 },
+            "backchanneling": { "type": "boolean", "default": true },
+            "filler_words": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "conversation_management": {
+      "type": "object",
+      "properties": {
+        "context_window": {
+          "type": "object",
+          "properties": {
+            "max_turns": { "type": "integer", "default": 50, "minimum": 1 },
+            "summarization_enabled": { "type": "boolean", "default": true },
+            "summarization_threshold": { "type": "integer", "default": 20, "minimum": 1 }
+          }
+        },
+        "memory": {
+          "type": "object",
+          "properties": {
+            "short_term": { "type": "boolean", "default": true },
+            "long_term": { "type": "boolean", "default": true },
+            "episodic": { "type": "boolean", "default": true },
+            "semantic": { "type": "boolean", "default": true },
+            "user_preferences": { "type": "boolean", "default": true },
+            "cross_session": { "type": "boolean", "default": true }
+          }
+        },
+        "topic_tracking": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "max_concurrent_topics": { "type": "integer", "default": 5, "minimum": 1 },
+            "topic_shift_detection": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "function_calling": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "available_functions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "parameters": { "type": "object" },
+              "requires_confirmation": { "type": "boolean", "default": false }
+            }
+          }
+        },
+        "external_apis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "endpoint": { "type": "string", "format": "uri" },
+              "auth_type": { "enum": ["api_key", "oauth2", "none"] }
+            }
+          }
+        },
+        "mcp_integration": {
+          "type": "object",
+          "description": "Model Context Protocol integration",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "servers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "transport": { "enum": ["stdio", "http", "websocket"] },
+                  "command": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "personality": {
+      "type": "object",
+      "properties": {
+        "traits": {
+          "type": "object",
+          "description": "Big Five personality traits",
+          "properties": {
+            "openness": { "type": "number", "minimum": 0, "maximum": 1 },
+            "conscientiousness": { "type": "number", "minimum": 0, "maximum": 1 },
+            "extraversion": { "type": "number", "minimum": 0, "maximum": 1 },
+            "agreeableness": { "type": "number", "minimum": 0, "maximum": 1 },
+            "neuroticism": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "communication_style": {
+          "type": "object",
+          "properties": {
+            "formality": { "type": "number", "minimum": 0, "maximum": 1 },
+            "verbosity": { "type": "number", "minimum": 0, "maximum": 1 },
+            "humor": { "type": "number", "minimum": 0, "maximum": 1 },
+            "empathy": { "type": "number", "minimum": 0, "maximum": 1 },
+            "directness": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "backstory": { "type": "string" },
+        "knowledge_domains": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "quirks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "catchphrases": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "guardrails": {
+      "type": "object",
+      "properties": {
+        "content_policy": {
+          "type": "object",
+          "properties": {
+            "prohibited_topics": { 
+              "type": "array", 
+              "items": { "type": "string" }
+            },
+            "sensitive_topics_handling": { 
+              "enum": ["deflect", "acknowledge", "refer", "discuss_carefully"]
+            },
+            "profanity_filter": { "type": "boolean", "default": true },
+            "pii_detection": { "type": "boolean", "default": true }
+          }
+        },
+        "behavioral_limits": {
+          "type": "object",
+          "properties": {
+            "max_response_length": { "type": "integer", "default": 500, "minimum": 1 },
+            "stay_in_character": { "type": "boolean", "default": true },
+            "acknowledge_ai_nature": { 
+              "enum": ["always", "when_asked", "never"], 
+              "default": "when_asked"
+            },
+            "refuse_roleplay_as_real_people": { "type": "boolean", "default": true }
+          }
+        },
+        "safety": {
+          "type": "object",
+          "properties": {
+            "crisis_detection": { "type": "boolean", "default": true },
+            "crisis_response": { "type": "string" },
+            "escalation_webhook": { "type": "string", "format": "uri" }
+          }
+        }
+      }
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "conversation_logging": { "type": "boolean", "default": true },
+        "sentiment_tracking": { "type": "boolean", "default": true },
+        "engagement_metrics": { "type": "boolean", "default": true },
+        "error_tracking": { "type": "boolean", "default": true },
+        "a_b_testing": { "type": "boolean", "default": false }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": { 
+            "enum": ["web", "mobile_app", "phone", "smart_speaker", "vr_ar", "game", "kiosk", "robot"]
+          }
+        },
+        "latency_target_ms": { "type": "integer", "default": 500, "minimum": 0 },
+        "concurrent_sessions": { "type": "integer", "default": 100, "minimum": 1 },
+        "session_timeout_minutes": { "type": "integer", "default": 30, "minimum": 1 }
+      }
+    }
+  }
+}

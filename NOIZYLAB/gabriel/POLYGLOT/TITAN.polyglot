@@ -1,0 +1,5 @@
+#!/bin/bash
+# TITAN POLYGLOT - Bash + Perl dispatch
+# Run with: bash TITAN.polyglot
+
+echo "TITAN - Bash"

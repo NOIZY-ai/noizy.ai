@@ -1,0 +1,549 @@
+{
+"nodes": [
+{
+"id": "DOCTRINE_GOLD-01",
+"type": "fact",
+"claim": "Work Packs are the execution unit: Single unit of ",
+"confidence": 1.0
+},
+{
+"id": "ent_69f16187",
+"label": "MC96_PRIME",
+"type": "entity"
+},
+{
+"id": "ent_a6747a6b",
+"label": "DOCTRINE",
+"type": "entity"
+},
+{
+"id": "ent_24d7f03d",
+"label": "GOLD",
+"type": "entity"
+},
+{
+"id": "ent_99c03075",
+"label": "RULESET",
+"type": "entity"
+},
+{
+"id": "ent_0d45f5fd",
+"label": "CORE",
+"type": "entity"
+},
+{
+"id": "DOCTRINE_GOLD-02",
+"type": "fact",
+"claim": "Drift is tripwired and escalated: Detect semantic/",
+"confidence": 1.0
+},
+{
+"id": "DOCTRINE_GOLD-03",
+"type": "fact",
+"claim": "Artifact state machine prevents chaos: Every artif",
+"confidence": 1.0
+},
+{
+"id": "DOCTRINE_GOLD-04",
+"type": "fact",
+"claim": "Tiering is the universal output contract: Tier A e",
+"confidence": 1.0
+},
+{
+"id": "DOCTRINE_GOLD-05",
+"type": "fact",
+"claim": "TruthScan produces a safe fix queue: Duplicates + ",
+"confidence": 1.0
+},
+{
+"id": "DOCTRINE_GOLD-06",
+"type": "fact",
+"claim": "Prompt Stack enforces the machine: FAST (delta), S",
+"confidence": 1.0
+},
+{
+"id": "DOCTRINE_GOLD-07",
+"type": "fact",
+"claim": "Visibility matters: dashboard is the control plane",
+"confidence": 1.0
+},
+{
+"id": "2d353f56-5e9e-4f5e-a802-611b5c84a61c",
+"type": "THOUGHT",
+"claim": "The sky is blue.",
+"confidence": 1.0
+},
+{
+"id": "ent_d3b909c6",
+"label": "SkyColor",
+"type": "entity"
+},
+{
+"id": "ent_04f8996d",
+"label": "USER",
+"type": "entity"
+},
+{
+"id": "f5e3623a-9857-4409-890b-46ec8a36394d",
+"type": "THOUGHT",
+"claim": "I see the azure hue.",
+"confidence": 1.0
+},
+{
+"id": "ent_ff06535a",
+"label": "GABRIEL",
+"type": "entity"
+},
+{
+"id": "e20640b7-2741-4837-8adb-0ec0f3e8a0d4",
+"type": "THOUGHT",
+"claim": "The sky is blue.",
+"confidence": 1.0
+},
+{
+"id": "8f7b4750-abc5-4709-8f4a-274bd859c2f8",
+"type": "THOUGHT",
+"claim": "I see the azure hue.",
+"confidence": 1.0
+},
+{
+"id": "b5bf909d-5df8-4181-9a2c-6436cc2755ba",
+"type": "STATUS",
+"claim": "The system is crystal smooth.",
+"confidence": 1.0
+},
+{
+"id": "ent_46ef6c07",
+"label": "SHIRL",
+"type": "entity"
+},
+{
+"id": "ent_bd7439e1",
+"label": "M2Ultra",
+"type": "entity"
+},
+{
+"id": "168c65c4-1a8d-4595-acc6-2bcd24988ff5",
+"type": "THOUGHT",
+"claim": "Gabriel System Online. Awaiting command.",
+"confidence": 1.0
+},
+{
+"id": "ent_b35903bb",
+"label": "User Interaction",
+"type": "entity"
+},
+{
+"id": "ent_91bb96e5",
+"label": "VOICE_LOG",
+"type": "entity"
+},
+{
+"id": "ent_2dd12b83",
+"label": "GOD_MODE",
+"type": "entity"
+},
+{
+"id": "bd87d0d0-e8b3-4d4d-b63a-aaa900f832e2",
+"type": "THOUGHT",
+"claim": "Gabriel System Online. Awaiting command.",
+"confidence": 1.0
+},
+{
+"id": "da6d555a-e82e-4027-989f-29abb36323f4",
+"type": "THOUGHT",
+"claim": "Gabriel System Online. Awaiting command.",
+"confidence": 1.0
+},
+{
+"id": "99dc976c-ae5d-49cf-baf7-102dcfe58731",
+"type": "THOUGHT",
+"claim": "Gabriel System Online. Awaiting command.",
+"confidence": 1.0
+},
+{
+"id": "d3345987-61e6-4b18-9176-73af83567dbf",
+"type": "THOUGHT",
+"claim": "Gabriel System Online. Awaiting command.",
+"confidence": 1.0
+},
+{
+"id": "d9724878-1d8b-4eb7-a483-dabc4ede4e52",
+"type": "THOUGHT",
+"claim": "Gabriel System Online. Awaiting command.",
+"confidence": 1.0
+}
+],
+"links": [
+{
+"source": "DOCTRINE_GOLD-01",
+"target": "ent_69f16187",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-01",
+"target": "ent_a6747a6b",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-01",
+"target": "ent_24d7f03d",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-01",
+"target": "ent_99c03075",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-01",
+"target": "ent_0d45f5fd",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-02",
+"target": "ent_69f16187",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-02",
+"target": "ent_a6747a6b",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-02",
+"target": "ent_24d7f03d",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-02",
+"target": "ent_99c03075",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-02",
+"target": "ent_0d45f5fd",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-03",
+"target": "ent_69f16187",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-03",
+"target": "ent_a6747a6b",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-03",
+"target": "ent_24d7f03d",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-03",
+"target": "ent_99c03075",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-03",
+"target": "ent_0d45f5fd",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-04",
+"target": "ent_69f16187",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-04",
+"target": "ent_a6747a6b",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-04",
+"target": "ent_24d7f03d",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-04",
+"target": "ent_99c03075",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-04",
+"target": "ent_0d45f5fd",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-05",
+"target": "ent_69f16187",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-05",
+"target": "ent_a6747a6b",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-05",
+"target": "ent_24d7f03d",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-05",
+"target": "ent_99c03075",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-05",
+"target": "ent_0d45f5fd",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-06",
+"target": "ent_69f16187",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-06",
+"target": "ent_a6747a6b",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-06",
+"target": "ent_24d7f03d",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-06",
+"target": "ent_99c03075",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-06",
+"target": "ent_0d45f5fd",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-07",
+"target": "ent_69f16187",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-07",
+"target": "ent_a6747a6b",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-07",
+"target": "ent_24d7f03d",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-07",
+"target": "ent_99c03075",
+"relation": "MENTIONS"
+},
+{
+"source": "DOCTRINE_GOLD-07",
+"target": "ent_0d45f5fd",
+"relation": "MENTIONS"
+},
+{
+"source": "2d353f56-5e9e-4f5e-a802-611b5c84a61c",
+"target": "ent_d3b909c6",
+"relation": "MENTIONS"
+},
+{
+"source": "2d353f56-5e9e-4f5e-a802-611b5c84a61c",
+"target": "ent_04f8996d",
+"relation": "MENTIONS"
+},
+{
+"source": "f5e3623a-9857-4409-890b-46ec8a36394d",
+"target": "ent_d3b909c6",
+"relation": "MENTIONS"
+},
+{
+"source": "f5e3623a-9857-4409-890b-46ec8a36394d",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "f5e3623a-9857-4409-890b-46ec8a36394d",
+"target": "2d353f56-5e9e-4f5e-a802-611b5c84a61c",
+"relation": "OVERLAPS_WITH"
+},
+{
+"source": "e20640b7-2741-4837-8adb-0ec0f3e8a0d4",
+"target": "ent_d3b909c6",
+"relation": "MENTIONS"
+},
+{
+"source": "e20640b7-2741-4837-8adb-0ec0f3e8a0d4",
+"target": "ent_04f8996d",
+"relation": "MENTIONS"
+},
+{
+"source": "e20640b7-2741-4837-8adb-0ec0f3e8a0d4",
+"target": "f5e3623a-9857-4409-890b-46ec8a36394d",
+"relation": "OVERLAPS_WITH"
+},
+{
+"source": "8f7b4750-abc5-4709-8f4a-274bd859c2f8",
+"target": "ent_d3b909c6",
+"relation": "MENTIONS"
+},
+{
+"source": "8f7b4750-abc5-4709-8f4a-274bd859c2f8",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "8f7b4750-abc5-4709-8f4a-274bd859c2f8",
+"target": "2d353f56-5e9e-4f5e-a802-611b5c84a61c",
+"relation": "OVERLAPS_WITH"
+},
+{
+"source": "8f7b4750-abc5-4709-8f4a-274bd859c2f8",
+"target": "e20640b7-2741-4837-8adb-0ec0f3e8a0d4",
+"relation": "OVERLAPS_WITH"
+},
+{
+"source": "b5bf909d-5df8-4181-9a2c-6436cc2755ba",
+"target": "ent_46ef6c07",
+"relation": "MENTIONS"
+},
+{
+"source": "b5bf909d-5df8-4181-9a2c-6436cc2755ba",
+"target": "ent_bd7439e1",
+"relation": "MENTIONS"
+},
+{
+"source": "b5bf909d-5df8-4181-9a2c-6436cc2755ba",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "168c65c4-1a8d-4595-acc6-2bcd24988ff5",
+"target": "ent_b35903bb",
+"relation": "MENTIONS"
+},
+{
+"source": "168c65c4-1a8d-4595-acc6-2bcd24988ff5",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "168c65c4-1a8d-4595-acc6-2bcd24988ff5",
+"target": "ent_91bb96e5",
+"relation": "MENTIONS"
+},
+{
+"source": "168c65c4-1a8d-4595-acc6-2bcd24988ff5",
+"target": "ent_2dd12b83",
+"relation": "MENTIONS"
+},
+{
+"source": "bd87d0d0-e8b3-4d4d-b63a-aaa900f832e2",
+"target": "ent_b35903bb",
+"relation": "MENTIONS"
+},
+{
+"source": "bd87d0d0-e8b3-4d4d-b63a-aaa900f832e2",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "bd87d0d0-e8b3-4d4d-b63a-aaa900f832e2",
+"target": "ent_91bb96e5",
+"relation": "MENTIONS"
+},
+{
+"source": "bd87d0d0-e8b3-4d4d-b63a-aaa900f832e2",
+"target": "ent_2dd12b83",
+"relation": "MENTIONS"
+},
+{
+"source": "da6d555a-e82e-4027-989f-29abb36323f4",
+"target": "ent_b35903bb",
+"relation": "MENTIONS"
+},
+{
+"source": "da6d555a-e82e-4027-989f-29abb36323f4",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "da6d555a-e82e-4027-989f-29abb36323f4",
+"target": "ent_91bb96e5",
+"relation": "MENTIONS"
+},
+{
+"source": "da6d555a-e82e-4027-989f-29abb36323f4",
+"target": "ent_2dd12b83",
+"relation": "MENTIONS"
+},
+{
+"source": "99dc976c-ae5d-49cf-baf7-102dcfe58731",
+"target": "ent_b35903bb",
+"relation": "MENTIONS"
+},
+{
+"source": "99dc976c-ae5d-49cf-baf7-102dcfe58731",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "99dc976c-ae5d-49cf-baf7-102dcfe58731",
+"target": "ent_91bb96e5",
+"relation": "MENTIONS"
+},
+{
+"source": "99dc976c-ae5d-49cf-baf7-102dcfe58731",
+"target": "ent_2dd12b83",
+"relation": "MENTIONS"
+},
+{
+"source": "d3345987-61e6-4b18-9176-73af83567dbf",
+"target": "ent_b35903bb",
+"relation": "MENTIONS"
+},
+{
+"source": "d3345987-61e6-4b18-9176-73af83567dbf",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "d3345987-61e6-4b18-9176-73af83567dbf",
+"target": "ent_91bb96e5",
+"relation": "MENTIONS"
+},
+{
+"source": "d3345987-61e6-4b18-9176-73af83567dbf",
+"target": "ent_2dd12b83",
+"relation": "MENTIONS"
+},
+{
+"source": "d9724878-1d8b-4eb7-a483-dabc4ede4e52",
+"target": "ent_b35903bb",
+"relation": "MENTIONS"
+},
+{
+"source": "d9724878-1d8b-4eb7-a483-dabc4ede4e52",
+"target": "ent_ff06535a",
+"relation": "MENTIONS"
+},
+{
+"source": "d9724878-1d8b-4eb7-a483-dabc4ede4e52",
+"target": "ent_91bb96e5",
+"relation": "MENTIONS"
+},
+{
+"source": "d9724878-1d8b-4eb7-a483-dabc4ede4e52",
+"target": "ent_2dd12b83",
+"relation": "MENTIONS"
+}
+]
+}

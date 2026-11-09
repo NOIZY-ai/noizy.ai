@@ -1,0 +1,215 @@
+#!/bin/zsh
+# ============================================================================
+# GOD MODE COMMAND DISPATCHER
+# The Central Nervous System of NoizyLab
+# ============================================================================
+
+VERSION="1.0.0"
+
+# --- HELPER FUNCTIONS ---
+function print_header() {
+    clear
+    echo "⚡️ \033[1;33mGOD MODE :: $1\033[0m"
+    echo "=================================================="
+}
+
+function show_help() {
+    echo "Usage: god <command> [args]"
+    echo ""
+    echo "Commands:"
+    echo "  email    - Manage NoizyLab Email (Inbox, Support)"
+    echo "  net      - Network Optimization (Jumbo Frames, DNS)"
+    echo "  fix      - Run Self-Healing Protocols (Repair Rob)"
+    echo "  status   - System Status & Diagnostics"
+    echo "  memory   - View MemCell Context"
+    echo "  noizy    - NoizyLab Status"
+    echo "  update   - Update System Tools"
+    echo "  miracle  - Run Miracle Setup (SVN & Tools)"
+    echo "  ai       - Launch AI Tools (Designer, Copilot)"
+    echo "  window   - Open Gabriel Control Window (GUI)"
+    echo "  pc       - Control DreamChamber PC Nodes"
+    echo "  universe - Sync Code Universe from External Volumes"
+    echo "  help     - Show this help"
+    echo ""
+}
+
+# --- SUBCOMMANDS ---
+
+function cmd_email() {
+    print_header "EMAIL MANAGER"
+    if [ "$1" == "inbox" ]; then
+        echo "📬 Opening Inbox..."
+        # Hook into mailmgr if available
+        if command -v mailmgr &> /dev/null; then
+            mailmgr inbox
+        else
+            echo "❌ 'mailmgr' not found."
+        fi
+    elif [ "$1" == "support" ]; then
+        echo "🆘 Opening Support Ticket..."
+        # Placeholder for support workflow
+        if command -v mailmgr &> /dev/null; then
+            mailmgr support
+        else
+            echo "❌ 'mailmgr' not found."
+        fi
+    else
+        echo "Launching Email Dashboard..."
+        if command -v mailmgr &> /dev/null; then
+            mailmgr dashboard
+        else
+            echo "❌ 'mailmgr' not found."
+        fi
+    fi
+}
+
+function cmd_net() {
+    print_header "NETWORK OPTIMIZER"
+    echo "🌐 Checking Network Status..."
+    if [ "$1" == "dns.flush" ] || [ "$1" == "dns" ]; then
+        echo "🚿 Flushing DNS Cache..."
+        sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+        echo "✅ DNS Flushed."
+    else
+        echo "🚀 Enhancing Packet Flow (Jumbo Frames)..."
+        # Attempt to set Jumbo Frames if not already
+        sudo ifconfig en0 mtu 9000 2>/dev/null
+        echo "✅ Network Optimized."
+    fi
+}
+
+function cmd_fix() {
+    print_header "SELF REPAIR"
+    echo "🔧 Initiating Repair Sequence..."
+    if [ -f "$HOME/rr.sh" ]; then
+        "$HOME/rr.sh" all
+    elif [ -f "$HOME/NOIZYLAB/scripts/MASTER_REPAIR.sh" ]; then
+        "$HOME/NOIZYLAB/scripts/MASTER_REPAIR.sh"
+    else
+        echo "❌ No repair scripts found."
+    fi
+}
+
+function cmd_status() {
+    print_header "SYSTEM STATUS"
+    echo "🖥️  Host: $(scutil --get ComputerName)"
+    echo "⏱️  Uptime: $(uptime | cut -d ',' -f1)"
+    echo "📡 IP: $(ipconfig getifaddr en0)"
+    echo ""
+    echo "💾 Storage:"
+    df -h / /Volumes/RSP 2>/dev/null | tail -n +2 | awk '{print "   " $9 ": " $5 " used (" $4 " free)"}'
+    echo ""
+    echo "🧠 Memory:"
+    vm_stat | grep "Pages free" | awk '{print "   Free: " $3 * 4096 / 1024 / 1024 " MB"}'
+    echo ""
+    echo "🔮 MemCell Intelligence:"
+    "$HOME/NOIZYLAB/scripts/core/MemCell.py" recall | head -n 5
+}
+
+function cmd_memory() {
+    print_header "MEMCELL INTELLIGENCE"
+    "$HOME/NOIZYLAB/scripts/core/MemCell.py" status
+    echo ""
+    echo "--- RECALL ---"
+    "$HOME/NOIZYLAB/scripts/core/MemCell.py" recall
+}
+
+function cmd_miracle() {
+    print_header "MIRACLE SETUP APPLICATION"
+    echo "✨ Initiating Miracle Protocol..."
+    python3 "$HOME/NOIZYLAB/GABRIEL/tools/miracle_setup.py"
+}
+
+
+
+function cmd_ai() {
+    print_header "AI COMMAND CENTER"
+    if [ "$1" == "designer" ]; then
+        echo "🎨 Launching Microsoft Designer..."
+        open "https://designer.microsoft.com"
+    elif [ "$1" == "copilot" ]; then
+        echo "🤖 Launching Copilot..."
+        open "https://copilot.microsoft.com"
+    elif [ "$1" == "video" ]; then
+        echo "🎬 Launching Clipchamp..."
+        open "https://app.clipchamp.com"
+    elif [ "$1" == "extensions" ]; then
+        echo "🧩 Opening AI Extensions..."
+        # Placeholder for specific extensions or store
+        open "https://microsoftedge.microsoft.com/addons/category/Productivity"
+    else
+        echo "Available AI Tools:"
+        echo "  - designer : Microsoft Designer (DALL-E 3)"
+        echo "  - copilot  : Microsoft Copilot (GPT-4)"
+        echo "  - video    : Clipchamp Video Editor"
+        echo "  - extensions: Browser AI Extensions"
+        echo ""
+        echo "Example: god ai designer"
+    fi
+}
+
+function cmd_universe() {
+    print_header "UNIVERSE SYNC"
+    echo "🪐 Synchronizing Code Universe to GitHub..."
+    if [ -f "$HOME/setup_universe.sh" ]; then
+        chmod +x "$HOME/setup_universe.sh"
+        "$HOME/setup_universe.sh"
+    else
+        echo "❌ setup_universe.sh not found!"
+    fi
+}
+
+function cmd_window() {
+    print_header "GABRIEL CONTROL WINDOW"
+    echo "🖥️  Loading UI..."
+    nohup python3 "$HOME/NOIZYLAB/GABRIEL/tools/gabriel_control.py" >/dev/null 2>&1 &
+    echo "✅ Window Launched."
+}
+
+function cmd_pc() {
+    print_header "DREAMCHAMBER PC BRIDGE"
+    if [ ! -f ~/bin/dreamchamber ]; then
+        echo "❌ 'dreamchamber' tool not found!"
+        return
+    fi
+    
+    if [ -z "$1" ]; then
+        ~/bin/dreamchamber help
+    else
+        ~/bin/dreamchamber "$@"
+    fi
+}
+
+function cmd_update() {
+    print_header "SYSTEM UPDATE"
+    echo "🔄 Updating Homebrew..."
+    brew update && brew upgrade
+    echo "✅ System Updated."
+}
+
+# --- MAIN DISPATCHER ---
+
+# Log to MemCell
+"$HOME/NOIZYLAB/scripts/core/MemCell.py" track "god_command" "$1" &>/dev/null &
+
+COMMAND="$1"
+shift
+
+case "$COMMAND" in
+    email) cmd_email "$@" ;;
+    net) cmd_net "$@" ;;
+    fix) cmd_fix "$@" ;;
+    status) cmd_status "$@" ;;
+    memory) cmd_memory "$@" ;;
+    memory) cmd_memory "$@" ;;
+    miracle) cmd_miracle "$@" ;;
+    ai) cmd_ai "$@" ;;
+    window) cmd_window "$@" ;;
+    universe) cmd_universe "$@" ;;
+    universe) cmd_universe "$@" ;;
+    update) cmd_update "$@" ;;
+    pc) cmd_pc "$@" ;;
+    noizy) cmd_status "$@" ;; # Alias for status
+    help|--help|-h) show_help ;;
+    *) show_help ;;
+esac

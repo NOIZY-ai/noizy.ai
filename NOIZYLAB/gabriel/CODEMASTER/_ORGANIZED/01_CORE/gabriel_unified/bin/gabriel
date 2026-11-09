@@ -1,0 +1,220 @@
+#!/usr/bin/env python3
+"""
+GABRIEL CLI - Unified Command Line Interface
+MC96DIGIUNIVERSE AI LIFELUV INFINITE ENERGY
+
+Usage:
+    gabriel status          Show system status
+    gabriel activate        Activate all systems
+    gabriel dreamchamber    Launch DreamChamber
+    gabriel speak <text>    Speak text with TTS
+    gabriel scan            Run visual scanner
+    gabriel server          Start MC96 server
+    gabriel doctor          Run system diagnostics
+    gabriel help            Show this help message
+"""
+
+import sys
+import os
+from pathlib import Path
+
+# Add GABRIEL_UNIFIED to path
+GABRIEL_ROOT = Path.home() / "GABRIEL_UNIFIED"
+sys.path.insert(0, str(GABRIEL_ROOT))
+
+import argparse
+import subprocess
+import json
+from datetime import datetime
+
+
+def print_banner():
+    print("""
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║              GABRIEL CLI - MC96DIGIUNIVERSE                      ║
+║                                                                  ║
+║         GOD MODE: ENABLED    ENERGY: ∞ INFINITE                  ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+""")
+
+
+def cmd_status(args):
+    """Show system status"""
+    print_banner()
+    print("📊 SYSTEM STATUS")
+    print("=" * 60)
+
+    components = {
+        "DreamChamber": GABRIEL_ROOT / "core" / "dreamchamber.py",
+        "Visual Scanner": GABRIEL_ROOT / "core" / "visual_scanner.py",
+        "MC96 Server": GABRIEL_ROOT / "core" / "mc96_server_x1000.py",
+        "God Brain": GABRIEL_ROOT / "god_brain.py",
+        "Launcher": GABRIEL_ROOT / "GORUNFREEX1000.py",
+    }
+
+    for name, path in components.items():
+        status = "✅ READY" if path.exists() else "❌ MISSING"
+        print(f"  {status} {name}")
+
+    # Check if server is running
+    result = subprocess.run(
+        ["lsof", "-i", ":5174"],
+        capture_output=True,
+        text=True
+    )
+    server_status = "✅ RUNNING" if result.returncode == 0 else "⚪ STOPPED"
+    print(f"\n  Server (port 5174): {server_status}")
+
+    print("\n" + "=" * 60)
+    print(f"  Timestamp: {datetime.now().isoformat()}")
+    print(f"  Energy Level: ∞ INFINITE")
+
+
+def cmd_activate(args):
+    """Activate all systems"""
+    print_banner()
+    print("🚀 ACTIVATING ALL SYSTEMS...")
+    print("=" * 60)
+
+    # Run DreamChamber
+    dreamchamber = GABRIEL_ROOT / "core" / "dreamchamber.py"
+    if dreamchamber.exists():
+        subprocess.run([sys.executable, str(dreamchamber)])
+    else:
+        print("❌ DreamChamber not found")
+
+
+def cmd_dreamchamber(args):
+    """Launch DreamChamber"""
+    dreamchamber = GABRIEL_ROOT / "core" / "dreamchamber.py"
+    if dreamchamber.exists():
+        subprocess.run([sys.executable, str(dreamchamber)])
+    else:
+        print("❌ DreamChamber not found")
+
+
+def cmd_speak(args):
+    """Speak text with TTS"""
+    text = " ".join(args.text)
+    if not text:
+        print("Usage: gabriel speak <text>")
+        return
+
+    print(f"🗣️  Speaking: {text}")
+    subprocess.run(["say", "-v", "Oliver", text])
+
+
+def cmd_scan(args):
+    """Run visual scanner"""
+    scanner = GABRIEL_ROOT / "core" / "visual_scanner.py"
+    if scanner.exists():
+        subprocess.run([sys.executable, str(scanner)])
+    else:
+        print("❌ Visual Scanner not found")
+
+
+def cmd_server(args):
+    """Start MC96 server"""
+    server = GABRIEL_ROOT / "core" / "mc96_server_x1000.py"
+    if server.exists():
+        print("🌐 Starting MC96 Server on port 5174...")
+        subprocess.run([sys.executable, str(server)])
+    else:
+        print("❌ MC96 Server not found")
+
+
+def cmd_doctor(args):
+    """Run system diagnostics"""
+    print_banner()
+    print("🔍 RUNNING DIAGNOSTICS...")
+    print("=" * 60)
+
+    checks = [
+        ("Python", lambda: sys.version),
+        ("GABRIEL_ROOT", lambda: str(GABRIEL_ROOT) if GABRIEL_ROOT.exists() else "MISSING"),
+        ("Core Directory", lambda: "OK" if (GABRIEL_ROOT / "core").exists() else "MISSING"),
+        ("Config Directory", lambda: "OK" if (GABRIEL_ROOT / "config").exists() else "MISSING"),
+        ("Logs Directory", lambda: "OK" if (GABRIEL_ROOT / "logs").exists() else "MISSING"),
+    ]
+
+    all_ok = True
+    for name, check in checks:
+        try:
+            result = check()
+            ok = "MISSING" not in result
+            status = "✅" if ok else "❌"
+            print(f"  {status} {name}: {result}")
+            if not ok:
+                all_ok = False
+        except Exception as e:
+            print(f"  ❌ {name}: ERROR - {e}")
+            all_ok = False
+
+    print("\n" + "=" * 60)
+    if all_ok:
+        print("  ✅ ALL SYSTEMS HEALTHY")
+    else:
+        print("  ⚠️  SOME ISSUES DETECTED")
+
+
+def cmd_help(args):
+    """Show help"""
+    print(__doc__)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="GABRIEL CLI - MC96DIGIUNIVERSE AI LIFELUV",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
+
+    # Status
+    subparsers.add_parser("status", help="Show system status")
+
+    # Activate
+    subparsers.add_parser("activate", help="Activate all systems")
+
+    # DreamChamber
+    subparsers.add_parser("dreamchamber", help="Launch DreamChamber")
+
+    # Speak
+    speak_parser = subparsers.add_parser("speak", help="Speak text with TTS")
+    speak_parser.add_argument("text", nargs="*", help="Text to speak")
+
+    # Scan
+    subparsers.add_parser("scan", help="Run visual scanner")
+
+    # Server
+    subparsers.add_parser("server", help="Start MC96 server")
+
+    # Doctor
+    subparsers.add_parser("doctor", help="Run system diagnostics")
+
+    # Help
+    subparsers.add_parser("help", help="Show help")
+
+    args = parser.parse_args()
+
+    commands = {
+        "status": cmd_status,
+        "activate": cmd_activate,
+        "dreamchamber": cmd_dreamchamber,
+        "speak": cmd_speak,
+        "scan": cmd_scan,
+        "server": cmd_server,
+        "doctor": cmd_doctor,
+        "help": cmd_help,
+    }
+
+    if args.command in commands:
+        commands[args.command](args)
+    else:
+        cmd_help(args)
+
+
+if __name__ == "__main__":
+    main()

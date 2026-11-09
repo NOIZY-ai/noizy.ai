@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #050505;
+  --color-panel: #0a0a0a;
+  --color-primary: #00ff9d; /* Neon Green */
+  --color-secondary: #00d2ff; /* Cyan */
+  --color-danger: #ff0055;
+  --color-text: #e0e0e0;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden; /* App-like feel */
+}
+
+/* Planar2485 Theme Utilities */
+.planar-panel {
+  @apply bg-neutral-900/80 backdrop-blur-md border border-white/10 rounded-lg p-4 shadow-xl;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.planar-header {
+  @apply text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-3 flex items-center gap-2;
+}
+
+.neon-text {
+  text-shadow: 0 0 10px currentColor;
+}
+
+.scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.console-input {
+  @apply bg-black border border-white/20 text-green-400 font-mono text-sm p-3 w-full rounded focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all;
+}
+
+/* Animations */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 3s infinite;
+}

@@ -1,0 +1,39 @@
+{
+  "name": "gabriel-hp-omen",
+  "version": "1.0.0",
+  "description": "GABRIEL Workers AI Controller - Directs & Controls All AI Inference",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "db:create": "wrangler d1 create gabriel-memcell",
+    "db:migrate": "wrangler d1 execute gabriel-memcell --file=./schema.sql",
+    "db:migrate:local": "wrangler d1 execute gabriel-memcell --file=./schema.sql --local",
+    "kv:create": "wrangler kv namespace create GABRIEL_CACHE",
+    "r2:create": "wrangler r2 bucket create gabriel-files",
+    "queue:create": "wrangler queues create gabriel-tasks",
+    "tail": "wrangler tail",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "@cloudflare/ai-utils": "^1.0.0",
+    "hono": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "typescript": "^5.3.0",
+    "wrangler": "^3.99.0"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "ai",
+    "gabriel",
+    "hp-omen",
+    "function-calling",
+    "batch-api"
+  ],
+  "author": "NOIZYLAB",
+  "license": "MIT"
+}

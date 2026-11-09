@@ -1,0 +1,636 @@
+{
+  "$schema": "../openai_voice_complete.schema.json",
+  "integration_id": "oai_a1b2c3d4e5f6g7h8",
+  "version": "2025.2.0",
+  "name": "NOIZYVOX OpenAI Voice Complete Integration",
+  "openai_audio_model_family": {
+    "text_to_speech_models": [
+      {
+        "model_id": "tts-1",
+        "generation": "1st Gen",
+        "description": "Standard quality, optimized for real-time streaming",
+        "quality_tier": "standard",
+        "latency": "~150ms first byte",
+        "sample_rate_hz": 24000,
+        "pricing_per_1m_chars_usd": 15.00,
+        "voices": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"],
+        "output_formats": ["mp3", "opus", "aac", "flac", "wav", "pcm"],
+        "max_input_chars": 4096,
+        "streaming": true,
+        "speed_control": {
+          "min": 0.25,
+          "max": 4.0,
+          "default": 1.0
+        },
+        "best_for": [
+          "Real-time applications",
+          "Voice assistants",
+          "Interactive experiences",
+          "High-volume production"
+        ],
+        "limitations": [
+          "No instruction-guided control",
+          "Fixed voice characteristics",
+          "No emotion tags"
+        ]
+      },
+      {
+        "model_id": "tts-1-hd",
+        "generation": "1st Gen HD",
+        "description": "High-definition audio with superior clarity",
+        "quality_tier": "high-definition",
+        "latency": "~300ms first byte",
+        "sample_rate_hz": 48000,
+        "pricing_per_1m_chars_usd": 30.00,
+        "voices": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"],
+        "output_formats": ["mp3", "opus", "aac", "flac", "wav", "pcm"],
+        "max_input_chars": 4096,
+        "streaming": true,
+        "speed_control": {
+          "min": 0.25,
+          "max": 4.0,
+          "default": 1.0
+        },
+        "best_for": [
+          "Audiobooks",
+          "Podcasts",
+          "Professional narration",
+          "Studio-quality production"
+        ],
+        "limitations": [
+          "Higher latency than tts-1",
+          "No instruction-guided control"
+        ]
+      },
+      {
+        "model_id": "gpt-4o-mini-tts",
+        "generation": "2nd Gen (Next-Gen)",
+        "description": "Instruction-guided TTS with emotion and style control",
+        "quality_tier": "premium",
+        "latency": "~200ms first byte",
+        "sample_rate_hz": 24000,
+        "pricing_per_1m_chars_usd": 12.00,
+        "voices": [
+          "alloy", "ash", "ballad", "coral", "echo",
+          "fable", "nova", "onyx", "sage", "shimmer", "verse"
+        ],
+        "output_formats": ["mp3", "opus", "aac", "flac", "wav", "pcm"],
+        "max_input_chars": 4096,
+        "streaming": true,
+        "instruction_guided": true,
+        "instruction_capabilities": {
+          "emotion_control": true,
+          "speaking_style": true,
+          "character_voice": true,
+          "pacing_control": true,
+          "emphasis_control": true,
+          "accent_hints": true
+        },
+        "instruction_examples": [
+          "Speak in a warm, grandfatherly tone with gentle pauses",
+          "Deliver this like an excited sports announcer",
+          "Read this as a mysterious narrator in a thriller",
+          "Sound empathetic and understanding, like a counselor"
+        ],
+        "best_for": [
+          "Custom persona voices",
+          "Emotional narration",
+          "Character performances",
+          "Branded voice experiences"
+        ],
+        "noizyvox_recommendation": "PRIMARY TTS FOR PERSONA PACKS"
+      }
+    ],
+    "speech_to_text_models": [
+      {
+        "model_id": "whisper-1",
+        "generation": "1st Gen",
+        "description": "OpenAI Whisper large-v2 via API",
+        "languages_supported": 99,
+        "pricing_per_minute_usd": 0.006,
+        "max_file_size_mb": 25,
+        "supported_formats": ["mp3", "mp4", "mpeg", "mpga", "m4a", "wav", "webm"],
+        "output_formats": ["json", "text", "srt", "vtt", "verbose_json"],
+        "features": {
+          "transcription": true,
+          "translation_to_english": true,
+          "word_timestamps": true,
+          "segment_timestamps": true,
+          "language_detection": true,
+          "prompt_conditioning": true
+        },
+        "word_error_rate": "~5% on clean speech",
+        "best_for": [
+          "General transcription",
+          "Subtitle generation",
+          "Meeting notes"
+        ]
+      },
+      {
+        "model_id": "gpt-4o-transcribe",
+        "generation": "2nd Gen (Next-Gen)",
+        "description": "GPT-4o powered transcription with superior accuracy",
+        "languages_supported": 99,
+        "pricing_per_minute_usd": 0.01,
+        "max_file_size_mb": 25,
+        "supported_formats": ["mp3", "mp4", "mpeg", "mpga", "m4a", "wav", "webm"],
+        "output_formats": ["json", "text", "verbose_json"],
+        "features": {
+          "transcription": true,
+          "word_timestamps": true,
+          "segment_timestamps": true,
+          "language_detection": true,
+          "streaming": true,
+          "improved_accent_handling": true,
+          "better_noise_robustness": true
+        },
+        "word_error_rate": "~4% (20% improvement over whisper-1)",
+        "best_for": [
+          "Professional transcription",
+          "Difficult audio conditions",
+          "Accented speech"
+        ],
+        "noizyvox_recommendation": "PRIMARY ASR FOR QUALITY"
+      }
+    ],
+    "realtime_speech_models": [
+      {
+        "model_id": "gpt-4o-realtime-preview",
+        "generation": "2nd Gen Realtime",
+        "description": "Native speech-to-speech with GPT-4o intelligence",
+        "type": "speech-to-speech",
+        "latency": "~300ms end-to-end",
+        "pricing": {
+          "audio_input_per_minute_usd": 0.06,
+          "audio_output_per_minute_usd": 0.24,
+          "text_input_per_1m_tokens_usd": 2.50,
+          "text_output_per_1m_tokens_usd": 10.00,
+          "cached_text_input_per_1m_tokens_usd": 1.25
+        },
+        "voices": [
+          "alloy", "ash", "ballad", "coral", "echo",
+          "fable", "nova", "onyx", "sage", "shimmer", "verse"
+        ],
+        "exclusive_voices": ["cedar", "marin"],
+        "audio_formats": {
+          "input": ["pcm16", "g711_ulaw", "g711_alaw"],
+          "output": ["pcm16", "g711_ulaw", "g711_alaw"]
+        },
+        "features": {
+          "native_audio_understanding": true,
+          "bidirectional_streaming": true,
+          "function_calling": true,
+          "tool_use": true,
+          "multi_turn_conversation": true,
+          "emotion_preservation": true,
+          "natural_interruption": true,
+          "server_side_vad": true,
+          "input_transcription": true,
+          "output_transcription": true
+        },
+        "context_window_tokens": 128000,
+        "max_output_tokens": 4096,
+        "best_for": [
+          "Voice agents",
+          "Customer support bots",
+          "AI companions",
+          "Interactive NPCs"
+        ],
+        "noizyvox_recommendation": "PRIMARY FOR AGENTIC VOICE"
+      }
+    ],
+    "audio_preview_models": [
+      {
+        "model_id": "gpt-4o-audio-preview",
+        "description": "GPT-4o with audio input/output in chat completions",
+        "capabilities": {
+          "audio_input": true,
+          "audio_output": true,
+          "text_input": true,
+          "text_output": true,
+          "image_input": true,
+          "function_calling": true
+        },
+        "pricing": {
+          "audio_input_per_1m_tokens_usd": 100.00,
+          "audio_output_per_1m_tokens_usd": 200.00,
+          "text_input_per_1m_tokens_usd": 2.50,
+          "text_output_per_1m_tokens_usd": 10.00
+        },
+        "use_cases": [
+          "Audio analysis",
+          "Voice-based reasoning",
+          "Multimodal understanding"
+        ]
+      }
+    ]
+  },
+  "voice_engine_preview": {
+    "status": "Limited Preview - Partner Access Only",
+    "capabilities": {
+      "voice_cloning": {
+        "min_audio_sample_seconds": 15,
+        "quality": "High fidelity voice replication",
+        "languages": "Multilingual support",
+        "emotion_transfer": true,
+        "speaker_verification": true
+      },
+      "safety_measures": [
+        "Explicit consent verification required",
+        "Watermarking of generated audio",
+        "Usage monitoring and auditing",
+        "Partner-only access during preview"
+      ]
+    },
+    "access_requirements": [
+      "Enterprise partnership agreement",
+      "Demonstrated legitimate use case",
+      "Commitment to safety guidelines"
+    ],
+    "noizyvox_recommendation": "Apply for partner access for premium artist voice replication"
+  },
+  "voice_characteristics": {
+    "standard_voices": [
+      {
+        "voice_id": "alloy",
+        "gender": "Neutral",
+        "age_range": "Young Adult",
+        "character_traits": ["Balanced", "Versatile", "Clear", "Friendly"],
+        "tonal_qualities": ["Warm", "Approachable", "Neutral affect"],
+        "pitch_range": "Medium",
+        "speaking_rate": "Moderate",
+        "best_content_types": ["General narration", "Tutorials", "Assistants"],
+        "emotion_range": "Moderate",
+        "availability": ["tts-1", "tts-1-hd", "gpt-4o-mini-tts", "realtime"]
+      },
+      {
+        "voice_id": "fable",
+        "gender": "Female",
+        "age_range": "Adult",
+        "character_traits": ["Expressive", "Dramatic", "Theatrical", "Dynamic"],
+        "tonal_qualities": ["Bright", "Animated", "Emotive"],
+        "pitch_range": "Wide",
+        "speaking_rate": "Variable",
+        "best_content_types": ["Audiobooks", "Character voices", "Entertainment"],
+        "emotion_range": "Very High",
+        "availability": ["tts-1", "tts-1-hd", "gpt-4o-mini-tts", "realtime"],
+        "noizyvox_recommendation": "EXCELLENT FOR PERSONA PACKS"
+      },
+      {
+        "voice_id": "onyx",
+        "gender": "Male",
+        "age_range": "Mature Adult",
+        "character_traits": ["Deep", "Authoritative", "Commanding", "Professional"],
+        "tonal_qualities": ["Resonant", "Rich bass", "Gravitas"],
+        "pitch_range": "Low",
+        "speaking_rate": "Measured",
+        "best_content_types": ["Documentaries", "News", "Corporate", "Trailers"],
+        "emotion_range": "Moderate",
+        "availability": ["tts-1", "tts-1-hd", "gpt-4o-mini-tts", "realtime"],
+        "noizyvox_recommendation": "IDEAL FOR EPIC NARRATOR PERSONAS"
+      }
+    ],
+    "extended_voices": [
+      {
+        "voice_id": "sage",
+        "gender": "Neutral",
+        "character_traits": ["Wise", "Measured", "Thoughtful", "Calm"],
+        "best_content_types": ["Educational", "Philosophy", "Guidance"],
+        "availability": ["gpt-4o-mini-tts", "realtime"]
+      },
+      {
+        "voice_id": "verse",
+        "gender": "Neutral",
+        "character_traits": ["Poetic", "Rhythmic", "Creative", "Flowing"],
+        "best_content_types": ["Poetry", "Creative writing", "Artistic content"],
+        "availability": ["gpt-4o-mini-tts", "realtime"]
+      }
+    ],
+    "exclusive_realtime_voices": [
+      {
+        "voice_id": "cedar",
+        "gender": "Male",
+        "character_traits": ["Rich", "Resonant", "Grounded", "Natural"],
+        "best_content_types": ["Conversations", "Storytelling", "Premium experiences"],
+        "availability": ["realtime-only"],
+        "premium": true
+      },
+      {
+        "voice_id": "marin",
+        "gender": "Female",
+        "character_traits": ["Bright", "Articulate", "Fresh", "Modern"],
+        "best_content_types": ["Conversations", "Assistants", "Premium experiences"],
+        "availability": ["realtime-only"],
+        "premium": true
+      }
+    ]
+  },
+  "instruction_guided_synthesis": {
+    "capabilities": {
+      "emotion_control": {
+        "supported_emotions": [
+          "joy", "excitement", "enthusiasm", "warmth", "friendliness",
+          "sadness", "melancholy", "wistfulness", "grief",
+          "anger", "frustration", "intensity", "urgency",
+          "fear", "anxiety", "nervousness", "tension",
+          "calm", "serenity", "peace", "tranquility",
+          "confidence", "authority", "power", "determination"
+        ],
+        "instruction_patterns": [
+          "Speak with [emotion] in your voice",
+          "Sound [emotional quality]",
+          "Your tone should convey [emotional state]"
+        ]
+      },
+      "speaking_style_control": {
+        "supported_styles": [
+          "conversational", "formal", "casual", "intimate",
+          "professional", "academic", "journalistic",
+          "theatrical", "dramatic", "comedic",
+          "narrative", "storytelling", "documentary"
+        ],
+        "instruction_patterns": [
+          "Speak in a [style] manner",
+          "Deliver this like a [role/profession]",
+          "Read this as if it were [content type]"
+        ]
+      },
+      "pacing_control": {
+        "options": [
+          "very slow", "slow", "measured", "moderate",
+          "brisk", "fast", "rapid", "variable"
+        ],
+        "instruction_patterns": [
+          "Speak [speed adverb]",
+          "Take your time with this",
+          "Deliver rapidly with urgency"
+        ]
+      },
+      "character_voice": {
+        "instruction_patterns": [
+          "Speak like a [character type]",
+          "Voice this as a [age/gender/personality]",
+          "Imagine you are [specific character description]"
+        ],
+        "example_characters": [
+          "wise old mentor",
+          "excited child",
+          "stern military commander",
+          "gentle grandmother"
+        ]
+      }
+    },
+    "noizyvox_persona_mapping": {
+      "instruction_template": "You are voicing the character '{persona_name}'. {short_bio} Your vocal qualities are: {archetype_tags}.",
+      "example_mapping": {
+        "persona_id": "solar_sentinel_001",
+        "display_name": "Solar Sentinel",
+        "archetype_tags": ["epic", "inspirational", "warm", "heroic"],
+        "generated_instruction": "You are voicing the character 'Solar Sentinel'. A mythic guardian voice embodying hope and cosmic power."
+      }
+    }
+  },
+  "api_architecture": {
+    "rest_endpoints": {
+      "text_to_speech": {
+        "endpoint": "POST https://api.openai.com/v1/audio/speech",
+        "method": "POST",
+        "content_type": "application/json",
+        "response_type": "audio/mpeg (streaming)",
+        "request_schema": {
+          "model": "string (required) - tts-1, tts-1-hd, or gpt-4o-mini-tts",
+          "input": "string (required) - Text to synthesize, max 4096 chars",
+          "voice": "string (required) - Voice preset ID",
+          "response_format": "string (optional) - mp3, opus, aac, flac, wav, pcm",
+          "speed": "number (optional) - 0.25 to 4.0, default 1.0",
+          "instructions": "string (optional, gpt-4o-mini-tts only)"
+        }
+      },
+      "transcription": {
+        "endpoint": "POST https://api.openai.com/v1/audio/transcriptions",
+        "method": "POST",
+        "content_type": "multipart/form-data",
+        "request_schema": {
+          "file": "file (required) - Audio file",
+          "model": "string (required) - whisper-1, gpt-4o-transcribe, gpt-4o-mini-transcribe",
+          "language": "string (optional) - ISO-639-1 code",
+          "response_format": "string (optional) - json, text, srt, vtt, verbose_json"
+        }
+      },
+      "translation": {
+        "endpoint": "POST https://api.openai.com/v1/audio/translations",
+        "method": "POST",
+        "description": "Translate audio to English text"
+      }
+    },
+    "websocket_endpoints": {
+      "realtime_api": {
+        "endpoint": "wss://api.openai.com/v1/realtime",
+        "query_params": {
+          "model": "gpt-4o-realtime-preview or gpt-4o-mini-realtime-preview"
+        },
+        "headers": {
+          "Authorization": "Bearer $OPENAI_API_KEY",
+          "OpenAI-Beta": "realtime=v1"
+        },
+        "protocol": "WebSocket with JSON messages",
+        "audio_format": "Base64 encoded PCM16 at 24kHz mono"
+      }
+    },
+    "webrtc_endpoints": {
+      "session_creation": {
+        "endpoint": "POST https://api.openai.com/v1/realtime/sessions",
+        "description": "Create ephemeral token for browser WebRTC",
+        "response": "Ephemeral client token for WebRTC connection"
+      }
+    }
+  },
+  "sdk_ecosystem": {
+    "official_sdks": [
+      {
+        "name": "OpenAI Python SDK",
+        "package": "openai",
+        "installation": "pip install openai",
+        "github": "https://github.com/openai/openai-python",
+        "documentation": "https://platform.openai.com/docs/libraries/python",
+        "audio_support": {
+          "tts": true,
+          "transcription": true,
+          "translation": true,
+          "streaming": true
+        }
+      },
+      {
+        "name": "OpenAI Node.js SDK",
+        "package": "openai",
+        "installation": "npm install openai",
+        "github": "https://github.com/openai/openai-node",
+        "documentation": "https://platform.openai.com/docs/libraries/node",
+        "audio_support": {
+          "tts": true,
+          "transcription": true,
+          "translation": true,
+          "streaming": true
+        }
+      },
+      {
+        "name": "OpenAI Agents SDK (JavaScript)",
+        "package": "@openai/agents",
+        "installation": "npm install @openai/agents",
+        "github": "https://github.com/openai/openai-agents-js",
+        "documentation": "https://openai.github.io/openai-agents-js/",
+        "features": [
+          "Voice agents with WebRTC",
+          "Automatic microphone/speaker",
+          "Built-in audio streaming",
+          "Tool/function calling"
+        ]
+      }
+    ],
+    "azure_openai_sdk": {
+      "name": "Azure OpenAI SDK",
+      "languages": ["Python", "JavaScript", ".NET", "Java", "Go"],
+      "github": "https://github.com/azure-samples/aoai-realtime-audio-sdk",
+      "documentation": "https://learn.microsoft.com/en-us/azure/ai-services/openai/",
+      "features": [
+        "Enterprise authentication (Azure AD)",
+        "Regional deployment",
+        "Private endpoints",
+        "Content filtering"
+      ]
+    }
+  },
+  "fine_tuning_capabilities": {
+    "whisper_fine_tuning": {
+      "availability": "Via Hugging Face Transformers (not direct OpenAI API)",
+      "use_cases": [
+        "Domain-specific vocabulary",
+        "Accent adaptation",
+        "Technical terminology"
+      ],
+      "process": [
+        "Prepare labeled audio-transcript pairs",
+        "Format as Hugging Face dataset",
+        "Fine-tune using Transformers library"
+      ],
+      "noizyvox_recommendation": "Use for artist name recognition"
+    },
+    "text_model_fine_tuning": {
+      "available_models": ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"],
+      "api_endpoint": "POST https://api.openai.com/v1/fine_tuning/jobs",
+      "data_format": "JSONL with messages array",
+      "use_cases_for_voice": [
+        "Script enhancement patterns",
+        "SSML generation rules",
+        "Persona consistency"
+      ],
+      "noizyvox_recommendation": "Fine-tune for SSML generation"
+    }
+  },
+  "pricing_complete": {
+    "text_to_speech": {
+      "tts-1": {
+        "per_1m_characters": 15.00,
+        "per_1k_characters": 0.015,
+        "streaming": "Included"
+      },
+      "tts-1-hd": {
+        "per_1m_characters": 30.00,
+        "per_1k_characters": 0.030,
+        "streaming": "Included"
+      },
+      "gpt-4o-mini-tts": {
+        "per_1m_characters": 12.00,
+        "per_1k_characters": 0.012,
+        "streaming": "Included",
+        "instructions": "Included"
+      }
+    },
+    "speech_to_text": {
+      "whisper-1": {
+        "per_minute": 0.006,
+        "per_hour": 0.36
+      },
+      "gpt-4o-transcribe": {
+        "per_minute": 0.01,
+        "per_hour": 0.60
+      },
+      "gpt-4o-mini-transcribe": {
+        "per_minute": 0.003,
+        "per_hour": 0.18
+      }
+    },
+    "realtime_api": {
+      "gpt-4o-realtime-preview": {
+        "audio_input_per_minute": 0.06,
+        "audio_output_per_minute": 0.24,
+        "text_input_per_1m_tokens": 2.50,
+        "text_output_per_1m_tokens": 10.00
+      },
+      "gpt-4o-mini-realtime-preview": {
+        "audio_input_per_minute": 0.01,
+        "audio_output_per_minute": 0.04,
+        "text_input_per_1m_tokens": 0.60,
+        "text_output_per_1m_tokens": 2.40
+      }
+    },
+    "audio_in_chat": {
+      "gpt-4o-audio-preview": {
+        "audio_input_per_1m_tokens": 100.00,
+        "audio_output_per_1m_tokens": 200.00
+      },
+      "gpt-4o-mini-audio-preview": {
+        "audio_input_per_1m_tokens": 20.00,
+        "audio_output_per_1m_tokens": 40.00
+      }
+    }
+  },
+  "noizyvox_recommendations": {
+    "tier_1_premium_production": {
+      "tts_model": "gpt-4o-mini-tts",
+      "tts_rationale": "Instruction-guided for persona matching, best quality-to-cost ratio",
+      "asr_model": "gpt-4o-transcribe",
+      "asr_rationale": "Superior accuracy for professional transcription",
+      "realtime_model": "gpt-4o-realtime-preview",
+      "realtime_rationale": "Full GPT-4o intelligence for complex voice agents",
+      "estimated_cost_per_1m_chars": 12.00
+    },
+    "tier_2_balanced": {
+      "tts_model": "tts-1",
+      "asr_model": "gpt-4o-mini-transcribe",
+      "realtime_model": "gpt-4o-mini-realtime-preview",
+      "estimated_cost_per_1m_chars": 15.00
+    },
+    "tier_3_high_volume": {
+      "tts_model": "tts-1",
+      "asr_model": "whisper-1",
+      "fallback_to_oss": true,
+      "estimated_cost_per_1m_chars": 15.00
+    },
+    "persona_pack_strategy": {
+      "primary_tts": "gpt-4o-mini-tts",
+      "voice_selection": ["fable", "onyx", "shimmer", "sage", "verse"],
+      "instruction_usage": "Generate dynamic instructions from persona metadata",
+      "hybrid_approach": "Use Fish Speech for cloned voices, OpenAI for preset-based"
+    },
+    "agentic_voice_strategy": {
+      "primary_model": "gpt-4o-realtime-preview",
+      "fallback_model": "gpt-4o-mini-realtime-preview",
+      "function_calling": true,
+      "vad_mode": "server_side"
+    }
+  },
+  "implementation_examples": {
+    "python_tts_streaming": "from openai import OpenAI\nclient = OpenAI()\nwith client.audio.speech.with_streaming_response.create(\n    model='gpt-4o-mini-tts',\n    voice='fable',\n    input='Hello, world!',\n    instructions='Speak warmly'\n) as response:\n    response.stream_to_file('output.mp3')",
+    "python_realtime_agent": "import asyncio\nfrom openai import AsyncOpenAI\nasync def voice_agent():\n    client = AsyncOpenAI()\n    async with client.beta.realtime.connect(\n        model='gpt-4o-realtime-preview'\n    ) as conn:\n        await conn.session.update(session={'voice': 'sage'})",
+    "javascript_webrtc": "import { RealtimeClient } from '@openai/realtime-api-beta';\nconst client = new RealtimeClient({ apiKey: process.env.OPENAI_API_KEY });\nawait client.connect();",
+    "persona_instruction_generator": "def generate_instruction(persona):\n    return f\"You are '{persona.display_name}'. {persona.short_bio}\""
+  },
+  "metadata": {
+    "created_at": "2024-12-11T10:00:00Z",
+    "updated_at": "2024-12-11T10:00:00Z",
+    "created_by": "noizyvox_platform",
+    "openai_api_version": "2024-12-01",
+    "tags": ["openai", "voice", "tts", "asr", "realtime", "production"]
+  }
+}

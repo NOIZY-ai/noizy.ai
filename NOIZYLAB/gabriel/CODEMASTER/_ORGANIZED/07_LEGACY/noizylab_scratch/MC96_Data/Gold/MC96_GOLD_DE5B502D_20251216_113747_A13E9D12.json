@@ -1,0 +1,27 @@
+{
+  "GOLD_ID": "GOLD_de5b502d",
+  "Title": "[MC96_PRIME] GORUNFREEX1000 Ruleset",
+  "Body": "TruthScan produces a safe fix queue: Duplicates + canonical plan + Safe-Auto/Safe-Confirm/Manual actions; 'do-no-harm' checklist always emitted.",
+  "Tags": [
+    "CORE",
+    "DOCTRINE",
+    "GOLD",
+    "RULESET"
+  ],
+  "Provenance": [
+    {
+      "id": "DOCTRINE_GOLD-05",
+      "source": "MEMCELL_CORE",
+      "timestamp": "2025-12-16T11:27:46.267348-05:00"
+    }
+  ],
+  "Meta": {
+    "Confidence": 80,
+    "LastVerified": "2025-12-16T11:37:47.881946-05:00",
+    "DriftRisk": "LOW",
+    "DriftTypes": [],
+    "GateStatus": "ACTIVE",
+    "Actionability": "ACTION",
+    "Trigger": "Action Flag: ACTION, Confidence: 80"
+  }
+}

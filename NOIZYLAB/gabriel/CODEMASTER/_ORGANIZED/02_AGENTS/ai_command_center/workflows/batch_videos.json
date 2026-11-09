@@ -1,0 +1,25 @@
+[
+    {
+        "type": "video",
+        "prompt": "cinematic sunset over ocean waves",
+        "duration": 5
+    },
+    {
+        "type": "video",
+        "prompt": "futuristic city skyline at night",
+        "duration": 5
+    },
+    {
+        "type": "video",
+        "prompt": "drone shot through forest canopy",
+        "duration": 5
+    },
+    {
+        "type": "audio",
+        "prompt": "ambient electronic music, calm"
+    },
+    {
+        "type": "audio",
+        "prompt": "epic orchestral trailer music"
+    }
+]

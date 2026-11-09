@@ -1,0 +1,361 @@
+{
+  "$schema": "../supersonic_pipeline.schema.json",
+  "pipeline_id": "sonic_a1b2c3d4e5f6g7h8",
+  "version": "1.0.0",
+  "name": "NOIZYVOX Production Pipeline",
+  "description": "Optimized end-to-end voice synthesis pipeline using best-in-class open-source models",
+  "active_tier": "tier_1_premium",
+  "recommended_stack": {
+    "tier_1_premium": {
+      "tts_primary": "Fish Speech V1.5",
+      "tts_fallback": "XTTS-v2",
+      "voice_cloning": "Fish Speech V1.5",
+      "lip_sync_video": "LatentSync",
+      "lip_sync_image": "Hallo2",
+      "emotion_text": "GoEmotions",
+      "emotion_audio": "Emotion2Vec",
+      "asr": "Whisper Large V3",
+      "vocoder": "BigVGAN V2",
+      "llm": "LLaMA 3.3 70B",
+      "embeddings": "BGE-M3",
+      "vector_db": "Qdrant"
+    },
+    "tier_2_balanced": {
+      "tts_primary": "F5-TTS",
+      "tts_fallback": "CosyVoice2",
+      "voice_cloning": "OpenVoice V2",
+      "lip_sync_video": "Wav2Lip",
+      "lip_sync_image": "SadTalker",
+      "emotion_text": "DistilRoBERTa Emotion",
+      "emotion_audio": "SpeechBrain",
+      "asr": "Faster-Whisper",
+      "vocoder": "HiFi-GAN",
+      "llm": "Qwen 2.5 32B",
+      "embeddings": "BGE-M3",
+      "vector_db": "ChromaDB"
+    },
+    "tier_3_edge": {
+      "tts_primary": "Kokoro TTS V1.0",
+      "tts_fallback": "Piper TTS",
+      "voice_cloning": "None (use prebuilt personas)",
+      "lip_sync_video": "Rhubarb (visemes only)",
+      "lip_sync_image": "LivePortrait",
+      "emotion_text": "DistilBERT Emotion",
+      "emotion_audio": "None",
+      "asr": "Whisper Tiny",
+      "vocoder": "Vocos",
+      "llm": "Gemma 2 9B (llama.cpp)",
+      "embeddings": "all-MiniLM-L6-v2",
+      "vector_db": "SQLite-VSS"
+    }
+  },
+  "pipeline_stages": [
+    {
+      "stage": "1_script_analysis",
+      "models": ["LLaMA 3.3 70B", "GoEmotions", "BGE-M3"],
+      "description": "Analyze script for emotions, emphasis, pacing",
+      "latency_target_ms": 500,
+      "gpu_required": true,
+      "can_stream": false,
+      "parallelizable": false
+    },
+    {
+      "stage": "2_ssml_generation",
+      "models": ["LLaMA 3.3 70B"],
+      "description": "Generate production SSML with prosody markup",
+      "latency_target_ms": 300,
+      "gpu_required": true,
+      "can_stream": true,
+      "parallelizable": false
+    },
+    {
+      "stage": "3_persona_retrieval",
+      "models": ["BGE-M3", "Qdrant"],
+      "description": "Retrieve persona characteristics for consistency",
+      "latency_target_ms": 50,
+      "gpu_required": false,
+      "can_stream": false,
+      "parallelizable": true
+    },
+    {
+      "stage": "4_voice_synthesis",
+      "models": ["Fish Speech V1.5", "BigVGAN V2"],
+      "description": "Generate speech from SSML",
+      "latency_target_ms": 200,
+      "gpu_required": true,
+      "can_stream": true,
+      "parallelizable": false
+    },
+    {
+      "stage": "5_audio_enhancement",
+      "models": ["DeepFilterNet", "Resemble Enhance"],
+      "description": "Noise reduction and quality enhancement",
+      "latency_target_ms": 100,
+      "gpu_required": false,
+      "can_stream": true,
+      "parallelizable": false
+    },
+    {
+      "stage": "6_quality_assessment",
+      "models": ["UTMOS", "ECAPA-TDNN"],
+      "description": "Validate quality and speaker similarity",
+      "latency_target_ms": 50,
+      "gpu_required": false,
+      "can_stream": false,
+      "parallelizable": true
+    },
+    {
+      "stage": "7_lip_sync_generation",
+      "models": ["LatentSync", "Rhubarb"],
+      "description": "Generate lip sync animation",
+      "latency_target_ms": 500,
+      "gpu_required": true,
+      "can_stream": false,
+      "parallelizable": true,
+      "skip_conditions": ["no_video_output", "audio_only"]
+    },
+    {
+      "stage": "8_watermarking",
+      "models": ["AudioSeal", "Custom spectral"],
+      "description": "Embed provenance watermark",
+      "latency_target_ms": 20,
+      "gpu_required": false,
+      "can_stream": true,
+      "parallelizable": false
+    }
+  ],
+  "model_registry": {
+    "fish_speech_v1.5": {
+      "name": "Fish Speech V1.5",
+      "version": "1.5.0",
+      "repo": "fishaudio/fish-speech",
+      "license": "Apache-2.0",
+      "commercial_use": true,
+      "model_size_gb": 2.8,
+      "vram_required_gb": 6,
+      "quantization_options": ["fp16", "int8"],
+      "supported_languages": ["en", "zh", "ja", "ko", "de", "fr", "es", "it", "pt", "ru"],
+      "latency_benchmark_ms": {
+        "gpu_a100": 45,
+        "gpu_4090": 65,
+        "gpu_3090": 95,
+        "cpu_only": 850
+      }
+    },
+    "xtts_v2": {
+      "name": "XTTS-v2",
+      "version": "2.0.3",
+      "repo": "coqui-ai/TTS",
+      "license": "other",
+      "commercial_use": false,
+      "model_size_gb": 1.8,
+      "vram_required_gb": 4,
+      "quantization_options": ["fp16"],
+      "supported_languages": ["en", "es", "fr", "de", "it", "pt", "pl", "tr", "ru", "nl", "cs", "ar", "zh", "ja", "hu", "ko"],
+      "latency_benchmark_ms": {
+        "gpu_a100": 120,
+        "gpu_4090": 180,
+        "gpu_3090": 250,
+        "cpu_only": 2500
+      }
+    },
+    "bigvgan_v2": {
+      "name": "BigVGAN V2",
+      "version": "2.0.0",
+      "repo": "NVIDIA/BigVGAN",
+      "license": "MIT",
+      "commercial_use": true,
+      "model_size_gb": 0.4,
+      "vram_required_gb": 2,
+      "quantization_options": ["fp16", "fp32"],
+      "supported_languages": ["universal"],
+      "latency_benchmark_ms": {
+        "gpu_a100": 8,
+        "gpu_4090": 12,
+        "gpu_3090": 18,
+        "cpu_only": 150
+      }
+    },
+    "whisper_large_v3": {
+      "name": "Whisper Large V3",
+      "version": "3.0",
+      "repo": "openai/whisper",
+      "license": "MIT",
+      "commercial_use": true,
+      "model_size_gb": 2.9,
+      "vram_required_gb": 8,
+      "quantization_options": ["fp16", "int8"],
+      "supported_languages": ["multilingual"],
+      "latency_benchmark_ms": {
+        "gpu_a100": 80,
+        "gpu_4090": 120,
+        "gpu_3090": 180,
+        "cpu_only": 1200
+      }
+    },
+    "latentsync": {
+      "name": "LatentSync",
+      "version": "1.0.0",
+      "repo": "bytedance/LatentSync",
+      "license": "Apache-2.0",
+      "commercial_use": true,
+      "model_size_gb": 1.5,
+      "vram_required_gb": 8,
+      "quantization_options": ["fp16"],
+      "supported_languages": ["universal"],
+      "latency_benchmark_ms": {
+        "gpu_a100": 200,
+        "gpu_4090": 350,
+        "gpu_3090": 500,
+        "cpu_only": 5000
+      }
+    },
+    "bge_m3": {
+      "name": "BGE-M3",
+      "version": "1.0.0",
+      "repo": "BAAI/bge-m3",
+      "license": "MIT",
+      "commercial_use": true,
+      "model_size_gb": 0.8,
+      "vram_required_gb": 2,
+      "quantization_options": ["fp16", "int8"],
+      "supported_languages": ["multilingual"],
+      "latency_benchmark_ms": {
+        "gpu_a100": 5,
+        "gpu_4090": 8,
+        "gpu_3090": 12,
+        "cpu_only": 80
+      }
+    }
+  },
+  "performance_benchmarks": {
+    "rtf_target": 0.1,
+    "first_byte_ms": 150,
+    "quality_mos_target": 4.3,
+    "speaker_similarity_target": 0.88,
+    "word_error_rate_target": 0.02,
+    "gpu_utilization_target": 0.85,
+    "throughput_chars_per_second": 5000
+  },
+  "cost_comparison": {
+    "elevenlabs_equivalent_cost_per_1m_chars": 300,
+    "playht_equivalent_cost_per_1m_chars": 250,
+    "noizyvox_oss_cost_per_1m_chars": 5,
+    "savings_percent": 98.3,
+    "break_even_volume_chars": 500000,
+    "infrastructure_monthly_cost": {
+      "cloud_gpu_cost": 1500,
+      "storage_cost": 100,
+      "bandwidth_cost": 200,
+      "total": 1800
+    }
+  },
+  "hardware_requirements": {
+    "tier_1_premium": {
+      "gpu": "NVIDIA A100 80GB or RTX 4090 24GB",
+      "vram_min_gb": 24,
+      "ram_min_gb": 64,
+      "storage_min_gb": 200,
+      "cpu_cores_min": 16
+    },
+    "tier_2_balanced": {
+      "gpu": "NVIDIA RTX 3090 or RTX 4080",
+      "vram_min_gb": 12,
+      "ram_min_gb": 32,
+      "storage_min_gb": 100,
+      "cpu_cores_min": 8
+    },
+    "tier_3_edge": {
+      "gpu": "None (CPU only) or Intel Arc",
+      "vram_min_gb": 0,
+      "ram_min_gb": 16,
+      "storage_min_gb": 50,
+      "cpu_cores_min": 4
+    }
+  },
+  "optimization_settings": {
+    "batching": {
+      "enabled": true,
+      "max_batch_size": 8,
+      "max_wait_ms": 50
+    },
+    "caching": {
+      "enabled": true,
+      "cache_embeddings": true,
+      "cache_ssml": true,
+      "cache_audio_segments": false,
+      "ttl_seconds": 3600
+    },
+    "quantization": {
+      "enabled": true,
+      "precision": "fp16",
+      "dynamic_quantization": false
+    },
+    "streaming": {
+      "enabled": true,
+      "chunk_size_tokens": 50,
+      "overlap_tokens": 10
+    },
+    "model_loading": {
+      "preload_all": false,
+      "lazy_load": true,
+      "unload_idle_seconds": 300,
+      "model_parallelism": false
+    }
+  },
+  "fallback_chain": [
+    {
+      "component": "tts",
+      "primary": "Fish Speech V1.5",
+      "fallbacks": ["XTTS-v2", "F5-TTS", "Kokoro TTS"],
+      "failover_conditions": ["model_unavailable", "quality_below_threshold", "timeout"]
+    },
+    {
+      "component": "voice_cloning",
+      "primary": "Fish Speech V1.5",
+      "fallbacks": ["OpenVoice V2", "XTTS-v2"],
+      "failover_conditions": ["model_unavailable", "similarity_below_threshold"]
+    },
+    {
+      "component": "lip_sync",
+      "primary": "LatentSync",
+      "fallbacks": ["Wav2Lip", "Rhubarb"],
+      "failover_conditions": ["model_unavailable", "gpu_unavailable"]
+    },
+    {
+      "component": "llm",
+      "primary": "LLaMA 3.3 70B",
+      "fallbacks": ["Qwen 2.5 32B", "Gemma 2 9B"],
+      "failover_conditions": ["model_unavailable", "vram_insufficient"]
+    }
+  ],
+  "quality_gates": {
+    "mos_minimum": 3.8,
+    "speaker_similarity_minimum": 0.80,
+    "intelligibility_minimum": 0.95,
+    "emotion_accuracy_minimum": 0.75,
+    "retry_on_failure": true,
+    "max_retries": 3,
+    "fallback_on_quality_fail": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics_endpoint": "https://metrics.noizyvox.ai/pipeline",
+    "log_level": "info",
+    "trace_requests": false,
+    "sample_rate": 0.1,
+    "alerting": {
+      "enabled": true,
+      "latency_threshold_ms": 2000,
+      "error_rate_threshold": 0.05,
+      "quality_drop_threshold": 0.1
+    }
+  },
+  "metadata": {
+    "created_at": "2024-12-11T10:00:00Z",
+    "updated_at": "2024-12-11T10:00:00Z",
+    "created_by": "noizyvox_platform",
+    "environment": "production",
+    "tags": ["supersonic", "production", "tier-1", "open-source"]
+  }
+}

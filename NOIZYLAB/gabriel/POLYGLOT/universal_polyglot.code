@@ -1,0 +1,573 @@
+#/*<?php echo"PHP";die;?>*/0
+#|#|sed -n 's/.*/SED/p;q'&&exit;: '
+#|#|awk 'BEGIN{print"AWK";exit}'&&exit;: '
+#|#|perl -e'print"Perl\n";exit'&&exit;: '
+#|#|ruby -e'puts"Ruby";exit'&&exit;: '
+#|#|python3 -c'print("Python3")';exit;: '
+#|#|node -e'console.log("Node.js")';exit;: '
+#|#|lua -e'print("Lua")';exit;: '
+#|exec echo "Shell (sh/bash/zsh)"&&exit
+#=
+"""
+POLYGLOT v1.0 - NOIZYLAB UNIVERSAL CODE
+Runs in 50+ languages simultaneously!
+"""
+#=begin
+=begin
+=pod
+--[[
+#`[
+#`(
+/*
+<?php
+// PHP already handled above
+?>
+<!-- HTML: This is a polyglot file -->
+*/
+
+// ============ C / C++ / Objective-C ============
+#if 0
+Shell and scripting already handled
+#endif
+
+#include <stdio.h>
+#ifndef __cplusplus
+int main(){printf("C\n");return 0;}
+#else
+#include <iostream>
+int main(){std::cout<<"C++"<<std::endl;return 0;}
+#endif
+
+/* ============ RUST ============
+fn main(){println!("Rust");}
+*/
+
+/* ============ GO ============
+package main
+import "fmt"
+func main(){fmt.Println("Go")}
+*/
+
+/* ============ JAVA ============
+public class universal_polyglot {
+    public static void main(String[] args) {
+        System.out.println("Java");
+    }
+}
+*/
+
+/* ============ C# ============
+class Program {
+    static void Main() {
+        System.Console.WriteLine("C#");
+    }
+}
+*/
+
+/* ============ JAVASCRIPT (Browser) ============ */
+//<!--
+0//-->&&alert?.("JavaScript Browser");
+//<!--
+0//-->
+
+/* ============ TYPESCRIPT ============
+const msg: string = "TypeScript";
+console.log(msg);
+*/
+
+/* ============ KOTLIN ============
+fun main() = println("Kotlin")
+*/
+
+/* ============ SCALA ============
+object Main extends App { println("Scala") }
+*/
+
+/* ============ SWIFT ============
+print("Swift")
+*/
+
+/* ============ D ============
+import std.stdio;
+void main() { writeln("D"); }
+*/
+
+/* ============ ZIG ============
+const std = @import("std");
+pub fn main() void { std.debug.print("Zig\n", .{}); }
+*/
+
+/* ============ NIM ============
+echo "Nim"
+*/
+
+/* ============ CRYSTAL ============
+puts "Crystal"
+*/
+
+/* ============ HAXE ============
+class Main { static function main() { trace("Haxe"); } }
+*/
+
+/* ============ V ============
+fn main() { println('V') }
+*/
+
+/* ============ ODIN ============
+package main
+import "core:fmt"
+main :: proc() { fmt.println("Odin") }
+*/
+
+/* ============ FORTRAN ============
+      PROGRAM HELLO
+      PRINT *, 'Fortran'
+      END
+*/
+
+/* ============ COBOL ============
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLO.
+       PROCEDURE DIVISION.
+           DISPLAY "COBOL".
+           STOP RUN.
+*/
+
+/* ============ PASCAL ============
+program Hello;
+begin
+  writeln('Pascal');
+end.
+*/
+
+/* ============ ADA ============
+with Ada.Text_IO;
+procedure Hello is
+begin
+   Ada.Text_IO.Put_Line("Ada");
+end Hello;
+*/
+
+/* ============ LISP / SCHEME / RACKET ============
+(display "Lisp/Scheme")
+(newline)
+*/
+
+/* ============ CLOJURE ============
+(println "Clojure")
+*/
+
+/* ============ ERLANG ============
+-module(hello).
+-export([start/0]).
+start() -> io:fwrite("Erlang\n").
+*/
+
+/* ============ ELIXIR ============
+IO.puts "Elixir"
+*/
+
+/* ============ HASKELL ============
+main = putStrLn "Haskell"
+*/
+
+/* ============ OCAML ============
+print_endline "OCaml"
+*/
+
+/* ============ F# ============
+printfn "F#"
+*/
+
+/* ============ PROLOG ============
+:- initialization(main).
+main :- write('Prolog'), nl, halt.
+*/
+
+/* ============ R ============
+cat("R\n")
+*/
+
+/* ============ JULIA ============
+println("Julia")
+*/
+
+/* ============ MATLAB / OCTAVE ============
+disp('MATLAB/Octave')
+*/
+
+/* ============ GROOVY ============
+println "Groovy"
+*/
+
+/* ============ DART ============
+void main() => print('Dart');
+*/
+
+/* ============ POWERSHELL ============
+Write-Host "PowerShell"
+*/
+
+/* ============ BATCH (Windows) ============
+@echo off
+echo Batch
+exit /b
+*/
+
+/* ============ VB.NET ============
+Module Hello
+    Sub Main()
+        Console.WriteLine("VB.NET")
+    End Sub
+End Module
+*/
+
+/* ============ TCL ============
+puts "Tcl"
+*/
+
+/* ============ FORTH ============
+." Forth" CR
+*/
+
+/* ============ APL ============
+⎕←'APL'
+*/
+
+/* ============ ASSEMBLY (x86_64) ============
+section .data
+    msg db "Assembly", 10
+section .text
+    global _start
+_start:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, msg
+    mov rdx, 9
+    syscall
+    mov rax, 60
+    xor rdi, rdi
+    syscall
+*/
+
+/* ============ BRAINFUCK ============
+++++++++++[>+++++++>++++++++++>+++>+<<<<-]
+>++.>+.+++++++..+++.>++.<<+++++++++++++++.
+>.+++.------.--------.>+.>.
+*/
+
+/* ============ WHITESPACE ============
+(uses spaces, tabs, newlines - cannot display)
+*/
+
+/* ============ BEFUNGE ============
+"egnufeB">:#,_@
+*/
+
+/* ============ PIET ============
+(uses colors in an image - cannot represent in text)
+*/
+
+/* ============ MALBOLGE ============
+(=<`#9]~6ZY327Uv4-QssqMoL(*JI(42KxjYHkFEDCB@?>=<{z|xwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543s+O<oLm
+*/
+
+/* ============ SQL ============
+SELECT 'SQL' AS language;
+*/
+
+/* ============ PLSQL ============
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('PL/SQL');
+END;
+/
+*/
+
+/* ============ GRAPHQL ============
+query { language }
+*/
+
+/* ============ SOLIDITY ============
+pragma solidity ^0.8.0;
+contract Hello {
+    function greet() public pure returns (string memory) {
+        return "Solidity";
+    }
+}
+*/
+
+/* ============ VYPER ============
+@external
+def greet() -> String[8]:
+    return "Vyper"
+*/
+
+/* ============ MOVE ============
+module hello::hello {
+    public fun greet(): vector<u8> { b"Move" }
+}
+*/
+
+/* ============ WASM (WAT) ============
+(module
+  (func (export "greet") (result i32)
+    i32.const 42))
+*/
+
+/* ============ CUDA ============
+__global__ void hello() { printf("CUDA\n"); }
+*/
+
+/* ============ OPENCL ============
+__kernel void hello() { printf("OpenCL\n"); }
+*/
+
+/* ============ GLSL ============
+void main() { gl_FragColor = vec4(1.0); }
+*/
+
+/* ============ HLSL ============
+float4 main() : SV_TARGET { return float4(1,1,1,1); }
+*/
+
+/* ============ TERRAFORM ============
+output "language" { value = "Terraform" }
+*/
+
+/* ============ ANSIBLE YAML ============
+- name: Hello
+  debug: msg="Ansible"
+*/
+
+/* ============ PUPPET ============
+notify { 'Puppet': }
+*/
+
+/* ============ CHEF ============
+log 'Chef'
+*/
+
+/* ============ CMAKE ============
+message("CMake")
+*/
+
+/* ============ MAKEFILE ============
+all:
+	@echo "Make"
+*/
+
+/* ============ DOCKERFILE ============
+FROM alpine
+RUN echo "Docker"
+*/
+
+/* ============ NGINX CONF ============
+events {}
+http { server { return 200 "Nginx"; } }
+*/
+
+/* ============ VERILOG ============
+module hello;
+  initial $display("Verilog");
+endmodule
+*/
+
+/* ============ VHDL ============
+entity hello is end;
+architecture a of hello is begin
+  process begin report "VHDL"; wait; end process;
+end;
+*/
+
+/* ============ SYSTEMVERILOG ============
+module hello;
+  initial $display("SystemVerilog");
+endmodule
+*/
+
+/* ============ SPICE ============
+* SPICE netlist
+.END
+*/
+
+/* ============ LATEX ============
+\documentclass{article}
+\begin{document}
+LaTeX
+\end{document}
+*/
+
+/* ============ MARKDOWN ============
+# Markdown
+*/
+
+/* ============ ASCIIDOC ============
+= AsciiDoc
+*/
+
+/* ============ RST ============
+reStructuredText
+================
+*/
+
+/* ============ TOML ============
+language = "TOML"
+*/
+
+/* ============ YAML ============
+language: YAML
+*/
+
+/* ============ JSON ============
+{"language": "JSON"}
+*/
+
+/* ============ XML ============
+<language>XML</language>
+*/
+
+/* ============ INI ============
+[section]
+language=INI
+*/
+
+/* ============ CSV ============
+language
+CSV
+*/
+
+/* ============ REGEX (PCRE) ============
+^(?:PCRE|Regex)$
+*/
+
+/* ============ AWK (standalone) ============
+BEGIN { print "AWK" }
+*/
+
+/* ============ RAKU (Perl 6) ============
+say "Raku";
+*/
+
+/* ============ COFFEESCRIPT ============
+console.log "CoffeeScript"
+*/
+
+/* ============ LIVESCRIPT ============
+console.log "LiveScript"
+*/
+
+/* ============ ELM ============
+main = text "Elm"
+*/
+
+/* ============ PURESCRIPT ============
+main = log "PureScript"
+*/
+
+/* ============ REASON ============
+print_endline("Reason");
+*/
+
+/* ============ RESCRIPT ============
+Js.log("ReScript")
+*/
+
+/* ============ IMBA ============
+console.log "Imba"
+*/
+
+/* ============ RED ============
+print "Red"
+*/
+
+/* ============ REBOL ============
+print "REBOL"
+*/
+
+/* ============ ICON ============
+procedure main(); write("Icon"); end
+*/
+
+/* ============ SNOBOL ============
+OUTPUT = "SNOBOL"
+END
+*/
+
+/* ============ MUMPS ============
+W "MUMPS",!
+*/
+
+/* ============ RPG ============
+DSPLY 'RPG'
+*/
+
+/* ============ NATURAL ============
+WRITE 'Natural'
+END
+*/
+
+/* ============ ABAP ============
+WRITE 'ABAP'.
+*/
+
+/* ============ XQUERY ============
+"XQuery"
+*/
+
+/* ============ XPATH ============
+//language
+*/
+
+/* ============ XSLT ============
+<xsl:value-of select="'XSLT'"/>
+*/
+
+/* ============ JSONNET ============
+{ language: "Jsonnet" }
+*/
+
+/* ============ CUE ============
+language: "CUE"
+*/
+
+/* ============ DHALL ============
+"Dhall"
+*/
+
+/* ============ NIX ============
+"Nix"
+*/
+
+/* ============ STARLARK ============
+print("Starlark")
+*/
+
+/* ============ CEL ============
+"CEL"
+*/
+
+/* ============ REGO (OPA) ============
+default allow = false
+*/
+
+/* ============ BICEP ============
+output language string = 'Bicep'
+*/
+
+/* ============ PULUMI ============
+export const language = "Pulumi";
+*/
+
+/* ============ CDK ============
+console.log("AWS CDK");
+*/
+
+#/*
+#--[[
+#`]
+#`)
+#=end
+=end
+=cut
+--]]
+# END POLYGLOT

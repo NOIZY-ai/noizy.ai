@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Cosmic Keystrokes</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <style>
+          @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap');
+
+          body {
+               font-family: 'Roboto Mono', monospace;
+               overflow: hidden;
+               background-color: #050510;
+          }
+
+          .cosmic-glow {
+               box-shadow: 0 0 10px #4f46e5, 0 0 20px #818cf8;
+          }
+
+          .star {
+               position: absolute;
+               background: white;
+               border-radius: 50%;
+               animation: twinkle var(--duration) infinite ease-in-out;
+               opacity: var(--opacity);
+          }
+
+          @keyframes twinkle {
+
+               0%,
+               100% {
+                    opacity: var(--opacity);
+                    transform: scale(1);
+               }
+
+               50% {
+                    opacity: 0.2;
+                    transform: scale(0.5);
+               }
+          }
+
+          .word-container {
+               transition: all 0.2s;
+          }
+
+          .typed-char {
+               color: #4ade80;
+               /* green-400 */
+               text-shadow: 0 0 5px #4ade80;
+          }
+
+          .projection-line {
+               height: 1px;
+               background: linear-gradient(90deg, rgba(79, 70, 229, 0) 0%, rgba(79, 70, 229, 0.5) 50%, rgba(79, 70, 229, 0) 100%);
+               width: 100%;
+               position: absolute;
+               z-index: -1;
+          }
+     </style>
+</head>
+
+<body class="text-white select-none">
+
+     <!-- HUD -->
+     <div class="fixed top-0 left-0 w-full p-6 flex justify-between items-start z-50 pointer-events-none">
+          <div>
+               <h1
+                    class="text-3xl font-bold font-['Orbitron'] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500 cosmic-glow-text">
+                    COSMIC KEYSTROKES
+               </h1>
+               <p class="text-xs text-indigo-300 mt-1 opacity-70">WASD to Move | Type words to destroy</p>
+          </div>
+          <div class="text-right">
+               <div
+                    class="text-4xl font-bold font-['Orbitron'] text-indigo-400 drop-shadow-[0_0_10px_rgba(129,140,248,0.8)]">
+                    <span id="score">0</span> pts
+               </div>
+               <div id="combo-display"
+                    class="text-sm text-purple-300 font-bold opacity-0 transition-opacity duration-300">
+                    COMBO x<span id="combo-count">0</span>
+               </div>
+          </div>
+     </div>
+
+     <!-- Game World -->
+     <div id="world" class="relative w-screen h-screen overflow-hidden">
+          <!-- Background Stars (generated via JS) -->
+          <div id="starfield" class="absolute inset-0 z-0"></div>
+
+          <!-- Player -->
+          <div id="player" class="absolute w-12 h-12 z-20 transition-transform duration-100 ease-linear">
+               <div class="relative w-full h-full">
+                    <!-- Ship Body -->
+                    <div
+                         class="absolute inset-0 bg-indigo-600 rotate-45 transform border-2 border-indigo-300 cosmic-glow rounded-sm">
+                    </div>
+                    <!-- Core -->
+                    <div class="absolute inset-3 bg-white blur-sm rounded-full"></div>
+                    <!-- Engine Trail -->
+                    <div
+                         class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-2 h-8 bg-gradient-to-b from-blue-400 to-transparent opacity-70 blur-[2px]">
+                    </div>
+               </div>
+          </div>
+
+          <!-- Typing Input Overlay (Hidden visual, functional focus) -->
+          <input type="text" id="hidden-input" class="opacity-0 absolute top-0 left-0" autocomplete="off">
+     </div>
+
+     <!-- Active Target Indicator -->
+     <div id="target-line" class="hidden absolute h-0.5 bg-indigo-500 opacity-30 origin-left z-10 pointer-events-none">
+     </div>
+
+     <script>
+          // --- Game Config & State ---
+          const config = {
+               playerSpeed: 6,
+               wordSpawnRate: 0.015,
+               wordSpeedBase: 1.5,
+               pointsPerChar: 10,
+               comboDecay: 2000
+          };
+
+          const state = {
+               score: 0,
+               combo: 0,
+               lastKillTime: 0,
+               player: { x: window.innerWidth / 4, y: window.innerHeight / 2 },
+               keys: { w: false, a: false, s: false, d: false },
+               entities: [],
+               activeTarget: null, // The word currently being typed
+               particles: []
+          };
+
+          const wordsList = [
+               'COSMIC', 'ORBIT', 'ASTEROID', 'NEBULA', 'GALAXY', 'PHOTON', 'QUANTUM', 'GRAVITY',
+               'HORIZON', 'STELLAR', 'PLASMA', 'BINARY', 'VOID', 'ECLIPSE', 'COMET', 'QUASAR',
+               'PULSAR', 'DARKMATTER', 'LIGHTSPEED', 'HYPERDRIVE', 'SINGULARITY', 'NOVA', 'ZENITH',
+               'ABYSS', 'INFINITY', 'DIMENSION', 'ENTROPY', 'FISSION', 'FUSION', 'ISOTOPE',
+               'KINETIC', 'LUMINOUS', 'MAGNETIC', 'NUCLEAR', 'OBSERVER', 'PARALLAX', 'RADIATION',
+               'SPECTRA', 'TELEMETRY', 'UNIVERSE', 'VECTOR', 'WAVELENGTH', 'XENON', 'YCTOMETER', 'ZERO'
+          ];
+
+          // --- DOM Elements ---
+          const dom = {
+               world: document.getElementById('world'),
+               starfield: document.getElementById('starfield'),
+               player: document.getElementById('player'),
+               score: document.getElementById('score'),
+               comboDisplay: document.getElementById('combo-display'),
+               comboCount: document.getElementById('combo-count'),
+               targetLine: document.getElementById('target-line')
+          };
+
+          // --- Initialization ---
+          function init() {
+               createStars();
+               window.addEventListener('keydown', (e) => handleKey(e, true));
+               window.addEventListener('keyup', (e) => handleKey(e, false));
+
+               // Global key press for typing
+               window.addEventListener('keydown', handleTyping);
+
+               requestAnimationFrame(gameLoop);
+          }
+
+          function createStars() {
+               for (let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    const size = Math.random() * 3 + 1;
+                    star.style.width = size + 'px';
+                    star.style.height = size + 'px';
+                    star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                    star.style.setProperty('--opacity', Math.random() * 0.7 + 0.3);
+                    dom.starfield.appendChild(star);
+               }
+          }
+
+          // --- Input Handling ---
+          function handleKey(e, isDown) {
+               const k = e.key.toLowerCase();
+               if (state.keys.hasOwnProperty(k)) {
+                    state.keys[k] = isDown;
+               }
+          }
+
+          function handleTyping(e) {
+               // Ignore movement keys if they aren't part of the target word (simple check)
+               // Actually, we want to capture letters a-z
+               if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+                    const char = e.key.toUpperCase();
+
+                    // If we don't have an active target, try to find one starting with this char
+                    if (!state.activeTarget) {
+                         // Find closest word starting with this char
+                         const candidates = state.entities.filter(ent =>
+                              ent.word.charAt(0) === char && isVisible(ent)
+                         );
+
+                         if (candidates.length > 0) {
+                              // Pick closest
+                              candidates.sort((a, b) => getDistance(state.player, a) - getDistance(state.player, b));
+                              state.activeTarget = candidates[0];
+                              processHit(state.activeTarget, char);
+                         }
+                    } else {
+                         // We have a target, check next char
+                         const expectedChar = state.activeTarget.word.charAt(state.activeTarget.typedIndex);
+                         if (char === expectedChar) {
+                              processHit(state.activeTarget, char);
+                         } else {
+                              // Miss! Reset combo? Or Shake effect?
+                              shakeElement(state.activeTarget.el);
+                         }
+                    }
+               }
+
+               // Cancel target with specific key? Maybe Escape?
+               if (e.key === 'Escape') {
+                    if (state.activeTarget) {
+                         resetTarget(state.activeTarget);
+                         state.activeTarget = null;
+                    }
+               }
+          }
+
+          function processHit(entity, char) {
+               entity.typedIndex++;
+               updateEntityVisuals(entity);
+               createParticle(entity.x + (entity.typedIndex * 15), entity.y, '#4ade80');
+
+               // Check formatted completion
+               if (entity.typedIndex >= entity.word.length) {
+                    destroyEntity(entity);
+               }
+          }
+
+          function destroyEntity(entity) {
+               // Score
+               const points = entity.word.length * config.pointsPerChar * (1 + (state.combo * 0.1));
+               state.score += Math.floor(points);
+               state.lastKillTime = Date.now();
+               state.combo++;
+
+               updateElementScore();
+               createExplosion(entity.x, entity.y);
+
+               // Remove
+               entity.el.remove();
+               state.entities = state.entities.filter(e => e !== entity);
+               state.activeTarget = null;
+          }
+
+          function resetTarget(entity) {
+               entity.typedIndex = 0;
+               updateEntityVisuals(entity);
+          }
+
+          // --- Core Loop ---
+          function gameLoop() {
+               updatePlayer();
+               updateEntities();
+               updateParticles();
+               checkCollisions();
+               updateStrings();
+
+               requestAnimationFrame(gameLoop);
+          }
+
+          function updatePlayer() {
+               if (state.keys.w) state.player.y -= config.playerSpeed;
+               if (state.keys.s) state.player.y += config.playerSpeed;
+               if (state.keys.a) state.player.x -= config.playerSpeed;
+               if (state.keys.d) state.player.x += config.playerSpeed;
+
+               // Bounds
+               state.player.x = Math.max(20, Math.min(window.innerWidth - 70, state.player.x));
+               state.player.y = Math.max(20, Math.min(window.innerHeight - 70, state.player.y));
+
+               dom.player.style.transform = `translate(${state.player.x}px, ${state.player.y}px)`;
+
+               // Slight rotation based on movement
+               const rotX = state.keys.w ? -10 : (state.keys.s ? 10 : 0);
+               const rotY = state.keys.a ? -10 : (state.keys.d ? 10 : 0);
+               dom.player.children[0].style.transform = `perspective(500px) rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(45deg)`;
+          }
+
+          function updateEntities() {
+               // Spawn
+               if (Math.random() < config.wordSpawnRate && state.entities.length < 10) {
+                    spawnWord();
+               }
+
+               // Move
+               state.entities.forEach(ent => {
+                    ent.x -= ent.speed;
+                    ent.el.style.transform = `translate(${ent.x}px, ${ent.y}px)`;
+
+                    // Cleanup off-screen
+                    if (ent.x < -200) {
+                         ent.el.remove();
+                         if (state.activeTarget === ent) state.activeTarget = null;
+                    }
+               });
+
+               state.entities = state.entities.filter(ent => ent.x >= -200);
+          }
+
+          function spawnWord() {
+               const wordText = wordsList[Math.floor(Math.random() * wordsList.length)];
+               const div = document.createElement('div');
+               div.className = 'absolute font-bold text-xl tracking-widest px-3 py-1 bg-black/50 border border-indigo-500/30 rounded backdrop-blur-sm word-container';
+               // Start off-screen right
+               const startX = window.innerWidth + 50;
+               const startY = Math.random() * (window.innerHeight - 100) + 50;
+
+               const entity = {
+                    word: wordText,
+                    x: startX,
+                    y: startY,
+                    speed: config.wordSpeedBase + Math.random(),
+                    el: div,
+                    typedIndex: 0
+               };
+
+               updateEntityVisuals(entity);
+               dom.world.appendChild(div);
+               state.entities.push(entity);
+          }
+
+          function updateEntityVisuals(entity) {
+               const typed = entity.word.substring(0, entity.typedIndex);
+               const untyped = entity.word.substring(entity.typedIndex);
+
+               let html = `<span class="typed-char">${typed}</span>`;
+               if (untyped.length > 0) {
+                    // Highlight next char
+                    html += `<span class="text-indigo-400 border-b-2 border-indigo-500">${untyped.charAt(0)}</span>`;
+                    html += `<span class="text-white opacity-70">${untyped.slice(1)}</span>`;
+               }
+
+               entity.el.innerHTML = html;
+
+               if (state.activeTarget === entity) {
+                    entity.el.classList.add('border-indigo-400', 'shadow-[0_0_15px_rgba(129,140,248,0.5)]');
+                    entity.el.classList.remove('border-indigo-500/30');
+               } else {
+                    entity.el.classList.remove('border-indigo-400', 'shadow-[0_0_15px_rgba(129,140,248,0.5)]');
+                    entity.el.classList.add('border-indigo-500/30');
+               }
+          }
+
+          function updateStrings() {
+               // Draw line to active target
+               if (state.activeTarget) {
+                    const px = state.player.x + 24;
+                    const py = state.player.y + 24;
+                    const tx = state.activeTarget.x;
+                    const ty = state.activeTarget.y + 15;
+
+                    const dist = Math.sqrt(Math.pow(tx - px, 2) + Math.pow(ty - py, 2));
+                    const angle = Math.atan2(ty - py, tx - px);
+
+                    dom.targetLine.style.width = `${dist}px`;
+                    dom.targetLine.style.transform = `translate(${px}px, ${py}px) rotate(${angle}rad)`;
+                    dom.targetLine.classList.remove('hidden');
+               } else {
+                    dom.targetLine.classList.add('hidden');
+               }
+
+               // Combo decay
+               if (Date.now() - state.lastKillTime > config.comboDecay) {
+                    state.combo = 0;
+               }
+
+               dom.comboDisplay.style.opacity = state.combo > 1 ? '1' : '0';
+               dom.comboCount.innerText = state.combo;
+          }
+
+          function checkCollisions() {
+               const buffer = 40;
+               state.entities.forEach(ent => {
+                    if (getDistance(state.player, ent) < buffer) {
+                         // Collision! Punishment? Reset score?
+                         // For now, let's just push player back or destroy word without score
+                         // But user asked for typing game. Collision might mean 'damage'.
+                         // Let's destroy word and lose points.
+                         createExplosion(ent.x, ent.y, '#ef4444');
+                         ent.el.remove();
+                         ent.x = -999; // Mark for cleanup
+                         state.score = Math.max(0, state.score - 50);
+                         state.combo = 0;
+                         dom.score.classList.add('text-red-500');
+                         setTimeout(() => dom.score.classList.remove('text-red-500'), 200);
+                         updateElementScore();
+
+                         if (state.activeTarget === ent) state.activeTarget = null;
+                    }
+               });
+          }
+
+          // --- VFX ---
+          function createParticle(x, y, color) {
+               const p = document.createElement('div');
+               p.className = 'absolute w-1 h-1 rounded-full pointer-events-none';
+               p.style.backgroundColor = color;
+               p.style.left = x + 'px';
+               p.style.top = y + 'px';
+               dom.world.appendChild(p);
+
+               const angle = Math.random() * Math.PI * 2;
+               const velocity = Math.random() * 2 + 1;
+
+               state.particles.push({
+                    el: p,
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * velocity,
+                    vy: Math.sin(angle) * velocity,
+                    life: 1.0
+               });
+          }
+
+          function createExplosion(x, y, color = '#818cf8') {
+               for (let i = 0; i < 15; i++) {
+                    createParticle(x + 20, y + 20, color);
+               }
+          }
+
+          function updateParticles() {
+               state.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.05;
+                    p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
+                    p.el.style.opacity = p.life;
+
+                    if (p.life <= 0) {
+                         p.el.remove();
+                    }
+               });
+               state.particles = state.particles.filter(p => p.life > 0);
+          }
+
+          function shakeElement(el) {
+               el.classList.add('translate-x-1');
+               setTimeout(() => el.classList.remove('translate-x-1'), 50);
+               setTimeout(() => el.classList.add('-translate-x-1'), 100);
+               setTimeout(() => el.classList.remove('-translate-x-1'), 150);
+          }
+
+          function updateElementScore() {
+               dom.score.innerText = state.score;
+          }
+
+          function getDistance(p1, p2) {
+               return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+          }
+
+          function isVisible(ent) {
+               return ent.x > -50 && ent.x < window.innerWidth && ent.y > 0 && ent.y < window.innerHeight;
+          }
+
+          // Run
+          init();
+
+     </script>
+</body>
+
+</html>

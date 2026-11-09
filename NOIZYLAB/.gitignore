@@ -1,0 +1,207 @@
+# Audio/Video - COMPREHENSIVE BLOCK
+*.wav
+*.WAV
+*.mp3
+*.MP3
+*.mov
+*.MOV
+*.mp4
+*.MP4
+*.avi
+*.AVI
+*.mkv
+*.MKV
+*.webm
+*.WEBM
+*.flv
+*.FLV
+*.wmv
+*.WMV
+*.m4v
+*.M4V
+*.logicx
+*.flac
+*.FLAC
+*.aif
+*.aiff
+*.AIF
+*.AIFF
+*.m4a
+*.M4A
+*.ogg
+*.OGG
+*.opus
+*.wma
+*.WMA
+*.aac
+*.AAC
+*.ac3
+*.dts
+*.nki
+*.nkm
+*.nkc
+*.nkx
+*.nks
+*.nicnt
+*.ncw
+*.kontakt
+*.exs
+*.rex
+*.rx2
+*.sf2
+*.sfz
+*.gig
+*.als
+*.ptx
+*.ptf
+*.cpr
+*.npr
+*.sesx
+*.dmg
+*.iso
+*.img
+*.pkg
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Large binary/sample directories
+**/Samples/
+**/samples/
+**/Audio Files/
+**/Bounces/
+**/Renders/
+**/Exports/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Data directories (large files)
+PROJECTS/*/data/raw_wavs/
+PROJECTS/*/data/dataset/
+PROJECTS/*/data/curated/
+
+# Catalogs (generated, large)
+docs/*_CATALOG.md
+
+# Temporary
+*.tmp
+*.bak
+mission-run-*/
+archives/
+
+_Archives/
+_Screenshots/
+_Shortcuts/
+archives/
+logs/
+.vscode/
+.cursor/
+.copilot/
+output_directory/
+reports/
+.worktrees/
+gabriel/vault/artifacts/manifests/FISHNET_MANIFEST.json
+gabriel/vault/artifacts/manifests/FISHNET_MANIFEST.json
+*.json.bak
+**/*MANIFEST*.json
+MC96/
+
+# Old bloated archives (permission issues)
+CODEMASTER_OLD_BLOATED/
+
+# Python virtual environments (HUGE - don't commit)
+**/venv/
+**/.venv/
+**/*_venv/
+**/*venv*/
+**/fairseq_venv*/
+**/xtts_venv*/
+**/rvc_venv*/
+**/local_fairseq/
+gabriel/fairseq_venv311/
+gabriel/xtts_venv/
+gabriel/rvc_venv/
+gabriel/venv/
+gabriel/.venv/
+gabriel/local_fairseq/
+GABRIEL/fairseq_venv311/
+GABRIEL/xtts_venv/
+GABRIEL/rvc_venv/
+GABRIEL/venv/
+GABRIEL/.venv/
+GABRIEL/local_fairseq/
+
+# Embedded git repos
+**/golang_ecosystem/
+**/modules/rvc_train/
+gabriel/golang_ecosystem/
+GABRIEL/golang_ecosystem/
+gabriel/modules/
+GABRIEL/modules/
+
+# Large model/data files
+*.pth
+*.pt
+*.bin
+*.safetensors
+*.onnx
+*.ckpt
+*.h5
+*.keras
+
+# Large JSON indexes
+gabriel_index.json
+**/gabriel_index.json
+
+# Large golang JSON databases (42MB+)
+gabriel/golang/brain.json
+gabriel/golang/memcell_db_*.json
+
+# SQLite Temporary Files
+*.sqlite-wal
+*.sqlite-shm
+*.db-wal
+*.db-shm
+
+# Cloudflare Wrangler
+.wrangler/
+node_modules/
+dist/
+.output/
+
+# System Debris
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Logs & Temp
+logs/
+*.log
+*.tmp
+*.bak
+temp_sentry_test/
+test_event*
+
+# External libraries (cloned repos)
+fairseq/
+noizy_fish.db

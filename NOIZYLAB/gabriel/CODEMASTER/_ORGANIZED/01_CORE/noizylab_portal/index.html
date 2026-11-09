@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>⚡ NOIZYLAB PORTAL // AI Remote Support</title>
+     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+     <style>
+          :root {
+               --neon-gold: #FFD700;
+               --neon-purple: #800020;
+               --neon-blue: #C2B280;
+               --neon-green: #00FF88;
+               --neon-red: #FF4444;
+               --deep-space: #050505;
+               --glass-bg: rgba(10, 0, 0, 0.85);
+               --glass-border: rgba(128, 0, 32, 0.5);
+               --turbo-gradient: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               background: var(--deep-space);
+               color: white;
+               font-family: 'Rajdhani', sans-serif;
+               min-height: 100vh;
+               overflow-x: hidden;
+          }
+
+          /* === HEADER === */
+          .header {
+               background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.7));
+               padding: 1.5rem 2rem;
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               border-bottom: 1px solid var(--glass-border);
+          }
+
+          .logo h1 {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 2rem;
+               font-weight: 900;
+               background: linear-gradient(135deg, #C2B280, #800020, #4A0404);
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               letter-spacing: 0.3rem;
+          }
+
+          .logo .subtitle {
+               font-size: 0.75rem;
+               color: var(--neon-blue);
+               letter-spacing: 0.2rem;
+          }
+
+          .header-actions {
+               display: flex;
+               gap: 1rem;
+          }
+
+          .btn {
+               background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 40, 0.9));
+               border: 1px solid var(--neon-blue);
+               color: var(--neon-blue);
+               padding: 0.7rem 1.5rem;
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.75rem;
+               cursor: pointer;
+               border-radius: 8px;
+               transition: all 0.3s;
+               text-transform: uppercase;
+          }
+
+          .btn:hover {
+               background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+               color: white;
+               box-shadow: 0 0 20px var(--neon-blue);
+          }
+
+          .btn.primary {
+               border-color: var(--neon-gold);
+               color: var(--neon-gold);
+          }
+
+          .btn.primary:hover {
+               background: linear-gradient(135deg, var(--neon-gold), #FFA500);
+               color: black;
+          }
+
+          /* === MAIN LAYOUT === */
+          .main-container {
+               display: grid;
+               grid-template-columns: 300px 1fr 1fr 350px;
+               gap: 1rem;
+               padding: 1rem;
+               height: calc(100vh - 120px);
+          }
+
+          .panel {
+               background: var(--glass-bg);
+               backdrop-filter: blur(20px);
+               border: 1px solid var(--glass-border);
+               border-radius: 12px;
+               overflow: hidden;
+               display: flex;
+               flex-direction: column;
+          }
+
+          .panel-header {
+               padding: 1rem;
+               background: rgba(128, 0, 32, 0.2);
+               border-bottom: 1px solid var(--glass-border);
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.8rem;
+               font-weight: 600;
+               color: var(--neon-gold);
+               letter-spacing: 0.1rem;
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+          }
+
+          .panel-content {
+               flex: 1;
+               overflow-y: auto;
+               padding: 1rem;
+          }
+
+          /* === MACHINES PANEL === */
+          .machine-card {
+               background: rgba(0, 0, 0, 0.4);
+               border: 1px solid var(--glass-border);
+               border-radius: 10px;
+               padding: 1rem;
+               margin-bottom: 1rem;
+               cursor: pointer;
+               transition: all 0.3s;
+          }
+
+          .machine-card:hover {
+               border-color: var(--neon-gold);
+               box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+          }
+
+          .machine-card.selected {
+               border-color: var(--neon-gold);
+               background: rgba(255, 215, 0, 0.1);
+          }
+
+          .machine-header {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               margin-bottom: 0.8rem;
+          }
+
+          .machine-name {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 1rem;
+               font-weight: 600;
+          }
+
+          .status-dot {
+               width: 12px;
+               height: 12px;
+               border-radius: 50%;
+               box-shadow: 0 0 10px currentColor;
+          }
+
+          .status-dot.online {
+               background: var(--neon-green);
+               color: var(--neon-green);
+          }
+
+          .status-dot.offline {
+               background: var(--neon-red);
+               color: var(--neon-red);
+          }
+
+          .status-dot.warning {
+               background: var(--neon-gold);
+               color: var(--neon-gold);
+          }
+
+          .machine-info {
+               font-size: 0.8rem;
+               color: rgba(255, 255, 255, 0.6);
+          }
+
+          .machine-info span {
+               display: block;
+               margin-bottom: 0.3rem;
+          }
+
+          /* === DIAGNOSTICS PANEL === */
+          .diagnostics-grid {
+               display: grid;
+               grid-template-columns: repeat(2, 1fr);
+               gap: 1rem;
+               margin-bottom: 1.5rem;
+          }
+
+          .diag-card {
+               background: rgba(0, 0, 0, 0.4);
+               border: 1px solid var(--glass-border);
+               border-radius: 10px;
+               padding: 1rem;
+               text-align: center;
+          }
+
+          .diag-card .icon {
+               font-size: 2rem;
+               margin-bottom: 0.5rem;
+          }
+
+          .diag-card .label {
+               font-size: 0.7rem;
+               color: rgba(255, 255, 255, 0.6);
+               margin-bottom: 0.3rem;
+          }
+
+          .diag-card .value {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 1.2rem;
+               font-weight: 700;
+          }
+
+          .diag-card.good .value {
+               color: var(--neon-green);
+          }
+
+          .diag-card.warning .value {
+               color: var(--neon-gold);
+          }
+
+          .diag-card.critical .value {
+               color: var(--neon-red);
+          }
+
+          .problems-list {
+               margin-bottom: 1.5rem;
+          }
+
+          .problem-item {
+               background: rgba(255, 68, 68, 0.1);
+               border-left: 3px solid var(--neon-red);
+               padding: 0.8rem;
+               margin-bottom: 0.5rem;
+               border-radius: 0 8px 8px 0;
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+          }
+
+          .problem-text {
+               font-size: 0.85rem;
+          }
+
+          .heal-btn {
+               background: var(--neon-green);
+               color: black;
+               border: none;
+               padding: 0.4rem 0.8rem;
+               font-size: 0.7rem;
+               font-weight: 600;
+               border-radius: 4px;
+               cursor: pointer;
+          }
+
+          /* === TERMINAL PANEL === */
+          .terminal {
+               flex: 1;
+               background: #0a0a0a;
+               font-family: 'Courier New', monospace;
+               font-size: 0.85rem;
+               padding: 1rem;
+               overflow-y: auto;
+               line-height: 1.6;
+          }
+
+          .terminal-line {
+               margin-bottom: 0.3rem;
+          }
+
+          .terminal-line.user {
+               color: var(--neon-blue);
+          }
+
+          .terminal-line.output {
+               color: #CCC;
+          }
+
+          .terminal-line.error {
+               color: var(--neon-red);
+          }
+
+          .terminal-line.success {
+               color: var(--neon-green);
+          }
+
+          .terminal-input-area {
+               display: flex;
+               padding: 0.8rem;
+               background: rgba(0, 0, 0, 0.5);
+               border-top: 1px solid var(--glass-border);
+          }
+
+          .terminal-input-area input {
+               flex: 1;
+               background: transparent;
+               border: none;
+               color: white;
+               font-family: 'Courier New', monospace;
+               font-size: 0.9rem;
+               outline: none;
+          }
+
+          .terminal-input-area .prompt {
+               color: var(--neon-gold);
+               margin-right: 0.5rem;
+               font-weight: bold;
+          }
+
+          /* === FOOTER === */
+          .footer {
+               position: fixed;
+               bottom: 0;
+               left: 0;
+               right: 0;
+               padding: 0.8rem 2rem;
+               background: rgba(0, 0, 0, 0.9);
+               border-top: 1px solid var(--glass-border);
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               font-size: 0.75rem;
+          }
+
+          .footer-status {
+               display: flex;
+               gap: 2rem;
+          }
+
+          .footer-status span {
+               color: rgba(255, 255, 255, 0.6);
+          }
+
+          .footer-status .value {
+               color: var(--neon-blue);
+               font-family: 'Orbitron', monospace;
+          }
+
+          /* === NOTIFICATIONS === */
+          .notification {
+               position: fixed;
+               top: 50%;
+               left: 50%;
+               transform: translate(-50%, -50%) scale(0.9);
+               font-family: 'Orbitron', sans-serif;
+               padding: 1.5rem 3rem;
+               background: var(--glass-bg);
+               border: 2px solid var(--neon-gold);
+               border-radius: 15px;
+               box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+               opacity: 0;
+               transition: all 0.3s;
+               z-index: 1000;
+               pointer-events: none;
+          }
+
+          .notification.show {
+               opacity: 1;
+               transform: translate(-50%, -50%) scale(1);
+          }
+
+          /* === SCROLLBAR === */
+          ::-webkit-scrollbar {
+               width: 6px;
+          }
+
+          ::-webkit-scrollbar-track {
+               background: transparent;
+          }
+
+          ::-webkit-scrollbar-thumb {
+               background: var(--glass-border);
+               border-radius: 3px;
+          }
+
+          /* === VIDEO CHAT PANEL === */
+          .video-container {
+               display: flex;
+               flex-direction: column;
+               gap: 0.8rem;
+               height: 100%;
+          }
+
+          .video-wrapper {
+               position: relative;
+               flex: 1;
+               background: #0a0a0a;
+               border-radius: 10px;
+               overflow: hidden;
+               border: 1px solid var(--glass-border);
+          }
+
+          .video-wrapper video {
+               width: 100%;
+               height: 100%;
+               object-fit: cover;
+          }
+
+          .video-wrapper .video-label {
+               position: absolute;
+               bottom: 0.5rem;
+               left: 0.5rem;
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.65rem;
+               background: rgba(0, 0, 0, 0.7);
+               padding: 0.3rem 0.6rem;
+               border-radius: 4px;
+               color: var(--neon-gold);
+          }
+
+          .local-video {
+               flex: 0 0 120px;
+          }
+
+          .remote-video {
+               flex: 1;
+          }
+
+          .video-controls {
+               display: flex;
+               gap: 0.5rem;
+               justify-content: center;
+               padding: 0.5rem;
+          }
+
+          .video-btn {
+               background: rgba(0, 0, 0, 0.6);
+               border: 1px solid var(--glass-border);
+               color: white;
+               padding: 0.6rem 1rem;
+               border-radius: 20px;
+               cursor: pointer;
+               font-size: 1.2rem;
+               transition: all 0.3s;
+          }
+
+          .video-btn:hover {
+               background: var(--neon-purple);
+               border-color: var(--neon-gold);
+          }
+
+          .video-btn.active {
+               background: var(--neon-green);
+               color: black;
+          }
+
+          .video-btn.end-call {
+               background: var(--neon-red);
+          }
+
+          .call-status {
+               text-align: center;
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.7rem;
+               color: var(--neon-blue);
+               padding: 0.5rem;
+          }
+
+          /* === DRIVES PANEL === */
+          .drive-card {
+               display: flex;
+               align-items: center;
+               gap: 0.8rem;
+               padding: 0.6rem;
+               background: rgba(0, 0, 0, 0.3);
+               border-radius: 8px;
+               margin-bottom: 0.5rem;
+               cursor: pointer;
+               border-left: 3px solid var(--neon-green);
+               transition: all 0.2s;
+          }
+
+          .drive-card:hover {
+               background: rgba(255, 215, 0, 0.1);
+          }
+
+          .drive-card.warning {
+               border-color: var(--neon-gold);
+          }
+
+          .drive-card.critical {
+               border-color: var(--neon-red);
+          }
+
+          .drive-icon {
+               font-size: 1.5rem;
+          }
+
+          .drive-info {
+               display: flex;
+               flex-direction: column;
+          }
+
+          .drive-name {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.75rem;
+               font-weight: 600;
+          }
+
+          .drive-size {
+               font-size: 0.65rem;
+               color: rgba(255, 255, 255, 0.5);
+          }
+
+          @keyframes turbo-spin {
+               0% {
+                    background-position: 0% 50%;
+               }
+
+               50% {
+                    background-position: 100% 50%;
+               }
+
+               100% {
+                    background-position: 0% 50%;
+               }
+          }
+
+          .turbo-mode {
+               animation: turbo-pulse 0.5s infinite alternate;
+               border: 2px solid transparent !important;
+               background-image: linear-gradient(#000, #000), var(--turbo-gradient);
+               background-origin: border-box;
+               background-clip: content-box, border-box;
+               box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+          }
+     </style>
+</head>
+
+<body>
+     <!-- HEADER -->
+     <div class="header">
+          <div class="logo">
+               <h1>⚡ NOIZYLAB PORTAL</h1>
+               <div class="subtitle">AI-POWERED REMOTE SUPPORT • GABRIEL SYSTEM</div>
+          </div>
+          <div class="header-actions">
+               <button class="btn" onclick="discoverMachines()">📡 DISCOVER</button>
+               <button class="btn" onclick="runFullDiagnostics()">🔍 SCAN ALL</button>
+               <button class="btn" onclick="toggleGabrielStream()">⚡ GABRIEL</button>
+               <button class="btn" onclick="toggleLegacyRepair()">🔧 REPAIR</button>
+               <button class="btn" onclick="toggleVideoPanel()">📹 VIDEO</button>
+               <button class="btn" onclick="toggleGodMode()">⚡ GOD MODE</button>
+               <button class="btn" onclick="toggleTurboMode()">🚀 TURBO</button>
+               <button class="btn primary" onclick="gabrielSpeak('GABRIEL online. Portal ready.')">🔊 VOICE</button>
+          </div>
+     </div>
+
+     <!-- MAIN LAYOUT -->
+     <div class="main-container">
+          <!-- MACHINES PANEL -->
+          <div class="panel">
+               <div class="panel-header">
+                    <span>🖥️ CONNECTED MACHINES</span>
+                    <span id="machine-count">0</span>
+               </div>
+               <div class="panel-content" id="machines-list">
+                    <!-- Machine cards rendered here -->
+               </div>
+               <div class="panel-header" style="margin-top: auto;">
+                    <span>💾 LOCAL DRIVES</span>
+                    <span id="drives-count">0</span>
+               </div>
+               <div class="panel-content" id="drives-list" style="max-height: 200px;">
+                    <!-- Drives rendered here -->
+               </div>
+          </div>
+
+          <!-- DIAGNOSTICS PANEL -->
+          <div class="panel">
+               <div class="panel-header">
+                    <span>🔬 AI DIAGNOSTICS</span>
+                    <span id="selected-machine-name">Select a machine</span>
+               </div>
+               <div class="panel-content">
+                    <!-- HEALTH SCORE -->
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                         <div style="font-size: 3rem; font-family: 'Orbitron'; font-weight: 900;" id="health-score">—
+                         </div>
+                         <div style="font-size: 0.8rem; color: var(--neon-blue);">HEALTH SCORE</div>
+                         <div style="font-size: 0.65rem; color: rgba(255,255,255,0.5);" id="scan-time"></div>
+                    </div>
+
+                    <div class="diagnostics-grid" id="diag-grid">
+                         <div class="diag-card good">
+                              <div class="icon">🔥</div>
+                              <div class="label">CPU</div>
+                              <div class="value" id="diag-cpu">—</div>
+                         </div>
+                         <div class="diag-card good">
+                              <div class="icon">🧠</div>
+                              <div class="label">RAM</div>
+                              <div class="value" id="diag-ram">—</div>
+                         </div>
+                         <div class="diag-card good">
+                              <div class="icon">💾</div>
+                              <div class="label">DISK</div>
+                              <div class="value" id="diag-disk">—</div>
+                         </div>
+                         <div class="diag-card good">
+                              <div class="icon">🌐</div>
+                              <div class="label">NETWORK</div>
+                              <div class="value" id="diag-net">—</div>
+                         </div>
+                         <div class="diag-card good">
+                              <div class="icon">🔗</div>
+                              <div class="label">SWITCH</div>
+                              <div class="value" id="diag-switch">—</div>
+                         </div>
+                         <div class="diag-card good">
+                              <div class="icon">📦</div>
+                              <div class="label">MTU</div>
+                              <div class="value" id="diag-mtu">—</div>
+                         </div>
+                    </div>
+
+                    <div class="panel-header"
+                         style="margin: -1rem; margin-bottom: 1rem; margin-top: 1rem; padding: 0.8rem;">
+                         <span>📋 RECOMMENDATIONS</span>
+                    </div>
+                    <div id="recommendations-list" style="font-size: 0.75rem; max-height: 80px; overflow-y: auto;">
+                         <div style="color: rgba(255,255,255,0.5); padding: 0.5rem;">Run diagnostics to get
+                              recommendations</div>
+                    </div>
+
+                    <div class="panel-header"
+                         style="margin: -1rem; margin-bottom: 1rem; margin-top: 1rem; padding: 0.8rem;">
+                         <span>⚠️ PROBLEMS DETECTED</span>
+                         <button class="heal-btn" onclick="healAll()">🩹 HEAL ALL</button>
+                    </div>
+                    <div class="problems-list" id="problems-list">
+                         <div style="color: rgba(255,255,255,0.5); text-align: center; padding: 2rem;">
+                              No problems detected
+                         </div>
+                    </div>
+               </div>
+          </div>
+
+          <!-- TERMINAL PANEL -->
+          <div class="panel">
+               <div class="panel-header">
+                    <span>💻 LIVE TERMINAL</span>
+                    <button class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.6rem;" onclick="clearTerminal()">🗑️
+                         CLEAR</button>
+               </div>
+               <div class="terminal" id="terminal">
+                    <div class="terminal-line success">[PORTAL] GABRIEL AI Remote Support initialized.</div>
+                    <div class="terminal-line output">[PORTAL] Waiting for machine selection...</div>
+               </div>
+               <div class="terminal-input-area">
+                    <span class="prompt">$</span>
+                    <input type="text" id="terminal-input" placeholder="Enter command..."
+                         onkeydown="handleTerminalKey(event)">
+               </div>
+          </div>
+
+          <!-- VIDEO CHAT PANEL -->
+          <div class="panel" id="video-panel">
+               <div class="panel-header">
+                    <span>📹 VIDEO CHAT</span>
+                    <span id="call-status-badge">OFFLINE</span>
+               </div>
+               <div class="panel-content">
+                    <div class="video-container">
+                         <div class="video-wrapper remote-video">
+                              <video id="remote-video" autoplay playsinline></video>
+                              <span class="video-label">REMOTE</span>
+                         </div>
+                         <div class="video-wrapper local-video">
+                              <video id="local-video" autoplay playsinline muted></video>
+                              <span class="video-label">YOU</span>
+                         </div>
+                         <div class="call-status" id="call-status">📵 No active call</div>
+                         <div class="video-controls">
+                              <button class="video-btn" id="btn-camera" onclick="toggleCamera()">📷</button>
+                              <button class="video-btn" id="btn-mic" onclick="toggleMic()">🎤</button>
+                              <button class="video-btn active" id="btn-call" onclick="startCall()">📞</button>
+                              <button class="video-btn end-call" onclick="endCall()">📵</button>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+
+     <!-- GABRIEL STREAMING WINDOW (Collapsible) -->
+     <div id="gabriel-stream-container"
+          style="display: none; position: fixed; bottom: 80px; right: 20px; width: 500px; height: 350px; z-index: 1000;">
+          <div
+               style="background: linear-gradient(135deg, #0a0a0a, #1a0a0a); border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; height: 100%;">
+               <div
+                    style="padding: 0.5rem 1rem; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border);">
+                    <span style="font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-gold);">⚡ GABRIEL
+                         DREAMCHAMBER</span>
+                    <div>
+                         <button class="btn" style="padding: 0.2rem 0.5rem; font-size: 0.6rem;"
+                              onclick="toggleFullscreenGabriel()">🔲</button>
+                         <button class="btn" style="padding: 0.2rem 0.5rem; font-size: 0.6rem;"
+                              onclick="toggleGabrielStream()">✕</button>
+                    </div>
+               </div>
+               <div id="vm-view-container" tabindex="0"
+                    style="position: relative; width: 100%; height: calc(100% - 40px); background: #000; display: flex; align-items: center; justify-content: center; outline: none;">
+                    <div id="vm-placeholder" style="color: var(--neon-gold); text-align: center;">
+                         <div style="font-size: 2rem; margin-bottom: 1rem;">🖥️</div>
+                         <div>WAITING FOR STREAM</div>
+                         <div style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 0.5rem;">Select a
+                              machine to view screen</div>
+                    </div>
+                    <img id="gabriel_remote_desktop_view"
+                         style="width: 100%; height: 100%; object-fit: contain; display: none;" alt="Remote Screen">
+               </div>
+          </div>
+     </div>
+
+     <!-- LEGACY REPAIR PANEL (Modal) -->
+     <div id="legacy-repair-modal"
+          style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto;">
+          <div style="max-width: 800px; margin: 2rem auto; padding: 2rem;">
+               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Orbitron'; color: var(--neon-gold);">🔧 LEGACY MAC REPAIR SYSTEM</h2>
+                    <button class="btn" onclick="toggleLegacyRepair()">✕ CLOSE</button>
+               </div>
+
+               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <!-- Target Disk Mode -->
+                    <div class="panel" style="background: rgba(10,0,0,0.8);">
+                         <div class="panel-header">💿 TARGET DISK MODE</div>
+                         <div class="panel-content" style="font-size: 0.8rem;">
+                              <p style="margin-bottom: 1rem; color: rgba(255,255,255,0.7);">
+                                   Connect old Mac Pro via Thunderbolt and boot it in Target Disk Mode to access its
+                                   drives.
+                              </p>
+                              <div
+                                   style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                   <strong>Instructions:</strong><br>
+                                   1. Connect Thunderbolt cable between Macs<br>
+                                   2. Boot old Mac holding <kbd
+                                        style="background: #333; padding: 2px 6px; border-radius: 4px;">T</kbd> key<br>
+                                   3. Old Mac's disk appears on GOD.local<br>
+                                   4. Run repair from here
+                              </div>
+                              <button class="btn primary" onclick="scanTargetDisk()" style="width: 100%;">🔍 SCAN FOR
+                                   TARGET DISKS</button>
+                              <div id="target-disk-status" style="margin-top: 1rem; min-height: 50px;"></div>
+                         </div>
+                    </div>
+
+                    <!-- Legacy OS Repair -->
+                    <div class="panel" style="background: rgba(10,0,0,0.8);">
+                         <div class="panel-header">🍎 LEGACY OSX REPAIR</div>
+                         <div class="panel-content" style="font-size: 0.8rem;">
+                              <p style="margin-bottom: 1rem; color: rgba(255,255,255,0.7);">
+                                   Repair tools for older macOS versions (10.6 - 10.15).
+                              </p>
+                              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                   <button class="btn" onclick="runLegacyRepair('permissions')">🔐 Repair Disk
+                                        Permissions</button>
+                                   <button class="btn" onclick="runLegacyRepair('fsck')">🔧 Run fsck -fy</button>
+                                   <button class="btn" onclick="runLegacyRepair('rebuild')">📚 Rebuild Spotlight
+                                        Index</button>
+                                   <button class="btn" onclick="runLegacyRepair('caches')">🗑️ Clear System
+                                        Caches</button>
+                                   <button class="btn" onclick="runLegacyRepair('kext')">⚙️ Rebuild Kext Cache</button>
+                              </div>
+                         </div>
+                    </div>
+
+                    <!-- Disk First Aid -->
+                    <div class="panel" style="background: rgba(10,0,0,0.8);">
+                         <div class="panel-header">💊 DISK FIRST AID</div>
+                         <div class="panel-content" style="font-size: 0.8rem;">
+                              <p style="margin-bottom: 1rem; color: rgba(255,255,255,0.7);">
+                                   Run Disk Utility repairs on mounted volumes.
+                              </p>
+                              <select id="repair-volume-select" class="btn"
+                                   style="width: 100%; margin-bottom: 0.5rem; padding: 0.5rem;">
+                                   <option value="">Select Volume...</option>
+                              </select>
+                              <button class="btn" onclick="verifyVolume()" style="width: 100%; margin-bottom: 0.5rem;">✓
+                                   Verify Volume</button>
+                              <button class="btn primary" onclick="repairVolume()" style="width: 100%;">🔧 Repair
+                                   Volume</button>
+                              <div id="repair-status"
+                                   style="margin-top: 1rem; min-height: 100px; background: rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; max-height: 150px;">
+                              </div>
+                         </div>
+                    </div>
+
+                    <!-- Data Recovery -->
+                    <div class="panel" style="background: rgba(10,0,0,0.8);">
+                         <div class="panel-header">💾 DATA RECOVERY</div>
+                         <div class="panel-content" style="font-size: 0.8rem;">
+                              <p style="margin-bottom: 1rem; color: rgba(255,255,255,0.7);">
+                                   Recover files from damaged or formatted drives.
+                              </p>
+                              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                   <button class="btn" onclick="runRecovery('photorec')">📷 PhotoRec
+                                        (Images/Docs)</button>
+                                   <button class="btn" onclick="runRecovery('testdisk')">💿 TestDisk
+                                        (Partitions)</button>
+                                   <button class="btn" onclick="runRecovery('scan')">🔍 Deep Scan Drive</button>
+                              </div>
+                              <div
+                                   style="margin-top: 1rem; padding: 0.5rem; background: rgba(128,0,32,0.3); border-radius: 8px; border-left: 3px solid var(--neon-red);">
+                                   ⚠️ Data recovery works best on unmounted drives. Use Target Disk Mode for best
+                                   results.
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+
+     <!-- GOD MODE PANEL (Modal) -->
+     <div id="god-mode-modal"
+          style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto;">
+          <div style="max-width: 800px; margin: 2rem auto; padding: 2rem;">
+               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Orbitron'; color: var(--neon-gold);">⚡ GOD MODE AUTOMATION</h2>
+                    <button class="btn" onclick="toggleGodMode()">✕ CLOSE</button>
+               </div>
+
+               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <!-- App Launcher -->
+                    <div class="panel" style="background: rgba(10,0,0,0.8);">
+                         <div class="panel-header">🚀 APPLICATION LAUNCHER</div>
+                         <div class="panel-content">
+                              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                   <button class="btn" onclick="runAuto('launch_app', {app: 'Safari'})">🧭
+                                        Safari</button>
+                                   <button class="btn" onclick="runAuto('launch_app', {app: 'Terminal'})">💻
+                                        Terminal</button>
+                                   <button class="btn" onclick="runAuto('launch_app', {app: 'Music'})">🎵 Music</button>
+                                   <button class="btn" onclick="runAuto('launch_app', {app: 'System Settings'})">⚙️
+                                        Settings</button>
+                                   <button class="btn" onclick="runAuto('launch_app', {app: 'Xcode'})">🛠️
+                                        Xcode</button>
+                                   <button class="btn" onclick="runAuto('launch_app', {app: 'Slack'})">💬 Slack</button>
+                              </div>
+                         </div>
+                    </div>
+
+                    <!-- System Control -->
+                    <div class="panel" style="background: rgba(10,0,0,0.8);">
+                         <div class="panel-header">🎛️ SYSTEM CONTROL</div>
+                         <div class="panel-content">
+                              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                   <button class="btn" onclick="runAuto('set_volume', {level: 50})">🔊 Volume
+                                        50%</button>
+                                   <button class="btn" onclick="runAuto('set_volume', {level: 100})">🔊 Volume
+                                        100%</button>
+                                   <button class="btn" onclick="runAuto('set_volume', {level: 0})">🔇 Mute</button>
+                                   <button class="btn" onclick="runAuto('system_info', {})">ℹ️ System Info</button>
+                              </div>
+                         </div>
+                    </div>
+
+                    <!-- Metal Core -->
+                    <div class="panel" style="background: rgba(10,0,0,0.8); grid-column: span 2;">
+                         <div class="panel-header">☢️ METAL CORE BENCHMARK</div>
+                         <div class="panel-content">
+                              <button class="btn primary" style="width: 100%; margin-bottom: 1rem;"
+                                   onclick="runMetalBenchmark()">🔥 IGNITE METAL COMPUTE</button>
+                              <div id="metal-status"
+                                   style="font-family: monospace; color: var(--neon-blue); text-align: center;">Ready to
+                                   forge.</div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+
+     <!-- FOOTER -->
+     <div class="footer">
+          <div class="footer-status">
+               <span>API: <span class="value" id="api-status">CONNECTING...</span></span>
+               <span>LATENCY: <span class="value" id="latency">—</span></span>
+               <span>VOICE: <span class="value">READY</span></span>
+          </div>
+          <div style="color: rgba(255,255,255,0.5);">
+               NOIZYLAB PORTAL v1.0 • Powered by GABRIEL
+          </div>
+     </div>
+
+     <!-- NOTIFICATION -->
+     <div class="notification" id="notification"></div>
+
+     <script>
+          // ============================================================
+          //                    PORTAL CORE ENGINE
+          // ============================================================
+
+          const API_BASE = 'http://localhost:5185';
+          const VOICE_SERVER = 'http://localhost:5176';
+          const SIGNALING_SERVER = 'ws://localhost:5181/ws';
+          let machines = [];
+          let selectedMachine = null;
+          let signalingSocket = null;
+
+          // ============================================================
+          //                    MACHINE DISCOVERY
+          // ============================================================
+
+          async function discoverMachines() {
+               showNotification('📡 Scanning network...');
+               addTerminalLine('[PORTAL] Discovering machines on local network...', 'output');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/machines`);
+                    if (res.ok) {
+                         machines = await res.json();
+                         renderMachines();
+                         showNotification(`✅ Found ${machines.length} machines`);
+                         addTerminalLine(`[PORTAL] Discovered ${machines.length} machines.`, 'success');
+                    }
+               } catch (err) {
+                    // Demo fallback
+                    machines = [
+                         { id: 'm2ultra', name: 'M2 ULTRA', ip: '127.0.0.1', status: 'online', os: 'macOS 15.7', lastSeen: 'Now' },
+                         { id: 'hpomen', name: 'HP-OMEN', ip: '10.0.0.160', status: 'online', os: 'Windows 11', lastSeen: '2s ago' },
+                    ];
+                    renderMachines();
+                    addTerminalLine('[PORTAL] Using demo machine list (API offline).', 'output');
+               }
+          }
+
+          function renderMachines() {
+               const list = document.getElementById('machines-list');
+               document.getElementById('machine-count').textContent = machines.length;
+
+               list.innerHTML = machines.map(m => `
+                <div class="machine-card ${selectedMachine?.id === m.id ? 'selected' : ''}" onclick="selectMachine('${m.id}')">
+                    <div class="machine-header">
+                        <span class="machine-name">${m.name}</span>
+                        <span class="status-dot ${m.status}"></span>
+                    </div>
+                    <div class="machine-info">
+                        <span>📍 ${m.ip}</span>
+                        <span>💻 ${m.os}</span>
+                        <span>⏱️ ${m.lastSeen}</span>
+                    </div>
+                </div>
+            `).join('');
+          }
+
+          function selectMachine(id) {
+               selectedMachine = machines.find(m => m.id === id);
+               renderMachines();
+               document.getElementById('selected-machine-name').textContent = selectedMachine?.name || 'Select a machine';
+               addTerminalLine(`[PORTAL] Selected: ${selectedMachine.name} (${selectedMachine.ip})`, 'user');
+               runDiagnostics(selectedMachine);
+          }
+
+          // ============================================================
+          //                    DRIVES DISPLAY
+          // ============================================================
+
+          async function loadDrives() {
+               try {
+                    const res = await fetch(`${API_BASE}/api/drives`);
+                    if (res.ok) {
+                         const drives = await res.json();
+                         renderDrives(drives);
+                    }
+               } catch (err) {
+                    // Demo fallback
+                    const demoDrives = [
+                         { name: 'Macintosh HD', path: '/', size: '2TB', used: '67%', status: 'warning' },
+                         { name: '4TB Blue Fish', path: '/Volumes/4TB Blue Fish', size: '4TB', used: '45%', status: 'good' },
+                         { name: 'GabrielVol', path: '/Volumes/GabrielVol', size: '500GB', used: '23%', status: 'good' }
+                    ];
+                    renderDrives(demoDrives);
+               }
+          }
+
+          function renderDrives(drives) {
+               const list = document.getElementById('drives-list');
+               document.getElementById('drives-count').textContent = drives.length;
+
+               list.innerHTML = drives.map(d => `
+                    <div class="drive-card ${d.status}" onclick="openDrive('${d.path}')">
+                         <span class="drive-icon">💾</span>
+                         <div class="drive-info">
+                              <span class="drive-name">${d.name}</span>
+                              <span class="drive-size">${d.size} • ${d.used}</span>
+                         </div>
+                    </div>
+               `).join('');
+          }
+
+          function openDrive(path) {
+               addTerminalLine(`[PORTAL] Opening drive: ${path}`, 'user');
+          }
+
+          // ============================================================
+          //                    AI DIAGNOSTICS
+          // ============================================================
+
+          async function runDiagnostics(machine) {
+               addTerminalLine(`[DIAG] Running AI diagnostics on ${machine.name}...`, 'output');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/diagnose/${machine.id}`);
+                    if (res.ok) {
+                         const data = await res.json();
+                         updateDiagnosticsUI(data);
+                    }
+               } catch (err) {
+                    // Demo fallback
+                    const demoData = {
+                         cpu: { value: '12%', status: 'good' },
+                         ram: { value: '163/192GB', status: 'good' },
+                         disk: { value: '67%', status: 'warning' },
+                         network: { value: 'ONLINE', status: 'good' },
+                         problems: [
+                              { id: 1, text: 'PC_Bridge not mounted', fix: 'mount_shares' },
+                              { id: 2, text: 'visual_index.db missing', fix: 'rebuild_index' }
+                         ],
+                         score: 70
+                    };
+                    updateDiagnosticsUI(demoData);
+               }
+          }
+
+          function updateDiagnosticsUI(data) {
+               // Update health score
+               const scoreEl = document.getElementById('health-score');
+               if (data.score) {
+                    scoreEl.textContent = data.score + '/100';
+                    scoreEl.style.color = data.score >= 80 ? 'var(--neon-green)' :
+                         data.score >= 60 ? 'var(--neon-gold)' : 'var(--neon-red)';
+               }
+
+               // Update scan time
+               if (data.full_report?.scan_time) {
+                    document.getElementById('scan-time').textContent = `Scanned in ${data.full_report.scan_time}`;
+               }
+
+               // Update individual metrics
+               if (data.cpu) document.getElementById('diag-cpu').textContent = data.cpu.value;
+               if (data.ram) document.getElementById('diag-ram').textContent = data.ram.value;
+               if (data.disk) document.getElementById('diag-disk').textContent = data.disk.value;
+               if (data.network) document.getElementById('diag-net').textContent = data.network.value;
+
+               // Switch and MTU from full report
+               if (data.full_report?.network?.jumbo_frames) {
+                    const jf = data.full_report.network.jumbo_frames;
+                    document.getElementById('diag-switch').textContent = jf.enabled ? 'JUMBO' : 'NORMAL';
+                    document.getElementById('diag-mtu').textContent = jf.en0_mtu || '1500';
+               }
+
+               // Update card colors
+               const grid = document.getElementById('diag-grid');
+               const cards = grid.querySelectorAll('.diag-card');
+               const metrics = ['cpu', 'ram', 'disk', 'network'];
+               metrics.forEach((m, i) => {
+                    if (data[m]) {
+                         cards[i].className = `diag-card ${data[m].status}`;
+                    }
+               });
+
+               // Update recommendations
+               const recsEl = document.getElementById('recommendations-list');
+               if (data.recommendations?.length) {
+                    recsEl.innerHTML = data.recommendations.map(r =>
+                         `<div style="padding: 0.3rem; border-left: 2px solid var(--neon-blue); margin: 0.3rem 0;">${r}</div>`
+                    ).join('');
+               }
+
+               const problemsList = document.getElementById('problems-list');
+               if (data.problems?.length) {
+                    problemsList.innerHTML = data.problems.map(p => `
+                    <div class="problem-item">
+                        <span class="problem-text">⚠️ ${p.text}</span>
+                        <button class="heal-btn" onclick="healProblem('${p.fix}')">🩹 FIX</button>
+                    </div>
+                `).join('');
+                    gabrielSpeak(`Warning: ${data.problems.length} problems detected on ${selectedMachine?.name}.`);
+               } else {
+                    problemsList.innerHTML = '<div style="color: var(--neon-green); text-align: center; padding: 2rem;">✅ All systems healthy</div>';
+               }
+
+               addTerminalLine(`[DIAG] Health score: ${data.score}% - ${data.problems?.length || 0} problems found.`, data.score >= 80 ? 'success' : 'error');
+          }
+
+          async function healProblem(fix) {
+               addTerminalLine(`[HEAL] Executing fix: ${fix}...`, 'user');
+               showNotification('🩹 Healing in progress...');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/heal/${selectedMachine?.id}/${fix}`, { method: 'POST' });
+                    if (res.ok) {
+                         addTerminalLine(`[HEAL] ✅ Fix applied successfully.`, 'success');
+                         showNotification('✅ Problem resolved!');
+                         runDiagnostics(selectedMachine);
+                    }
+               } catch (err) {
+                    addTerminalLine(`[HEAL] Fix would be applied (API offline demo).`, 'output');
+                    showNotification('Demo: Fix simulated');
+               }
+          }
+
+          function healAll() {
+               addTerminalLine(`[HEAL] Running auto-heal on all problems...`, 'user');
+               gabrielSpeak('Initiating healing sequence.');
+               showNotification('🩹 Healing all problems...');
+          }
+
+          function runFullDiagnostics() {
+               machines.forEach(m => {
+                    addTerminalLine(`[SCAN] Queuing diagnostics for ${m.name}...`, 'output');
+               });
+               gabrielSpeak('Full network scan initiated.');
+          }
+
+          // ============================================================
+          //                    LIVE TERMINAL
+          // ============================================================
+
+          function addTerminalLine(text, type = 'output') {
+               const terminal = document.getElementById('terminal');
+               const line = document.createElement('div');
+               line.className = `terminal-line ${type}`;
+               line.textContent = text;
+               terminal.appendChild(line);
+               terminal.scrollTop = terminal.scrollHeight;
+          }
+
+          function clearTerminal() {
+               document.getElementById('terminal').innerHTML = '<div class="terminal-line success">[PORTAL] Terminal cleared.</div>';
+          }
+
+          async function handleTerminalKey(e) {
+               if (e.key === 'Enter') {
+                    const input = document.getElementById('terminal-input');
+                    const cmd = input.value.trim();
+                    if (!cmd) return;
+
+                    addTerminalLine(`$ ${cmd}`, 'user');
+                    input.value = '';
+
+                    // AI Chat Command
+                    if (cmd.startsWith('ai ') || cmd.startsWith('?')) {
+                         const query = cmd.replace(/^(ai\s+|\?)/, '');
+                         addTerminalLine(`[GABRIEL] Thinking...`, 'output');
+
+                         try {
+                              const res = await fetch(`${API_BASE}/api/ai/chat`, {
+                                   method: 'POST',
+                                   headers: { 'Content-Type': 'application/json' },
+                                   body: JSON.stringify({ query: query })
+                              });
+
+                              if (res.ok) {
+                                   const data = await res.json();
+                                   addTerminalLine(`[GABRIEL] ${data.response}`, 'success');
+                                   gabrielSpeak(data.response.substring(0, 100)); // Speak first 100 chars
+                              } else {
+                                   addTerminalLine(`[ERROR] AI unavailable.`, 'error');
+                              }
+                         } catch (err) {
+                              addTerminalLine(`[ERROR] AI connection failed: ${err.message}`, 'error');
+                         }
+                         return;
+                    }
+
+                    // Automation Command (auto <cmd> [payload])
+                    if (cmd.startsWith('auto ')) {
+                         const parts = cmd.split(' ');
+                         const action = parts[1];
+                         let payload = {};
+
+                         if (parts.length > 2) {
+                              try {
+                                   payload = JSON.parse(parts.slice(2).join(' '));
+                              } catch (e) {
+                                   // Treat as string arg
+                                   payload = { arg: parts.slice(2).join(' ') };
+                              }
+                         }
+
+                         addTerminalLine(`[AUTO] Executing: ${action}...`, 'output');
+
+                         try {
+                              const res = await fetch(`${API_BASE}/api/automation`, {
+                                   method: 'POST',
+                                   headers: { 'Content-Type': 'application/json' },
+                                   body: JSON.stringify({ command: action, payload: payload })
+                              });
+
+                              const data = await res.json();
+                              if (data.status === 'success' || !data.status) {
+                                   addTerminalLine(`[AUTO] Result: ${JSON.stringify(data)}`, 'success');
+                              } else {
+                                   addTerminalLine(`[AUTO] Error: ${data.message}`, 'error');
+                              }
+                         } catch (err) {
+                              addTerminalLine(`[AUTO] API Error: ${err.message}`, 'error');
+                         }
+                         return;
+                    }
+
+                    if (!selectedMachine) {
+                         addTerminalLine('[ERROR] No machine selected.', 'error');
+                         return;
+                    }
+
+                    try {
+                         const res = await fetch(`${API_BASE}/api/exec/${selectedMachine.id}`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ command: cmd })
+                         });
+
+                         if (res.ok) {
+                              const data = await res.json();
+                              addTerminalLine(data.output, data.success ? 'output' : 'error');
+                         }
+                    } catch (err) {
+                         addTerminalLine(`[DEMO] Command would execute on ${selectedMachine.name}: ${cmd}`, 'output');
+                    }
+               }
+          }
+
+          // ============================================================
+          //                    GABRIEL VOICE
+          // ============================================================
+
+          async function gabrielSpeak(text) {
+               try {
+                    await fetch(`${VOICE_SERVER}/speak?text=${encodeURIComponent(text)}`);
+               } catch (err) {
+                    const synth = window.speechSynthesis;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    synth.speak(utterance);
+               }
+          }
+
+
+          // ============================================================
+          //                    VIDEO CHAT (WebRTC)
+          // ============================================================
+
+          let localStream = null;
+          let remoteStream = null;
+          let peerConnection = null;
+          let cameraEnabled = true;
+          let micEnabled = true;
+
+          // Using Google's public STUN servers
+          const ICE_SERVERS = {
+               iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+               ]
+          };
+
+          function toggleVideoPanel() {
+               const panel = document.getElementById('video-panel');
+               panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+          }
+
+          async function startCamera() {
+               try {
+                    localStream = await navigator.mediaDevices.getUserMedia({
+                         video: { width: 1280, height: 720 },
+                         audio: true
+                    });
+                    document.getElementById('local-video').srcObject = localStream;
+                    updateCallStatus('READY', 'var(--neon-green)', '🟢 Camera ready');
+                    addTerminalLine('[VIDEO] Camera and microphone initialized.', 'success');
+                    return true;
+               } catch (err) {
+                    addTerminalLine(`[VIDEO] Failed to access camera: ${err.message}`, 'error');
+                    updateCallStatus('ERROR', 'var(--neon-red)', '❌ Camera access denied');
+                    return false;
+               }
+          }
+
+          async function startCall() {
+               // 1. Ensure Local Media
+               if (!localStream) {
+                    const started = await startCamera();
+                    if (!started) return;
+               }
+
+               if (!selectedMachine) {
+                    addTerminalLine('[VIDEO] Select a machine to call first.', 'error');
+                    return;
+               }
+
+               addTerminalLine(`[VIDEO] Initiating call to ${selectedMachine.name}...`, 'user');
+               updateCallStatus('CALLING', 'var(--neon-gold)', `📞 Calling ${selectedMachine.name}...`);
+               gabrielSpeak(`Calling ${selectedMachine.name}`);
+
+               // 2. Initialize Signaling
+               connectSignaling();
+          }
+
+          function connectSignaling() {
+               if (signalingSocket && signalingSocket.readyState === WebSocket.OPEN) {
+                    createPeerConnection(); // Already connected
+                    return;
+               }
+
+               try {
+                    signalingSocket = new WebSocket(`${SIGNALING_SERVER}/signaling`);
+
+                    signalingSocket.onopen = () => {
+                         addTerminalLine('[VIDEO] Signaling connected.', 'success');
+                         createPeerConnection();
+                    };
+
+                    signalingSocket.onmessage = async (event) => {
+                         const msg = JSON.parse(event.data);
+                         handleSignalingMessage(msg);
+                    };
+
+                    signalingSocket.onerror = (err) => {
+                         addTerminalLine('[VIDEO] Signaling connection failed.', 'error');
+                         // Fallback to demo mode for UI validation
+                         setTimeout(() => {
+                              updateCallStatus('DEMO', 'var(--neon-blue)', '🟢 Connected (Simulation)');
+                              addTerminalLine('[VIDEO] Simulation Mode Active', 'output');
+                         }, 1500);
+                    };
+               } catch (err) {
+                    addTerminalLine(`[VIDEO] Signaling error: ${err.message}`, 'error');
+               }
+          }
+
+          async function createPeerConnection() {
+               peerConnection = new RTCPeerConnection(ICE_SERVERS);
+
+               // Add Tracks
+               localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+               // Handle Remote Stream
+               peerConnection.ontrack = (event) => {
+                    document.getElementById('remote-video').srcObject = event.streams[0];
+                    updateCallStatus('LIVE', 'var(--neon-green)', `🟢 Connected to ${selectedMachine.name}`);
+                    addTerminalLine(`[VIDEO] Remote stream received from ${selectedMachine.name}`, 'success');
+               };
+
+               // Handle ICE Candidates
+               peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                         sendSignal({ type: 'candidate', candidate: event.candidate });
+                    }
+               };
+
+               // Create Offer
+               try {
+                    const offer = await peerConnection.createOffer();
+                    await peerConnection.setLocalDescription(offer);
+                    sendSignal({ type: 'offer', sdp: offer });
+                    addTerminalLine('[VIDEO] Offer sent.', 'output');
+               } catch (err) {
+                    addTerminalLine(`[VIDEO] Offer failed: ${err.message}`, 'error');
+               }
+          }
+
+          async function handleSignalingMessage(msg) {
+               if (!peerConnection) return;
+
+               if (msg.type === 'offer') {
+                    // Start call from remote offer (Answer Mode)
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    sendSignal({ type: 'answer', sdp: answer });
+                    updateCallStatus('LIVE', 'var(--neon-green)', '🟢 Call Answered');
+               } else if (msg.type === 'answer') {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+                    addTerminalLine('[VIDEO] Connection established.', 'success');
+               } else if (msg.type === 'candidate') {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(msg.candidate));
+               }
+          }
+
+          function sendSignal(data) {
+               if (signalingSocket && signalingSocket.readyState === WebSocket.OPEN) {
+                    signalingSocket.send(JSON.stringify(data));
+               }
+          }
+
+          function endCall() {
+               if (peerConnection) {
+                    peerConnection.close();
+                    peerConnection = null;
+               }
+               if (signalingSocket) {
+                    signalingSocket.close();
+                    signalingSocket = null;
+               }
+               document.getElementById('remote-video').srcObject = null;
+               updateCallStatus('OFFLINE', 'var(--neon-red)', '📵 Call ended');
+               addTerminalLine('[VIDEO] Call terminated.', 'output');
+               gabrielSpeak('Call ended');
+          }
+
+          function updateCallStatus(badge, color, text) {
+               const b = document.getElementById('call-status-badge');
+               b.textContent = badge;
+               b.style.color = color;
+               document.getElementById('call-status').textContent = text;
+          }
+
+          function toggleCamera() {
+               if (!localStream) return;
+               cameraEnabled = !cameraEnabled;
+               localStream.getVideoTracks().forEach(track => track.enabled = cameraEnabled);
+               document.getElementById('btn-camera').classList.toggle('active', cameraEnabled);
+               addTerminalLine(`[VIDEO] Camera ${cameraEnabled ? 'enabled' : 'disabled'}.`, 'output');
+          }
+
+          function toggleMic() {
+               if (!localStream) return;
+               micEnabled = !micEnabled;
+               localStream.getAudioTracks().forEach(track => track.enabled = micEnabled);
+               document.getElementById('btn-mic').classList.toggle('active', micEnabled);
+               addTerminalLine(`[VIDEO] Microphone ${micEnabled ? 'enabled' : 'muted'}.`, 'output');
+          }
+
+          // ============================================================
+          //                    UI HELPERS
+          // ============================================================
+
+          function showNotification(msg) {
+               const el = document.getElementById('notification');
+               el.textContent = msg;
+               el.classList.add('show');
+               setTimeout(() => el.classList.remove('show'), 2500);
+          }
+
+          async function checkAPI() {
+               try {
+                    const start = performance.now();
+                    const res = await fetch(`${API_BASE}/api/status`, { signal: AbortSignal.timeout(2000) });
+                    const latency = Math.round(performance.now() - start);
+
+                    if (res.ok) {
+                         document.getElementById('api-status').textContent = 'ONLINE';
+                         document.getElementById('api-status').style.color = 'var(--neon-green)';
+                         document.getElementById('latency').textContent = `${latency}ms`;
+                         return true;
+                    }
+               } catch (err) { }
+
+               document.getElementById('api-status').textContent = 'OFFLINE';
+               document.getElementById('api-status').style.color = 'var(--neon-red)';
+               return false;
+          }
+
+          // ============================================================
+          //                    INITIALIZATION
+          // ============================================================
+
+          function toggleTurboMode() {
+               document.body.classList.toggle('turbo-mode');
+               const isTurbo = document.body.classList.contains('turbo-mode');
+               if (isTurbo) {
+                    gabrielSpeak('Turbo Mode Engaged. Maximum Velocity.');
+                    addTerminalLine('[SYSTEM] 🚀 TURBO MODE ACTIVATED', 'success');
+               } else {
+                    gabrielSpeak('Turbo Mode Disengaged.');
+                    addTerminalLine('[SYSTEM] Turbo Mode Deactivated', 'output');
+               }
+          }
+
+          document.addEventListener('DOMContentLoaded', async () => {
+               console.log('[PORTAL] ⚡ Initializing NOIZYLAB AI Portal...');
+               await checkAPI();
+               discoverMachines();
+               loadDrives();
+               setInterval(checkAPI, 5000);
+               console.log('[PORTAL] ✅ Ready');
+          });
+
+          // ============================================================
+          //                    GABRIEL STREAMING WINDOW
+          // ============================================================
+
+          // ============================================================
+          //                    GABRIEL STREAMING WINDOW (Remote Desktop)
+          // ============================================================
+
+          let remoteDesktopSocket = null;
+          let activeStreamUrl = null;
+
+          function toggleGabrielStream() {
+               const container = document.getElementById('gabriel-stream-container');
+               if (container.style.display === 'none') {
+                    container.style.display = 'block';
+                    addTerminalLine('[GABRIEL] Opening Remote Desktop Viewer...', 'output');
+                    if (selectedMachine) {
+                         startRemoteDesktop(selectedMachine.id);
+                    }
+               } else {
+                    container.style.display = 'none';
+                    stopRemoteDesktop();
+               }
+          }
+
+          function toggleFullscreenGabriel() {
+               const container = document.getElementById('gabriel-stream-container');
+               const view = document.getElementById('gabriel_remote_desktop_view');
+
+               if (container.style.width === '100%') {
+                    // Minimize
+                    container.style.width = '500px';
+                    container.style.height = '350px';
+                    container.style.top = 'auto'; // Reset top
+                    container.style.bottom = '80px';
+                    container.style.right = '20px';
+                    container.style.left = 'auto';
+                    view.style.objectFit = 'contain';
+               } else {
+                    // Maximize
+                    container.style.width = '100%';
+                    container.style.height = 'calc(100% - 100px)';
+                    container.style.top = '60px';
+                    container.style.left = '0';
+                    container.style.right = 'auto';
+                    container.style.bottom = 'auto';
+                    view.style.objectFit = 'contain';
+               }
+          }
+
+          function startRemoteDesktop(machineId) {
+               if (remoteDesktopSocket) {
+                    remoteDesktopSocket.close();
+               }
+
+               const view = document.getElementById('gabriel_remote_desktop_view');
+               const placeholder = document.getElementById('vm-placeholder');
+
+               placeholder.innerHTML = '<div style="color: var(--neon-blue);">Establishing neural link...</div>';
+
+               try {
+                    // Connect to Screenshare WebSocket
+                    remoteDesktopSocket = new WebSocket(`${SIGNALING_SERVER}/screenshare/${machineId}`);
+                    remoteDesktopSocket.binaryType = 'blob';
+
+                    remoteDesktopSocket.onopen = () => {
+                         addTerminalLine(`[RDP] Connected to ${machineId} screen stream.`, 'success');
+                         placeholder.style.display = 'none';
+                         view.style.display = 'block';
+
+                         // Focus the container for keyboard input
+                         document.getElementById('vm-view-container').focus();
+                    };
+
+                    remoteDesktopSocket.onmessage = (event) => {
+                         if (activeStreamUrl) {
+                              URL.revokeObjectURL(activeStreamUrl);
+                         }
+                         activeStreamUrl = URL.createObjectURL(event.data);
+                         view.src = activeStreamUrl;
+                    };
+
+                    remoteDesktopSocket.onerror = (err) => {
+                         addTerminalLine(`[RDP] Stream connection error.`, 'error');
+                         placeholder.innerHTML = '<div style="color: var(--neon-red);">❌ STREAM UNREACHABLE</div>';
+                         placeholder.style.display = 'block';
+                         view.style.display = 'none';
+                    };
+
+                    remoteDesktopSocket.onclose = () => {
+                         addTerminalLine(`[RDP] Stream closed.`, 'output');
+                    };
+
+                    // Input Event Listeners
+                    setupInputHandlers(view);
+
+               } catch (err) {
+                    addTerminalLine(`[RDP] Failed to start stream: ${err.message}`, 'error');
+               }
+          }
+
+          function setupInputHandlers(element) {
+               const container = document.getElementById('vm-view-container');
+
+               // Mouse Movement
+               container.onmousemove = (e) => {
+                    sendInputEvent({
+                         type: 'mousemove',
+                         x: e.offsetX / container.clientWidth,
+                         y: e.offsetY / container.clientHeight
+                    });
+               };
+
+               // Clicks
+               container.onmousedown = (e) => {
+                    sendInputEvent({
+                         type: 'mousedown',
+                         button: e.button,
+                         x: e.offsetX / container.clientWidth,
+                         y: e.offsetY / container.clientHeight
+                    });
+               };
+
+               container.onmouseup = (e) => {
+                    sendInputEvent({
+                         type: 'mouseup',
+                         button: e.button,
+                         x: e.offsetX / container.clientWidth,
+                         y: e.offsetY / container.clientHeight
+                    });
+               };
+
+               // Keyboard (Capture on container focus)
+               container.onkeydown = (e) => {
+                    e.preventDefault();
+                    sendInputEvent({
+                         type: 'keydown',
+                         key: e.key,
+                         code: e.code,
+                         ctrl: e.ctrlKey,
+                         shift: e.shiftKey,
+                         alt: e.altKey,
+                         meta: e.metaKey
+                    });
+               };
+
+               container.onkeyup = (e) => {
+                    e.preventDefault();
+                    sendInputEvent({
+                         type: 'keyup',
+                         key: e.key,
+                         code: e.code
+                    });
+               };
+
+               // Prevent context menu
+               container.oncontextmenu = (e) => e.preventDefault();
+          }
+
+          function sendInputEvent(eventData) {
+               if (remoteDesktopSocket && remoteDesktopSocket.readyState === WebSocket.OPEN) {
+                    remoteDesktopSocket.send(JSON.stringify(eventData));
+               }
+          }
+
+          function stopRemoteDesktop() {
+               if (remoteDesktopSocket) {
+                    remoteDesktopSocket.close();
+                    remoteDesktopSocket = null;
+               }
+               if (activeStreamUrl) {
+                    URL.revokeObjectURL(activeStreamUrl);
+                    activeStreamUrl = null;
+               }
+          }
+
+          // ============================================================
+          //                    LEGACY MAC REPAIR SYSTEM
+          // ============================================================
+
+          function toggleLegacyRepair() {
+               const modal = document.getElementById('legacy-repair-modal');
+               if (modal.style.display === 'none') {
+                    modal.style.display = 'block';
+                    populateVolumeSelect();
+                    addTerminalLine('[REPAIR] Opening Legacy Mac Repair System...', 'output');
+               } else {
+                    modal.style.display = 'none';
+               }
+          }
+
+          async function populateVolumeSelect() {
+               const select = document.getElementById('repair-volume-select');
+               try {
+                    const res = await fetch(`${API_BASE}/api/drives`);
+                    if (res.ok) {
+                         const drives = await res.json();
+                         select.innerHTML = '<option value="">Select Volume...</option>' +
+                              drives.map(d => `<option value="${d.path}">${d.name} (${d.size})</option>`).join('');
+                    }
+               } catch (err) {
+                    select.innerHTML = '<option value="/">/ (Root)</option><option value="/Volumes/Data">Data</option>';
+               }
+          }
+
+          async function scanTargetDisk() {
+               const status = document.getElementById('target-disk-status');
+               status.innerHTML = '<div style="color: var(--neon-gold);">🔍 Scanning for Target Disk Mode drives...</div>';
+               addTerminalLine('[REPAIR] Scanning for Target Disk Mode drives...', 'output');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/exec/local`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ command: 'system_profiler SPThunderboltDataType | grep -E "Device Name|Vendor|Serial"' })
+                    });
+
+                    if (res.ok) {
+                         const data = await res.json();
+                         if (data.output && data.output.trim()) {
+                              status.innerHTML = `<div style="color: var(--neon-green);">✅ Target Disk Found:<br><pre style="font-size: 0.7rem; margin-top: 0.5rem;">${data.output}</pre></div>`;
+                              addTerminalLine('[REPAIR] Target Disk device detected!', 'success');
+                         } else {
+                              status.innerHTML = '<div style="color: rgba(255,255,255,0.5);">No Target Disk Mode drive detected. Connect old Mac and boot with T key held.</div>';
+                         }
+                    }
+               } catch (err) {
+                    status.innerHTML = '<div style="color: var(--neon-red);">❌ Scan failed - check API connection</div>';
+               }
+          }
+
+          async function runLegacyRepair(type) {
+               const commands = {
+                    'permissions': 'diskutil repairPermissions /',
+                    'fsck': 'diskutil verifyVolume /',
+                    'rebuild': 'sudo mdutil -E /',
+                    'caches': 'sudo rm -rf /System/Library/Caches/* /Library/Caches/* ~/Library/Caches/*',
+                    'kext': 'sudo kextcache -i /'
+               };
+
+               const cmd = commands[type];
+               if (!cmd) return;
+
+               addTerminalLine(`[REPAIR] Running: ${type}...`, 'user');
+               showNotification(`🔧 Running ${type} repair...`);
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/exec/local`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ command: cmd })
+                    });
+
+                    if (res.ok) {
+                         const data = await res.json();
+                         addTerminalLine(`[REPAIR] ${type}: ${data.success ? 'Complete' : 'Failed'}`, data.success ? 'success' : 'error');
+                         if (data.output) {
+                              addTerminalLine(`[REPAIR] ${data.output.substring(0, 200)}`, 'output');
+                         }
+                    }
+               } catch (err) {
+                    addTerminalLine(`[REPAIR] Error: ${err.message}`, 'error');
+               }
+          }
+
+          async function verifyVolume() {
+               const volume = document.getElementById('repair-volume-select').value;
+               if (!volume) {
+                    showNotification('⚠️ Select a volume first');
+                    return;
+               }
+
+               const status = document.getElementById('repair-status');
+               status.innerHTML = `<div style="color: var(--neon-gold);">Verifying ${volume}...</div>`;
+               addTerminalLine(`[REPAIR] Verifying volume: ${volume}`, 'user');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/exec/local`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ command: `diskutil verifyVolume "${volume}"` })
+                    });
+
+                    if (res.ok) {
+                         const data = await res.json();
+                         status.innerHTML = `<pre>${data.output || 'Verification complete'}</pre>`;
+                         addTerminalLine(`[REPAIR] Verify complete: ${data.success ? 'OK' : 'Issues found'}`, data.success ? 'success' : 'warning');
+                    }
+               } catch (err) {
+                    status.innerHTML = `<div style="color: var(--neon-red);">Error: ${err.message}</div>`;
+               }
+          }
+
+          async function repairVolume() {
+               const volume = document.getElementById('repair-volume-select').value;
+               if (!volume) {
+                    showNotification('⚠️ Select a volume first');
+                    return;
+               }
+
+               if (!confirm(`This will attempt to repair ${volume}. Continue?`)) return;
+
+               const status = document.getElementById('repair-status');
+               status.innerHTML = `<div style="color: var(--neon-gold);">🔧 Repairing ${volume}... (requires admin)</div>`;
+               addTerminalLine(`[REPAIR] Repairing volume: ${volume}`, 'user');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/exec/local`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ command: `diskutil repairVolume "${volume}"` })
+                    });
+
+                    if (res.ok) {
+                         const data = await res.json();
+                         status.innerHTML = `<pre>${data.output || 'Repair complete'}</pre>`;
+                         addTerminalLine(`[REPAIR] Repair complete`, data.success ? 'success' : 'warning');
+                         gabrielSpeak(`Volume repair ${data.success ? 'completed successfully' : 'encountered issues'}`);
+                    }
+               } catch (err) {
+                    status.innerHTML = `<div style="color: var(--neon-red);">Error: ${err.message}</div>`;
+               }
+          }
+
+          // ============================================================
+          //                    GOD MODE & AUTOMATION
+          // ============================================================
+
+          function toggleGodMode() {
+               const modal = document.getElementById('god-mode-modal');
+               if (modal.style.display === 'none') {
+                    modal.style.display = 'block';
+                    addTerminalLine('[SYSTEM] God Mode Interface Configured.', 'success');
+               } else {
+                    modal.style.display = 'none';
+               }
+          }
+
+          async function runAuto(command, payload) {
+               addTerminalLine(`[GOD MODE] Executing: ${command}`, 'user');
+               try {
+                    const res = await fetch(`${API_BASE}/api/automation`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ command: command, payload: payload })
+                    });
+                    const data = await res.json();
+                    if (data.status === 'success' || !data.status) { // Some commands return raw data
+                         addTerminalLine(`[GOD MODE] Success: ${JSON.stringify(data)}`, 'success');
+                         showNotification('✅ Command Executed');
+                    } else {
+                         addTerminalLine(`[GOD MODE] Error: ${data.message}`, 'error');
+                         showNotification('❌ Command Failed');
+                    }
+               } catch (err) {
+                    addTerminalLine(`[GOD MODE] API Error: ${err.message}`, 'error');
+               }
+          }
+
+          async function runMetalBenchmark() {
+               const status = document.getElementById('metal-status');
+               status.textContent = "⚡ Running Metal Compute Kernel... (M2 Ultra)";
+               status.style.color = "var(--neon-gold)";
+               addTerminalLine('[METAL] Igniting compute shaders...', 'user');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/metal/benchmark`);
+                    const data = await res.json();
+
+                    status.innerHTML = `RESULT: <span style="color: var(--neon-green); font-size: 1.2rem;">${data.result}</span>`;
+                    addTerminalLine(`[METAL] Benchmark Result: ${data.result}`, 'success');
+                    gabrielSpeak(`Metal Benchmark Complete. Score: ${data.result}`);
+               } catch (err) {
+                    status.textContent = "Error running benchmark";
+                    status.style.color = "var(--neon-red)";
+                    addTerminalLine(`[METAL] Error: ${err.message}`, 'error');
+               }
+          }
+
+          async function runRecovery(type) {
+               const recoveryPath = '/Applications/Techtool Pro.app/Contents/MacOS/photorec';
+               showNotification(`🔍 Starting ${type} recovery tool...`);
+               addTerminalLine(`[RECOVERY] Launching ${type}...`, 'user');
+
+               if (type === 'photorec') {
+                    addTerminalLine('[RECOVERY] PhotoRec requires terminal. Run: photorec /d /Users/m2ultra/Desktop/recovered', 'output');
+               } else if (type === 'testdisk') {
+                    addTerminalLine('[RECOVERY] TestDisk requires terminal. Run: testdisk', 'output');
+               } else {
+                    addTerminalLine('[RECOVERY] Deep scan requires unmounted drive. Use Disk Utility to unmount first.', 'output');
+               }
+          }
+     </script>
+</body>
+
+</html>

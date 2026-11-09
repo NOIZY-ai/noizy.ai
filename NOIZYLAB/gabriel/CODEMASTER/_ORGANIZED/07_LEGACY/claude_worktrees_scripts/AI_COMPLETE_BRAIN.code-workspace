@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../../AI_COMPLETE_BRAIN"
+		},
+		{
+			"path": "../../../../../.."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}

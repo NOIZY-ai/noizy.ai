@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(# Check NOIZYLAB_TEXT_VAULT in Documents \\(we already got python from there\\) echo \"\"=== NOIZYLAB_TEXT_VAULT CODE ===\"\" find /Users/m2ultra/Documents/NOIZYLAB_TEXT_VAULT -type f \\\\\\( -name \"\"*.py\"\" -o -name \"\"*.ts\"\" -o -name \"\"*.js\"\" -o -name \"\"*.sh\"\" \\\\\\))",
+      "Bash(python3:*)",
+      "Bash(tree:*)",
+      "Bash(lsof:*)",
+      "Bash(cat:*)"
+    ]
+  }
+}

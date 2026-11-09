@@ -1,0 +1,11 @@
+{
+     "mcpServers": {
+          "noizylab": {
+               "command": "python3",
+               "args": [
+                    "/Users/m2ultra/NOIZYLAB/mcp/noizylab_mcp_server.py"
+               ],
+               "env": {}
+          }
+     }
+}

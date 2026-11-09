@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "m2ultra",
+			"path": "../../.."
+		},
+		{
+			"path": "../../../../.."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}

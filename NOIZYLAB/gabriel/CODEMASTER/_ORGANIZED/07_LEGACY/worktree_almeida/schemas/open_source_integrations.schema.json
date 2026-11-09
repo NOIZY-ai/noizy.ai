@@ -1,0 +1,848 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/open_source_integrations.schema.json",
+  "title": "NOIZYVOX Open Source Integrations",
+  "description": "Configuration for integrating open-source TTS, ASR, and voice AI models",
+  "type": "object",
+  "required": ["integration_id", "version"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "integration_id": {
+      "type": "string",
+      "pattern": "^oss_[a-z0-9]{16}$",
+      "description": "Unique identifier for the integration configuration"
+    },
+    "version": {
+      "type": "string",
+      "description": "Configuration version"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable integration name"
+    },
+    "tts_models": {
+      "type": "object",
+      "description": "Text-to-Speech model configurations",
+      "properties": {
+        "fish_speech": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.5" },
+            "repo": { "type": "string", "default": "fishaudio/fish-speech" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "model_path": { "type": "string" },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 44100 },
+                "num_codebooks": { "type": "integer", "default": 4 },
+                "streaming_enabled": { "type": "boolean", "default": true },
+                "chunk_length_ms": { "type": "integer", "default": 100 },
+                "zero_shot_enabled": { "type": "boolean", "default": true },
+                "reference_audio_min_seconds": { "type": "number", "default": 3 },
+                "reference_audio_max_seconds": { "type": "number", "default": 30 },
+                "supported_languages": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "default": ["en", "zh", "ja", "ko", "de", "fr", "es", "it", "pt", "ru"]
+                }
+              }
+            },
+            "quantization": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "precision": { "type": "string", "enum": ["fp32", "fp16", "int8"], "default": "fp16" }
+              }
+            }
+          }
+        },
+        "xtts_v2": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "2.0.3" },
+            "repo": { "type": "string", "default": "coqui-ai/TTS" },
+            "license": { "type": "string", "default": "CPML" },
+            "commercial_use": { "type": "boolean", "default": false },
+            "model_path": { "type": "string" },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 24000 },
+                "gpt_cond_len": { "type": "integer", "default": 6 },
+                "gpt_cond_chunk_len": { "type": "integer", "default": 4 },
+                "streaming_enabled": { "type": "boolean", "default": true },
+                "stream_chunk_size": { "type": "integer", "default": 20 },
+                "supported_languages": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "default": ["en", "es", "fr", "de", "it", "pt", "pl", "tr", "ru", "nl", "cs", "ar", "zh", "ja", "hu", "ko"]
+                }
+              }
+            }
+          }
+        },
+        "f5_tts": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0.0" },
+            "repo": { "type": "string", "default": "SWivid/F5-TTS" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "model_path": { "type": "string" },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 24000 },
+                "nfe_step": { "type": "integer", "default": 32 },
+                "cfg_strength": { "type": "number", "default": 2.0 },
+                "sway_sampling_coef": { "type": "number", "default": -1.0 },
+                "speed": { "type": "number", "default": 1.0 }
+              }
+            }
+          }
+        },
+        "cosyvoice": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "2.0" },
+            "repo": { "type": "string", "default": "FunAudioLLM/CosyVoice" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "model_path": { "type": "string" },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 22050 },
+                "instruct_mode": { "type": "boolean", "default": true },
+                "cross_lingual": { "type": "boolean", "default": true },
+                "streaming_enabled": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "kokoro_tts": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "hexgrad/Kokoro-82M" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "model_path": { "type": "string" },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 24000 },
+                "cpu_optimized": { "type": "boolean", "default": true },
+                "model_size_mb": { "type": "integer", "default": 82 },
+                "rtf_cpu": { "type": "number", "default": 0.5 }
+              }
+            }
+          }
+        },
+        "piper": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.2.0" },
+            "repo": { "type": "string", "default": "rhasspy/piper" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "model_path": { "type": "string" },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 22050 },
+                "noise_scale": { "type": "number", "default": 0.667 },
+                "length_scale": { "type": "number", "default": 1.0 },
+                "noise_w": { "type": "number", "default": 0.8 },
+                "sentence_silence": { "type": "number", "default": 0.2 }
+              }
+            }
+          }
+        },
+        "openvoice": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "2.0" },
+            "repo": { "type": "string", "default": "myshell-ai/OpenVoice" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "model_path": { "type": "string" },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 22050 },
+                "tone_color_conversion": { "type": "boolean", "default": true },
+                "cross_lingual": { "type": "boolean", "default": true },
+                "instant_cloning": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        }
+      }
+    },
+    "asr_models": {
+      "type": "object",
+      "description": "Automatic Speech Recognition model configurations",
+      "properties": {
+        "whisper": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "large-v3" },
+            "repo": { "type": "string", "default": "openai/whisper" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "model_size": {
+              "type": "string",
+              "enum": ["tiny", "base", "small", "medium", "large", "large-v2", "large-v3", "turbo"],
+              "default": "large-v3"
+            },
+            "config": {
+              "type": "object",
+              "properties": {
+                "compute_type": { "type": "string", "enum": ["float32", "float16", "int8"], "default": "float16" },
+                "beam_size": { "type": "integer", "default": 5 },
+                "word_timestamps": { "type": "boolean", "default": true },
+                "vad_filter": { "type": "boolean", "default": true },
+                "condition_on_previous_text": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "faster_whisper": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0.0" },
+            "repo": { "type": "string", "default": "SYSTRAN/faster-whisper" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "device": { "type": "string", "enum": ["cuda", "cpu", "auto"], "default": "auto" },
+                "compute_type": { "type": "string", "default": "float16" },
+                "cpu_threads": { "type": "integer", "default": 4 },
+                "num_workers": { "type": "integer", "default": 1 },
+                "batched": { "type": "boolean", "default": true },
+                "batch_size": { "type": "integer", "default": 16 }
+              }
+            }
+          }
+        },
+        "whisperx": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "3.1.0" },
+            "repo": { "type": "string", "default": "m-bain/whisperX" },
+            "license": { "type": "string", "default": "BSD-4-Clause" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "align_model": { "type": "boolean", "default": true },
+                "diarize": { "type": "boolean", "default": true },
+                "min_speakers": { "type": "integer", "default": 1 },
+                "max_speakers": { "type": "integer", "default": 10 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vocoder_models": {
+      "type": "object",
+      "description": "Neural vocoder configurations",
+      "properties": {
+        "bigvgan": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "2.0" },
+            "repo": { "type": "string", "default": "NVIDIA/BigVGAN" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 24000 },
+                "hop_size": { "type": "integer", "default": 256 },
+                "resblock": { "type": "string", "default": "1" },
+                "upsample_rates": {
+                  "type": "array",
+                  "items": { "type": "integer" },
+                  "default": [8, 8, 2, 2]
+                }
+              }
+            }
+          }
+        },
+        "hifigan": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "jik876/hifi-gan" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 22050 },
+                "resblock_kernel_sizes": {
+                  "type": "array",
+                  "items": { "type": "integer" },
+                  "default": [3, 7, 11]
+                }
+              }
+            }
+          }
+        },
+        "vocos": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "0.1.0" },
+            "repo": { "type": "string", "default": "gemelo-ai/vocos" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 24000 },
+                "feature_extractor": { "type": "string", "default": "encodec" },
+                "bandwidth": { "type": "number", "default": 6.0 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lip_sync_models": {
+      "type": "object",
+      "description": "Lip synchronization model configurations",
+      "properties": {
+        "latentsync": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "bytedance/LatentSync" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "fps": { "type": "integer", "default": 25 },
+                "face_detection": { "type": "string", "default": "retinaface" },
+                "audio_encoder": { "type": "string", "default": "whisper" }
+              }
+            }
+          }
+        },
+        "wav2lip": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "Rudrabha/Wav2Lip" },
+            "license": { "type": "string", "default": "CC-BY-NC-4.0" },
+            "commercial_use": { "type": "boolean", "default": false },
+            "config": {
+              "type": "object",
+              "properties": {
+                "fps": { "type": "integer", "default": 25 },
+                "pads": {
+                  "type": "array",
+                  "items": { "type": "integer" },
+                  "default": [0, 10, 0, 0]
+                },
+                "face_det_batch_size": { "type": "integer", "default": 16 },
+                "wav2lip_batch_size": { "type": "integer", "default": 128 }
+              }
+            }
+          }
+        },
+        "sadtalker": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "OpenTalker/SadTalker" },
+            "license": { "type": "string", "default": "CC-BY-NC-4.0" },
+            "commercial_use": { "type": "boolean", "default": false },
+            "config": {
+              "type": "object",
+              "properties": {
+                "preprocess": { "type": "string", "enum": ["crop", "resize", "full"], "default": "crop" },
+                "still": { "type": "boolean", "default": false },
+                "enhancer": { "type": "string", "enum": ["gfpgan", "restoreformer", "none"], "default": "gfpgan" }
+              }
+            }
+          }
+        },
+        "hallo2": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "2.0" },
+            "repo": { "type": "string", "default": "fudan-generative-vision/hallo2" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "fps": { "type": "integer", "default": 25 },
+                "long_video_support": { "type": "boolean", "default": true },
+                "max_video_length_seconds": { "type": "integer", "default": 3600 }
+              }
+            }
+          }
+        },
+        "liveportrait": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "KwaiVGI/LivePortrait" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "stitching": { "type": "boolean", "default": true },
+                "relative_motion": { "type": "boolean", "default": true },
+                "pasteback": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "rhubarb": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.13.0" },
+            "repo": { "type": "string", "default": "DanielSWolf/rhubarb-lip-sync" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "recognizer": { "type": "string", "enum": ["pocketSphinx", "phonetic"], "default": "phonetic" },
+                "output_format": { "type": "string", "enum": ["json", "tsv", "xml", "dat"], "default": "json" },
+                "extended_shapes": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        }
+      }
+    },
+    "emotion_models": {
+      "type": "object",
+      "description": "Emotion detection and synthesis models",
+      "properties": {
+        "emotion2vec": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "ddlBoJack/emotion2vec" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "granularity": { "type": "string", "enum": ["utterance", "frame"], "default": "utterance" },
+                "num_emotions": { "type": "integer", "default": 9 }
+              }
+            }
+          }
+        },
+        "go_emotions": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "google-research/google-research/goemotions" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "num_labels": { "type": "integer", "default": 28 },
+                "threshold": { "type": "number", "default": 0.3 },
+                "multilabel": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "speechbrain_emotion": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "0.5.15" },
+            "repo": { "type": "string", "default": "speechbrain/speechbrain" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "model_hub": { "type": "string", "default": "speechbrain/emotion-recognition-wav2vec2-IEMOCAP" },
+                "sample_rate": { "type": "integer", "default": 16000 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "embedding_models": {
+      "type": "object",
+      "description": "Text and speaker embedding models",
+      "properties": {
+        "bge_m3": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "BAAI/bge-m3" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "max_length": { "type": "integer", "default": 8192 },
+                "embedding_dim": { "type": "integer", "default": 1024 },
+                "pooling_method": { "type": "string", "default": "cls" }
+              }
+            }
+          }
+        },
+        "ecapa_tdnn": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "speechbrain/spkrec-ecapa-voxceleb" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "embedding_dim": { "type": "integer", "default": 192 },
+                "sample_rate": { "type": "integer", "default": 16000 }
+              }
+            }
+          }
+        },
+        "resemblyzer": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "0.1.3" },
+            "repo": { "type": "string", "default": "resemble-ai/Resemblyzer" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "embedding_dim": { "type": "integer", "default": 256 },
+                "sample_rate": { "type": "integer", "default": 16000 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "llm_models": {
+      "type": "object",
+      "description": "Large Language Model configurations",
+      "properties": {
+        "llama": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "3.3" },
+            "repo": { "type": "string", "default": "meta-llama/Llama-3.3-70B-Instruct" },
+            "license": { "type": "string", "default": "Llama 3.3 Community" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "model_size": { "type": "string", "default": "70B" },
+                "context_length": { "type": "integer", "default": 131072 },
+                "quantization": { "type": "string", "enum": ["none", "int8", "int4", "gptq", "awq"], "default": "int4" },
+                "backend": { "type": "string", "enum": ["transformers", "vllm", "llama.cpp", "exllama"], "default": "vllm" }
+              }
+            }
+          }
+        },
+        "qwen": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "2.5" },
+            "repo": { "type": "string", "default": "Qwen/Qwen2.5-72B-Instruct" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "model_size": { "type": "string", "default": "72B" },
+                "context_length": { "type": "integer", "default": 131072 },
+                "quantization": { "type": "string", "default": "int4" },
+                "backend": { "type": "string", "default": "vllm" }
+              }
+            }
+          }
+        },
+        "gemma": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "2" },
+            "repo": { "type": "string", "default": "google/gemma-2-27b-it" },
+            "license": { "type": "string", "default": "Gemma" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "model_size": { "type": "string", "default": "27B" },
+                "context_length": { "type": "integer", "default": 8192 },
+                "quantization": { "type": "string", "default": "int4" },
+                "backend": { "type": "string", "default": "llama.cpp" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "audio_enhancement": {
+      "type": "object",
+      "description": "Audio enhancement and processing models",
+      "properties": {
+        "deepfilternet": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "3.0" },
+            "repo": { "type": "string", "default": "Rikorose/DeepFilterNet" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 48000 },
+                "atten_lim_db": { "type": "number", "default": 100 },
+                "post_filter": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "resemble_enhance": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "0.1.0" },
+            "repo": { "type": "string", "default": "resemble-ai/resemble-enhance" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "denoise": { "type": "boolean", "default": true },
+                "enhance": { "type": "boolean", "default": true },
+                "sample_rate": { "type": "integer", "default": 44100 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "quality_assessment": {
+      "type": "object",
+      "description": "Quality assessment models",
+      "properties": {
+        "utmos": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.0" },
+            "repo": { "type": "string", "default": "tarepan/SpeechMOS" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "domain": { "type": "string", "enum": ["synth", "natural", "bvcc"], "default": "synth" }
+              }
+            }
+          }
+        },
+        "dnsmos": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "4.0" },
+            "repo": { "type": "string", "default": "microsoft/DNS-Challenge" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "sample_rate": { "type": "integer", "default": 16000 },
+                "personalized": { "type": "boolean", "default": false }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vector_databases": {
+      "type": "object",
+      "description": "Vector database configurations",
+      "properties": {
+        "qdrant": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "1.7.0" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "host": { "type": "string", "default": "localhost" },
+                "port": { "type": "integer", "default": 6333 },
+                "grpc_port": { "type": "integer", "default": 6334 },
+                "collection_config": {
+                  "type": "object",
+                  "properties": {
+                    "distance": { "type": "string", "enum": ["cosine", "euclid", "dot"], "default": "cosine" },
+                    "on_disk": { "type": "boolean", "default": false }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "chromadb": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "0.4.0" },
+            "license": { "type": "string", "default": "Apache-2.0" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "persist_directory": { "type": "string" },
+                "anonymized_telemetry": { "type": "boolean", "default": false }
+              }
+            }
+          }
+        },
+        "sqlite_vss": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "0.1.2" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "db_path": { "type": "string" },
+                "dimensions": { "type": "integer", "default": 1024 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "watermarking": {
+      "type": "object",
+      "description": "Audio watermarking models",
+      "properties": {
+        "audioseal": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "version": { "type": "string", "default": "0.1.3" },
+            "repo": { "type": "string", "default": "facebookresearch/audioseal" },
+            "license": { "type": "string", "default": "MIT" },
+            "commercial_use": { "type": "boolean", "default": true },
+            "config": {
+              "type": "object",
+              "properties": {
+                "nbits": { "type": "integer", "default": 16 },
+                "sample_rate": { "type": "integer", "default": 16000 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime_config": {
+      "type": "object",
+      "description": "Runtime and deployment configuration",
+      "properties": {
+        "device": {
+          "type": "string",
+          "enum": ["cuda", "cpu", "mps", "auto"],
+          "default": "auto"
+        },
+        "gpu_memory_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.9
+        },
+        "model_cache_dir": {
+          "type": "string",
+          "description": "Directory to cache downloaded models"
+        },
+        "huggingface_hub": {
+          "type": "object",
+          "properties": {
+            "token": { "type": "string" },
+            "offline_mode": { "type": "boolean", "default": false },
+            "cache_dir": { "type": "string" }
+          }
+        },
+        "logging": {
+          "type": "object",
+          "properties": {
+            "level": { "type": "string", "enum": ["debug", "info", "warning", "error"], "default": "info" },
+            "format": { "type": "string", "default": "%(asctime)s - %(name)s - %(levelname)s - %(message)s" }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

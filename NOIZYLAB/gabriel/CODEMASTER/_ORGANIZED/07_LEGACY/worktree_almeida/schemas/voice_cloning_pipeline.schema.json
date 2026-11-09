@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/voice_cloning_pipeline.schema.json",
+  "title": "NOIZYVOX Voice Cloning Pipeline",
+  "description": "End-to-end voice cloning workflow for professional artists",
+  "type": "object",
+  "required": ["pipeline_id", "artist_id", "status"],
+  "properties": {
+    "pipeline_id": {
+      "type": "string",
+      "pattern": "^clone_[a-z0-9]{16}$",
+      "description": "Unique voice cloning pipeline identifier"
+    },
+    "artist_id": {
+      "type": "string",
+      "pattern": "^artist_[a-z0-9]{12}$",
+      "description": "Artist identifier for the voice clone"
+    },
+    "status": {
+      "enum": ["initiated", "recording", "processing", "training", "validation", "review", "approved", "published", "rejected"],
+      "description": "Current pipeline status"
+    },
+    "recording_session": {
+      "type": "object",
+      "properties": {
+        "session_type": { 
+          "enum": ["studio_guided", "remote_guided", "self_service", "existing_catalog"]
+        },
+        "target_duration_minutes": { "type": "integer", "default": 60, "minimum": 1 },
+        "minimum_duration_minutes": { "type": "integer", "default": 30, "minimum": 1 },
+        "optimal_duration_minutes": { "type": "integer", "default": 120, "minimum": 1 },
+        "script_type": { 
+          "enum": ["provided", "custom", "improvised", "mixed"]
+        },
+        "script_coverage": {
+          "type": "object",
+          "properties": {
+            "phoneme_coverage_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+            "diphone_coverage_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+            "emotion_coverage": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "prosody_variety_score": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "technical_requirements": {
+          "type": "object",
+          "properties": {
+            "sample_rate_hz": { "type": "integer", "default": 48000, "minimum": 16000 },
+            "bit_depth": { "type": "integer", "default": 24, "enum": [16, 24, 32] },
+            "format": { "enum": ["wav", "flac", "aiff"] },
+            "max_noise_floor_db": { "type": "number", "default": -60 },
+            "max_thd_percent": { "type": "number", "default": 0.1, "minimum": 0 },
+            "room_tone_required": { "type": "boolean", "default": true },
+            "pop_filter_required": { "type": "boolean", "default": true }
+          }
+        },
+        "recording_script": {
+          "type": "object",
+          "properties": {
+            "total_sentences": { "type": "integer", "minimum": 1 },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category": { 
+                    "enum": [
+                      "phoneme_coverage", "emotion_neutral", "emotion_joy", 
+                      "emotion_sadness", "emotion_anger", "emotion_fear", 
+                      "emotion_surprise", "whisper", "shout", "conversational", 
+                      "narrative", "commercial", "character"
+                    ]
+                  },
+                  "sentence_count": { "type": "integer", "minimum": 1 },
+                  "duration_minutes": { "type": "number", "minimum": 0 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "audio_processing": {
+      "type": "object",
+      "properties": {
+        "preprocessing": {
+          "type": "object",
+          "properties": {
+            "noise_reduction": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "algorithm": { 
+                  "enum": ["spectral_subtraction", "wiener", "rnn", "diffusion"]
+                },
+                "aggressiveness": { "type": "number", "default": 0.5, "minimum": 0, "maximum": 1 }
+              }
+            },
+            "normalization": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "target_lufs": { "type": "number", "default": -23 },
+                "peak_limit_db": { "type": "number", "default": -1 }
+              }
+            },
+            "silence_trimming": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "threshold_db": { "type": "number", "default": -40 },
+                "min_silence_ms": { "type": "integer", "default": 200, "minimum": 0 },
+                "padding_ms": { "type": "integer", "default": 100, "minimum": 0 }
+              }
+            },
+            "breath_detection": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "action": { "enum": ["keep", "reduce", "remove", "normalize"] }
+              }
+            }
+          }
+        },
+        "segmentation": {
+          "type": "object",
+          "properties": {
+            "method": { 
+              "enum": ["forced_alignment", "vad", "manual", "hybrid"]
+            },
+            "forced_alignment_model": { "type": "string" },
+            "output_format": { "enum": ["textgrid", "json", "ctm"] },
+            "granularity": { "enum": ["sentence", "word", "phoneme"] }
+          }
+        },
+        "quality_filtering": {
+          "type": "object",
+          "properties": {
+            "snr_threshold_db": { "type": "number", "default": 30 },
+            "clipping_detection": { "type": "boolean", "default": true },
+            "alignment_confidence_threshold": { "type": "number", "default": 0.8, "minimum": 0, "maximum": 1 },
+            "pronunciation_error_detection": { "type": "boolean", "default": true },
+            "auto_reject_threshold": { "type": "number", "default": 0.5, "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "model_training": {
+      "type": "object",
+      "properties": {
+        "architecture": {
+          "type": "object",
+          "properties": {
+            "base_model": { 
+              "enum": ["vits", "vits2", "naturalspeech", "naturalspeech2", "voicebox", "xtts", "tortoise", "bark", "custom"]
+            },
+            "vocoder": { 
+              "enum": ["hifigan", "bigvgan", "vocos", "waveglow", "universal", "diffusion"]
+            },
+            "speaker_encoder": { 
+              "enum": ["ge2e", "resemblyzer", "ecapa_tdnn", "wavlm", "custom"]
+            },
+            "emotion_encoder": { 
+              "enum": ["gst", "vae", "flow", "none"]
+            }
+          }
+        },
+        "training_config": {
+          "type": "object",
+          "properties": {
+            "epochs": { "type": "integer", "default": 1000, "minimum": 1 },
+            "batch_size": { "type": "integer", "default": 32, "minimum": 1 },
+            "learning_rate": { "type": "number", "default": 0.0001, "minimum": 0 },
+            "warmup_steps": { "type": "integer", "default": 4000, "minimum": 0 },
+            "gradient_accumulation": { "type": "integer", "default": 1, "minimum": 1 },
+            "mixed_precision": { "type": "boolean", "default": true },
+            "distributed_training": { "type": "boolean", "default": true },
+            "gpu_type": { "enum": ["A100", "H100", "A10G", "V100"] },
+            "gpu_count": { "type": "integer", "default": 4, "minimum": 1 },
+            "estimated_training_hours": { "type": "number", "minimum": 0 }
+          }
+        },
+        "data_augmentation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "techniques": {
+              "type": "array",
+              "items": { 
+                "enum": ["pitch_shift", "time_stretch", "noise_injection", "room_impulse", "formant_shift", "specaugment"]
+              }
+            }
+          }
+        },
+        "fine_tuning": {
+          "type": "object",
+          "properties": {
+            "base_checkpoint": { "type": "string" },
+            "frozen_layers": { "type": "array", "items": { "type": "string" } },
+            "adapter_training": { "type": "boolean", "default": false },
+            "lora_enabled": { "type": "boolean", "default": true },
+            "lora_rank": { "type": "integer", "default": 16, "minimum": 1 }
+          }
+        },
+        "checkpointing": {
+          "type": "object",
+          "properties": {
+            "save_frequency_steps": { "type": "integer", "default": 5000, "minimum": 1 },
+            "keep_last_n": { "type": "integer", "default": 5, "minimum": 1 },
+            "best_model_metric": { 
+              "enum": ["loss", "mel_loss", "mos_score", "speaker_similarity"]
+            }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "automatic_metrics": {
+          "type": "object",
+          "properties": {
+            "mos_prediction": {
+              "type": "object",
+              "properties": {
+                "model": { "enum": ["utmos", "nisqa", "dnsmos", "mosnet"] },
+                "threshold": { "type": "number", "default": 4.0, "minimum": 1, "maximum": 5 }
+              }
+            },
+            "speaker_similarity": {
+              "type": "object",
+              "properties": {
+                "model": { "enum": ["resemblyzer", "ecapa_tdnn", "wavlm"] },
+                "threshold": { "type": "number", "default": 0.85, "minimum": 0, "maximum": 1 }
+              }
+            },
+            "intelligibility": {
+              "type": "object",
+              "properties": {
+                "model": { "enum": ["whisper", "wav2vec2", "conformer"] },
+                "wer_threshold": { "type": "number", "default": 0.05, "minimum": 0, "maximum": 1 }
+              }
+            },
+            "emotion_accuracy": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string" },
+                "accuracy_threshold": { "type": "number", "default": 0.8, "minimum": 0, "maximum": 1 }
+              }
+            }
+          }
+        },
+        "human_evaluation": {
+          "type": "object",
+          "properties": {
+            "required": { "type": "boolean", "default": true },
+            "evaluator_count": { "type": "integer", "default": 5, "minimum": 1 },
+            "evaluation_samples": { "type": "integer", "default": 20, "minimum": 1 },
+            "metrics": {
+              "type": "array",
+              "items": { 
+                "enum": ["naturalness", "similarity", "emotion_match", "intelligibility", "overall_quality"]
+              }
+            },
+            "passing_threshold": { "type": "number", "default": 4.0, "minimum": 1, "maximum": 5 }
+          }
+        },
+        "artist_approval": {
+          "type": "object",
+          "properties": {
+            "required": { "type": "boolean", "default": true },
+            "sample_generation_count": { "type": "integer", "default": 10, "minimum": 1 },
+            "approval_deadline_days": { "type": "integer", "default": 7, "minimum": 1 },
+            "revision_rounds_allowed": { "type": "integer", "default": 3, "minimum": 0 }
+          }
+        }
+      }
+    },
+    "model_optimization": {
+      "type": "object",
+      "properties": {
+        "quantization": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "precision": { "enum": ["fp32", "fp16", "int8", "int4"] },
+            "method": { "enum": ["ptq", "qat", "gptq", "awq"] }
+          }
+        },
+        "pruning": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "sparsity_target": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "distillation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "student_architecture": { "type": "string" }
+          }
+        },
+        "export_formats": {
+          "type": "array",
+          "items": { 
+            "enum": ["pytorch", "onnx", "tensorrt", "coreml", "tflite", "openvino"]
+          }
+        }
+      }
+    },
+    "versioning": {
+      "type": "object",
+      "properties": {
+        "model_version": { "type": "string" },
+        "parent_version": { "type": "string" },
+        "changelog": { "type": "string" },
+        "training_data_hash": { "type": "string" },
+        "config_hash": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

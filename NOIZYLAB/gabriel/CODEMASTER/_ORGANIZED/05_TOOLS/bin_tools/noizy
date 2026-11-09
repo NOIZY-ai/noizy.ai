@@ -1,0 +1,425 @@
+#!/usr/bin/env python3
+"""
+NOIZYLAB CLI - GABRIEL Command Center
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The ultimate command-line interface for GABRIEL and NOIZYLAB.
+
+Commands:
+    noizy heal       - Run World Healer optimization
+    noizy scan       - Deep code scan
+    noizy diag       - System diagnostics
+    noizy portal     - Start/stop portal server
+    noizy status     - Show all systems status
+    noizy ai         - Query Gemini/Groq/Ollama
+    noizy voice      - Voice command mode
+"""
+
+import argparse
+import asyncio
+import subprocess
+import sys
+import os
+import json
+from pathlib import Path
+from datetime import datetime
+
+# Colors
+class C:
+    R = '\033[91m'  # Red
+    G = '\033[92m'  # Green
+    Y = '\033[93m'  # Yellow
+    B = '\033[94m'  # Blue
+    M = '\033[95m'  # Magenta
+    C = '\033[96m'  # Cyan
+    W = '\033[97m'  # White
+    X = '\033[0m'   # Reset
+    BOLD = '\033[1m'
+
+BANNER = f"""
+{C.C}╔══════════════════════════════════════════════════════════════╗
+║  {C.BOLD}🌊 NOIZYLAB CLI - GABRIEL COMMAND CENTER{C.X}{C.C}                    ║
+║  {C.G}Zero Latency • 100% Optimization • GORUNFREE{C.C}                 ║
+╚══════════════════════════════════════════════════════════════╝{C.X}
+"""
+
+NOIZYLAB_ROOT = Path.home() / "NOIZYLAB"
+PORTAL_DIR = NOIZYLAB_ROOT / "PORTAL"
+GABRIEL_DIR = Path.home() / ".gemini/antigravity/playground/iridescent-station/NOIZYLAB_WORKSPACES_LOCAL/GABRIEL_UNIFIED"
+
+def print_banner():
+    print(BANNER)
+
+def cmd(command: str, capture=True) -> str:
+    """Execute shell command"""
+    try:
+        result = subprocess.run(command, shell=True, capture_output=capture, text=True, timeout=30)
+        return result.stdout.strip() if capture else ""
+    except Exception as e:
+        return f"Error: {e}"
+
+# ============================================================================
+# COMMANDS
+# ============================================================================
+
+def cmd_status(args):
+    """Show all systems status"""
+    print_banner()
+    print(f"{C.Y}📊 SYSTEM STATUS{C.X}\n")
+    
+    # CPU
+    cpu = cmd("top -l 1 | grep 'CPU usage' | awk '{print $3}'")
+    print(f"  {C.G}CPU:{C.X} {cpu}")
+    
+    # Memory
+    mem = cmd("memory_pressure | grep 'System-wide' | head -1")
+    print(f"  {C.G}RAM:{C.X} {mem}")
+    
+    # Portal
+    portal_status = cmd("curl -s http://localhost:5185/api/status 2>/dev/null")
+    if "ONLINE" in portal_status:
+        print(f"  {C.G}Portal:{C.X} 🟢 ONLINE (port 5185)")
+    else:
+        print(f"  {C.R}Portal:{C.X} 🔴 OFFLINE")
+    
+    # HP-OMEN
+    omen = cmd("ping -c 1 -t 1 10.0.0.160 2>/dev/null | grep 'bytes from'")
+    if omen:
+        print(f"  {C.G}HP-OMEN:{C.X} 🟢 REACHABLE")
+    else:
+        print(f"  {C.R}HP-OMEN:{C.X} 🔴 OFFLINE")
+    
+    # Jumbo Frames
+    mtu = cmd("ifconfig en0 | grep mtu | awk '{print $NF}'")
+    print(f"  {C.G}MTU:{C.X} {mtu} {'⚡ Jumbo Frames' if mtu == '9000' else ''}")
+    
+    print()
+
+def cmd_heal(args):
+    """Run World Healer"""
+    print_banner()
+    print(f"{C.M}🌍 INITIATING WORLD HEALER...{C.X}\n")
+    
+    healer_path = GABRIEL_DIR / "core" / "world_healer.py"
+    if healer_path.exists():
+        os.system(f"python3 {healer_path}")
+    else:
+        print(f"{C.R}World Healer not found at {healer_path}{C.X}")
+        print("Running inline healing...")
+        
+        # Inline healing
+        print(f"\n{C.Y}1. Cache Cleanup...{C.X}")
+        cmd("rm -rf ~/Library/Caches/* 2>/dev/null", capture=False)
+        print(f"   {C.G}✅ Done{C.X}")
+        
+        print(f"{C.Y}2. DNS Flush...{C.X}")
+        cmd("dscacheutil -flushcache", capture=False)
+        print(f"   {C.G}✅ Done{C.X}")
+        
+        print(f"{C.Y}3. Memory GC...{C.X}")
+        import gc; gc.collect()
+        print(f"   {C.G}✅ Done{C.X}")
+
+def cmd_scan(args):
+    """Deep code scan"""
+    print_banner()
+    print(f"{C.C}🔍 SCANNING FOR CODE...{C.X}\n")
+    
+    locations = [
+        ("NOIZYLAB", NOIZYLAB_ROOT),
+        ("GABRIEL_UNIFIED", GABRIEL_DIR),
+        ("Home/m2ultra", Path.home() / "m2ultra"),
+    ]
+    
+    for name, path in locations:
+        if path.exists():
+            count = cmd(f"find '{path}' -maxdepth 4 -name '*.py' 2>/dev/null | wc -l").strip()
+            print(f"  {C.G}{name}:{C.X} {count} Python files")
+
+def cmd_diag(args):
+    """Run diagnostics"""
+    print_banner()
+    print(f"{C.B}🩺 RUNNING DIAGNOSTICS...{C.X}\n")
+    
+    result = cmd("curl -s http://localhost:5185/api/diagnose/local 2>/dev/null")
+    if result:
+        try:
+            data = json.loads(result)
+            print(f"  {C.G}CPU:{C.X} {data.get('cpu', {}).get('value', 'N/A')}")
+            print(f"  {C.G}RAM:{C.X} {data.get('ram', {}).get('value', 'N/A')}")
+            print(f"  {C.G}Disk:{C.X} {data.get('disk', {}).get('value', 'N/A')}")
+            print(f"  {C.G}Network:{C.X} {data.get('network', {}).get('value', 'N/A')}")
+        except:
+            print(f"  {C.R}Error parsing response{C.X}")
+    else:
+        print(f"  {C.R}Portal not responding. Start with: noizy portal start{C.X}")
+
+def cmd_portal(args):
+    """Control portal server"""
+    print_banner()
+    action = args.action if hasattr(args, 'action') else 'status'
+    
+    if action == 'start':
+        print(f"{C.G}🚀 Starting Portal Server...{C.X}")
+        os.system(f"cd {PORTAL_DIR} && nohup python3 portal_server.py > /tmp/portal.log 2>&1 &")
+        print(f"   Portal starting on http://localhost:5185")
+    elif action == 'stop':
+        print(f"{C.R}🛑 Stopping Portal Server...{C.X}")
+        os.system("pkill -f portal_server.py")
+        print(f"   Portal stopped")
+    else:
+        result = cmd("curl -s http://localhost:5185/api/status 2>/dev/null")
+        if "ONLINE" in result:
+            print(f"{C.G}Portal: 🟢 ONLINE at http://localhost:5185{C.X}")
+        else:
+            print(f"{C.R}Portal: 🔴 OFFLINE{C.X}")
+
+def cmd_ai(args):
+    """Query AI models"""
+    print_banner()
+    query = ' '.join(args.query) if hasattr(args, 'query') and args.query else None
+    
+    if not query:
+        print(f"{C.Y}Usage: noizy ai \"your question here\"{C.X}")
+        return
+    
+    print(f"{C.C}🧠 Querying AI...{C.X}\n")
+    
+    # Try Ollama first (local)
+    result = cmd(f'ollama run llama3.2 "{query}" 2>/dev/null')
+    if result and "error" not in result.lower():
+        print(f"{C.G}GABRIEL:{C.X} {result}")
+    else:
+        print(f"{C.Y}Ollama not available. Try: ollama serve{C.X}")
+
+def cmd_voice(args):
+    """Voice command mode"""
+    print_banner()
+    print(f"{C.M}🎤 VOICE MODE{C.X}")
+    print(f"   {C.Y}Coming soon! Use the Portal for voice features.{C.X}")
+    print(f"   http://localhost:5185")
+
+def cmd_ai_center(args, action: str):
+    """Run AI Command Center commands"""
+    print_banner()
+    ai_manager = NOIZYLAB_ROOT / "AI_COMMAND_CENTER" / "ai_manager.py"
+    if not ai_manager.exists():
+        print(f"{C.R}Error: AI Command Center not found{C.X}")
+        return
+    subprocess.run([sys.executable, str(ai_manager), action])
+
+def cmd_smart_chat(args):
+    """Smart LLM chat with auto-routing"""
+    print_banner()
+    message = ' '.join(args.message) if args.message else ''
+    if not message:
+        print(f"{C.Y}Usage: noizy chat 'your message'{C.X}")
+        return
+    
+    ai_manager = NOIZYLAB_ROOT / "AI_COMMAND_CENTER" / "ai_manager.py"
+    subprocess.run([sys.executable, str(ai_manager), 'chat', message])
+
+def cmd_polyglot(args):
+    """Polyglot generator commands"""
+    print_banner()
+    poly_dir = NOIZYLAB_ROOT / "POLYGLOT"
+    
+    if args.action == 'list':
+        print(f"{C.C}🌐 POLYGLOT LANGUAGES{C.X}\n")
+        subprocess.run([sys.executable, str(poly_dir / "polyglot_generator.py"), "--list"])
+    elif args.action == 'test':
+        print(f"{C.C}🧪 RUNNING POLYGLOT TESTS{C.X}\n")
+        subprocess.run(["bash", str(poly_dir / "test_polyglot.sh")])
+    elif args.action == 'generate':
+        print(f"{C.Y}Usage: cd POLYGLOT && python3 polyglot_generator.py python ruby lua{C.X}")
+
+def cmd_fast_scan(args):
+    """Run Go-Velocity Core scanner"""
+    print_banner()
+    print(f"{C.C}⚡ INITIATING GO-VELOCITY CORE...{C.X}\n")
+    
+    bin_path = NOIZYLAB_ROOT / "bin" / "fast-scan"
+    target_dir = str(Path(args.dir).resolve())
+    
+    if not bin_path.exists():
+        print(f"{C.R}Error: Go binary not found at {bin_path}{C.X}")
+        return
+
+    print(f"Scanning: {target_dir}")
+    try:
+        # Run the Go binary, allowing it to print directly to terminals
+        # We assume the Go binary prints human-readable stats to Stderr
+        subprocess.run([str(bin_path), "-dir", target_dir, "-json", "false"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"{C.R}Scan failed: {e}{C.X}")
+    except KeyboardInterrupt:
+        print(f"\n{C.Y}Scan aborted.{C.X}")
+
+# ============================================================================
+# MAIN
+# ============================================================================
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='NOIZYLAB CLI - GABRIEL Command Center',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  noizy status          Show system status
+  noizy heal            Run World Healer optimization
+  noizy scan            Deep code scan
+  noizy diag            Run diagnostics
+  noizy portal start    Start portal server
+  noizy portal stop     Stop portal server
+  noizy ai "hello"      Query AI
+        """
+    )
+    
+    subparsers = parser.add_subparsers(dest='command', help='Command to run')
+    
+    # Status
+    subparsers.add_parser('status', help='Show all systems status')
+    
+    # Heal
+    subparsers.add_parser('heal', help='Run World Healer optimization')
+    
+    # Scan
+    subparsers.add_parser('scan', help='Deep code scan')
+    
+    # Diag
+    subparsers.add_parser('diag', help='Run system diagnostics')
+    
+    # Portal
+    portal_parser = subparsers.add_parser('portal', help='Control portal server')
+    portal_parser.add_argument('action', nargs='?', default='status', 
+                               choices=['start', 'stop', 'status'])
+    
+    # AI
+    ai_parser = subparsers.add_parser('ai', help='Query AI models')
+    ai_parser.add_argument('query', nargs='*', help='Your question')
+    
+    # Voice
+    subparsers.add_parser('voice', help='Voice command mode')
+
+    # Fast Scan (Go-Velocity)
+    scan_parser = subparsers.add_parser('fast-scan', help='Run Go-Velocity file scanner')
+    scan_parser.add_argument('dir', nargs='?', default='.', help='Directory to scan')
+    
+    # AI Command Center Integration
+    subparsers.add_parser('ai-status', help='Show AI Command Center status')
+    subparsers.add_parser('ai-discover', help='Discover available AI services')
+    subparsers.add_parser('ai-diagnose', help='Run AI system diagnostics')
+    
+    # Smart Chat
+    chat_parser = subparsers.add_parser('chat', help='Smart LLM chat with auto-routing')
+    chat_parser.add_argument('message', nargs='*', help='Your message')
+    
+    # Polyglot
+    poly_parser = subparsers.add_parser('polyglot', help='Polyglot generator')
+    poly_parser.add_argument('action', nargs='?', default='list', choices=['list', 'test', 'generate'])
+    
+    # Quick actions
+    quick_parser = subparsers.add_parser('quick', help='Quick AI actions: fix, improve, explain, tldr')
+    quick_parser.add_argument('action', choices=['fix', 'improve', 'explain', 'tldr', 'review', 'idea'])
+    quick_parser.add_argument('content', nargs='*', help='Content to process')
+    
+    # Metrics
+    subparsers.add_parser('metrics', help='Show AI usage metrics')
+    
+    # Ensemble
+    ensemble_parser = subparsers.add_parser('ensemble', help='Query multiple AI models')
+    ensemble_parser.add_argument('prompt', nargs='*', help='Your prompt')
+    
+    # GABRIEL
+    gabriel_parser = subparsers.add_parser('gabriel', help='GABRIEL unified systems')
+    gabriel_parser.add_argument('action', nargs='?', default='status', choices=['status', 'scan', 'hot', 'metrics'])
+    
+    # Intelligence scan
+    intel_parser = subparsers.add_parser('intel', help='Intelligence scan')
+    
+    args = parser.parse_args()
+    
+    if args.command == 'status':
+        cmd_status(args)
+    elif args.command == 'heal':
+        cmd_heal(args)
+    elif args.command == 'scan':
+        cmd_scan(args)
+    elif args.command == 'diag':
+        cmd_diag(args)
+    elif args.command == 'portal':
+        cmd_portal(args)
+    elif args.command == 'ai':
+        cmd_ai(args)
+    elif args.command == 'voice':
+        cmd_voice(args)
+    elif args.command == 'fast-scan':
+        cmd_fast_scan(args)
+    elif args.command == 'ai-status':
+        cmd_ai_center(args, 'status')
+    elif args.command == 'ai-discover':
+        cmd_ai_center(args, 'discover')
+    elif args.command == 'ai-diagnose':
+        cmd_ai_center(args, 'diagnose')
+    elif args.command == 'chat':
+        cmd_smart_chat(args)
+    elif args.command == 'polyglot':
+        cmd_polyglot(args)
+    elif args.command == 'quick':
+        cmd_quick(args)
+    elif args.command == 'metrics':
+        cmd_ai_center(args, 'metrics')
+    elif args.command == 'ensemble':
+        cmd_ensemble(args)
+    elif args.command == 'gabriel':
+        cmd_gabriel(args)
+    elif args.command == 'intel':
+        cmd_intel(args)
+    else:
+        print_banner()
+        parser.print_help()
+
+
+def cmd_quick(args):
+    """Quick AI actions"""
+    print_banner()
+    content = ' '.join(args.content) if args.content else ''
+    if not content:
+        print(f"{C.Y}Usage: noizy quick {args.action} 'your content'{C.X}")
+        return
+    
+    ai_manager = NOIZYLAB_ROOT / "AI_COMMAND_CENTER" / "ai_manager.py"
+    subprocess.run([sys.executable, str(ai_manager), 'quick', args.action, content])
+
+
+def cmd_ensemble(args):
+    """Query multiple AI models"""
+    print_banner()
+    prompt = ' '.join(args.prompt) if args.prompt else ''
+    if not prompt:
+        print(f"{C.Y}Usage: noizy ensemble 'your question'{C.X}")
+        return
+    
+    ai_manager = NOIZYLAB_ROOT / "AI_COMMAND_CENTER" / "ai_manager.py"
+    subprocess.run([sys.executable, str(ai_manager), 'ensemble', prompt])
+
+
+def cmd_gabriel(args):
+    """GABRIEL unified systems"""
+    print_banner()
+    print(f"{C.M}🧠 GABRIEL SYSTEM{C.X}\n")
+    
+    ai_manager = NOIZYLAB_ROOT / "AI_COMMAND_CENTER" / "ai_manager.py"
+    subprocess.run([sys.executable, str(ai_manager), 'gabriel', args.action])
+
+
+def cmd_intel(args):
+    """Intelligence scan"""
+    print_banner()
+    print(f"{C.C}🔍 INTELLIGENCE SCAN{C.X}\n")
+    
+    ai_manager = NOIZYLAB_ROOT / "AI_COMMAND_CENTER" / "ai_manager.py"
+    subprocess.run([sys.executable, str(ai_manager), 'gabriel', 'scan'])
+
+
+if __name__ == '__main__':
+    main()

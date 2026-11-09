@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "vault": {
+      "transport": "stdio",
+      "command": "python3",
+      "args": ["./servers/vault_server.py"]
+    },
+    "omen": {
+      "transport": "stdio",
+      "command": "python3",
+      "args": ["./servers/omen_server.py"]
+    },
+    "gabriel": {
+      "transport": "stdio",
+      "command": "python3",
+      "args": ["/Users/m2ultra/NOIZYLAB/GABRIEL/mcp_servers/gabriel_mcp/server.py"]
+    }
+  }
+}

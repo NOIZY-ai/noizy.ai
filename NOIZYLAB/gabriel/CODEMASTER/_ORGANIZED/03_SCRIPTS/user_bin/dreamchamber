@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+import os
+import sys
+import platform
+import subprocess
+import json
+import socket
+
+# DREAMCHAMBER: Uses the NOIZYLAB DGS-1210-10 Network
+# SUBNET: 10.90.90.x (Recommended) or Local LAN
+# JUMBO: 9000 MTU
+
+PC_SETUP_SCRIPT = """
+# DREAMCHAMBER PC SETUP (Run as Administrator)
+Write-Host "Initializing DREAMCHAMBER Link..." -ForegroundColor Cyan
+
+# 1. Enable Jumbo Frames (Attempting common driver names)
+$adapters = Get-NetAdapter | Where-Object { $_.Status -eq "Up" }
+foreach ($adapter in $adapters) {
+    Write-Host "Configuring Adapter: $($adapter.Name)" -ForegroundColor Yellow
+    
+    # Try to set Jumbo Packet to 9014 or 9000
+    try {
+        Set-NetAdapterAdvancedProperty -Name $adapter.Name -DisplayName "Jumbo Packet" -DisplayValue "9014 Bytes" -ErrorAction SilentlyContinue
+        Write-Host "  -> Jumbo Packet set to 9014 Bytes" -ForegroundColor Green
+    } catch {
+        try {
+            Set-NetAdapterAdvancedProperty -Name $adapter.Name -DisplayName "Jumbo Packet" -DisplayValue "9000 Bytes" -ErrorAction SilentlyContinue
+            Write-Host "  -> Jumbo Packet set to 9000 Bytes" -ForegroundColor Green
+        } catch {
+            Write-Host "  -> Could not set Jumbo Packet automatically. Check driver." -ForegroundColor Red
+        }
+    }
+}
+
+# 2. Enable OpenSSH Server
+Write-Host "Checking OpenSSH Server..." -ForegroundColor Yellow
+$ssh = Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH.Server*'
+if ($ssh.State -ne "Installed") {
+    Write-Host "Installing OpenSSH Server..." -ForegroundColor Cyan
+    Add-WindowsCapability -Online -Name $ssh.Name
+}
+Start-Service sshd
+Set-Service -Name sshd -StartupType 'Automatic'
+Write-Host "SSH Server Active." -ForegroundColor Green
+
+# 3. Optimize SMB (Multichannel)
+Write-Host "Optimizing SMB..." -ForegroundColor Yellow
+Set-SmbServerConfiguration -EnableMultiChannel $true -Force
+Set-SmbClientConfiguration -EnableMultiChannel $true -Force
+Write-Host "SMB Multichannel Enabled." -ForegroundColor Green
+
+# 4. Show Info
+$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object Interfacelias -notlike "*Loopback*" | Select-Object -First 1).IPAddress
+Write-Host "DREAMCHAMBER PC READY." -ForegroundColor Green
+Write-Host "IP Address: $ip" -ForegroundColor White
+Write-Host "Run on Mac: dreamchamber link $ip" -ForegroundColor Magenta
+"""
+
+def log(msg, color="white"):
+    colors = {
+        "red": "\033[91m", "green": "\033[92m", "yellow": "\033[93m", 
+        "blue": "\033[94m", "magenta": "\033[95m", "cyan": "\033[96m", "white": "\033[0m"
+    }
+    print(f"{colors.get(color, '')}{msg}\033[0m")
+
+def check_mac_mtu():
+    log("Checking Mac MTU Status...", "yellow")
+    try:
+        # Get active interface with IP
+        cmd = "route get 8.8.8.8 | grep interface | awk '{print $2}'"
+        iface = subprocess.check_output(cmd, shell=True).decode().strip()
+        
+        cmd_mtu = f"ifconfig {iface} | grep mtu"
+        mtu_out = subprocess.check_output(cmd_mtu, shell=True).decode().strip()
+        
+        log(f"Interface {iface}: {mtu_out}", "cyan")
+        if "9000" in mtu_out:
+            log("✅ Jumbo Frames Active (MTU 9000)", "green")
+        else:
+            log("❌ Standard Frames (MTU 1500)", "red")
+            log(f"Action: sudo networksetup -setMTU {iface} 9000", "magenta")
+            
+    except Exception as e:
+        log(f"Error checking MTU: {e}", "red")
+
+def generate_pc_script():
+    log("Generating 'dreamchamber_pc_setup.ps1'...", "cyan")
+    path = os.path.expanduser("~/Desktop/dreamchamber_pc_setup.ps1")
+    with open(path, "w") as f:
+        f.write(PC_SETUP_SCRIPT)
+    log(f"✅ Script saved to Desktop: {path}", "green")
+    log("Transfer this to your PC and run as Administrator (PowerShell).", "yellow")
+
+def scan_network():
+    log("Scanning for PC Nodes (ARP)...", "yellow")
+    # Quick ARP scan
+    os.system("arp -a")
+
+def show_help():
+    log("=== DREAMCHAMBER BRIDGE ===", "magenta")
+    log("Usage: dreamchamber [command]")
+    log("  status   - Check Mac Network & MTU")
+    log("  init     - Generate PC Setup Script")
+    log("  scan     - Scan network for devices")
+    log("  ssh [ip] - Connect to PC")
+
+def main():
+    if len(sys.argv) < 2:
+        show_help()
+        sys.exit(0)
+    
+    cmd = sys.argv[1]
+    
+    if cmd == "status":
+        check_mac_mtu()
+    elif cmd == "init":
+        generate_pc_script()
+    elif cmd == "scan":
+        scan_network()
+    elif cmd == "ssh":
+        if len(sys.argv) < 3:
+            log("Usage: dreamchamber ssh [ip]", "red")
+        else:
+            os.system(f"ssh administrator@{sys.argv[2]}")
+    elif cmd == "serve-ai":
+        log("📢 Exposing M2 Ultra AI to DreamChamber...", "cyan")
+        log("Use this URL on your PC: http://[M2-IP]:11434", "green")
+        log("Restarting Ollama...", "yellow")
+        os.system("launchctl setenv OLLAMA_HOST '0.0.0.0'")
+        # Restart service if possible, or warn user
+        log("⚠️  Please restart Ollama.app for changes to take effect.", "magenta")
+    else:
+        show_help()
+
+if __name__ == "__main__":
+    main()

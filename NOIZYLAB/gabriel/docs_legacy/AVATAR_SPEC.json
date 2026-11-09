@@ -1,0 +1,92 @@
+{
+    "states": {
+        "IDLE": "Breathing loop (0.2hz), slight head drift, eyes scanning horizon.",
+        "LISTEN": "Lock eye contact, head tilt 5deg, freeze micro-movements.",
+        "THINK": "Eyes dart up-right, rapid blink, aura shift (Blue -> Purple).",
+        "SPEAK": "Full lip-sync (Viseme), head emphasizes stressed syllables.",
+        "ALERT": "Snap focus, pupils constrict, aura flash (Amber).",
+        "EXECUTE_CONFIRM": "Single firm nod, 'Power Pose', aura pulse (Green)."
+    },
+    "rig_requirements": [
+        "jawOpen",
+        "jawLeft",
+        "jawRight",
+        "mouthSmile",
+        "mouthFrown",
+        "mouthPucker",
+        "eyebrowRaise",
+        "eyebrowFrown",
+        "eyeBlinkLeft",
+        "eyeBlinkRight",
+        "pupilSize",
+        "headTilt",
+        "headTurn"
+    ],
+    "prosody_mapping": [
+        {
+            "source": "audio_rms",
+            "target": "jawOpen",
+            "factor": 1.2,
+            "smooth": 0.05
+        },
+        {
+            "source": "audio_pitch",
+            "target": "eyebrowRaise",
+            "factor": 0.8,
+            "smooth": 0.1
+        },
+        {
+            "source": "audio_tempo",
+            "target": "headNod",
+            "factor": 0.4,
+            "threshold": "beat"
+        },
+        {
+            "source": "sentiment_valence",
+            "target": "mouthSmile",
+            "factor": 1.0
+        }
+    ],
+    "voice_pipeline": [
+        "Input: WebAudio VAD (Worklet)",
+        "STT: Deepgram Nova-2 (Streaming)",
+        "Brain: Claude 3 Opus (Streaming)",
+        "TTS: ElevenLabs Turbo v2.5 (Streaming)",
+        "FX: TempleEngine (WebAudio Graph: Comp/Rev)"
+    ],
+    "hud": [
+        {
+            "id": "confidence_ring",
+            "label": "Truth",
+            "source": "memcell.confidence"
+        },
+        {
+            "id": "evidence_badge",
+            "label": "Source",
+            "source": "memcell.provenance.source_ids"
+        },
+        {
+            "id": "action_toast",
+            "label": "Next",
+            "source": "agent.next_action"
+        },
+        {
+            "id": "latency_meter",
+            "label": "Ms",
+            "source": "system.rtt"
+        }
+    ],
+    "performance_budget": [
+        "Render Frame: < 16.6ms (60fps)",
+        "Voice RTT: < 500ms (Glass-to-Glass)",
+        "Interrupt Reaction: < 300ms",
+        "MemCell Lookup: < 100ms"
+    ],
+    "implementation_steps": [
+        "1. Initialize Three.js WebGLRenderer (PowerPreference: High Performance).",
+        "2. Load GLB Rig with MorphTargets.",
+        "3. Bind AudioWorkletNode for VAD & Analysis.",
+        "4. Connect WebSocket to Sentinel for State Sync.",
+        "5. Render React HUD Overlay."
+    ]
+}

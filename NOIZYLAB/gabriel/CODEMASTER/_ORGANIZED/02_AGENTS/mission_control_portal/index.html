@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 MC96 Mission Control | GORUNFREE!!!</title>
+    <meta name="description" content="MC96ECOUNIVERSE Command Center - Rob Plowman's Digital Empire">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <div class="cosmic-dust"></div>
+
+    <!-- Main Container -->
+    <div class="mission-control">
+        <!-- Header -->
+        <header class="control-header">
+            <div class="logo-section" style="position: relative;">
+                <canvas id="avatar-canvas"
+                    style="position: absolute; top: -50px; left: -50px; width: 300px; height: 150px; pointer-events: none; z-index: 0; opacity: 0.6;"></canvas>
+                <div class="logo-ring" style="position: relative; z-index: 1;"></div>
+                <h1 class="main-title" style="position: relative; z-index: 1;">
+                    <span class="glow">MC96</span>
+                    <span class="subtitle">ECOUNIVERSE</span>
+                </h1>
+            </div>
+            <div class="status-bar">
+                <div class="status-item online">
+                    <span class="pulse"></span>
+                    <span>SYSTEM ONLINE</span>
+                </div>
+                <div class="status-item">
+                    <span class="clock" id="clock">--:--:--</span>
+                </div>
+                <div class="motto">GORUNFREE!!!</div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            <!-- Storage Overview Panel -->
+            <section class="panel storage-panel">
+                <div class="panel-header">
+                    <h2>📊 STORAGE COMMAND</h2>
+                    <span class="panel-status">LIVE</span>
+                </div>
+                <div class="panel-content">
+                    <div class="storage-summary">
+                        <div class="big-stat">
+                            <span class="stat-value" id="total-capacity">56</span>
+                            <span class="stat-unit">TB</span>
+                            <span class="stat-label">Total Capacity</span>
+                        </div>
+                        <div class="big-stat">
+                            <span class="stat-value" id="total-used">38.4</span>
+                            <span class="stat-unit">TB</span>
+                            <span class="stat-label">Used</span>
+                        </div>
+                        <div class="big-stat highlight">
+                            <span class="stat-value" id="total-free">17.6</span>
+                            <span class="stat-unit">TB</span>
+                            <span class="stat-label">Free</span>
+                        </div>
+                    </div>
+                    <div class="volume-grid" id="volume-grid">
+                        <!-- Volumes will be populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Critical Alerts Panel -->
+            <section class="panel alerts-panel">
+                <div class="panel-header">
+                    <h2>🚨 CRITICAL ALERTS</h2>
+                    <span class="alert-count" id="alert-count">3</span>
+                </div>
+                <div class="panel-content">
+                    <div class="alert-list" id="alert-list">
+                        <!-- Alerts populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions Panel -->
+            <section class="panel actions-panel">
+                <div class="panel-header">
+                    <h2>⚡ QUICK ACTIONS</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="action-grid">
+                        <button class="action-btn" onclick="runUpgrade()">
+                            <span class="action-icon">🚀</span>
+                            <span class="action-label">Quality Upgrade</span>
+                        </button>
+                        <button class="action-btn" onclick="runScan()">
+                            <span class="action-icon">🔍</span>
+                            <span class="action-label">Deep Scan</span>
+                        </button>
+                        <button class="action-btn" onclick="findOriginals()">
+                            <span class="action-icon">🎵</span>
+                            <span class="action-label">Find Originals</span>
+                        </button>
+                        <button class="action-btn" onclick="healWorld()">
+                            <span class="action-icon">🌍</span>
+                            <span class="action-label">Heal The World</span>
+                        </button>
+                        <button class="action-btn" onclick="refreshData()">
+                            <span class="action-icon">🔄</span>
+                            <span class="action-label">Refresh Data</span>
+                        </button>
+                        <button class="action-btn" onclick="openConsole()">
+                            <span class="action-icon">💻</span>
+                            <span class="action-label">Console</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Empire Statistics Panel -->
+            <section class="panel stats-panel">
+                <div class="panel-header">
+                    <h2>🎸 THE EMPIRE</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="empire-stats">
+                        <div class="empire-stat">
+                            <span class="stat-icon">💾</span>
+                            <span class="stat-value">20</span>
+                            <span class="stat-label">Volumes</span>
+                        </div>
+                        <div class="empire-stat">
+                            <span class="stat-icon">📁</span>
+                            <span class="stat-value">21.9M+</span>
+                            <span class="stat-label">Files</span>
+                        </div>
+                        <div class="empire-stat">
+                            <span class="stat-icon">🎹</span>
+                            <span class="stat-value">$100K+</span>
+                            <span class="stat-label">Library Value</span>
+                        </div>
+                        <div class="empire-stat">
+                            <span class="stat-icon">📅</span>
+                            <span class="stat-value">40+</span>
+                            <span class="stat-label">Years</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original Work Finder Panel -->
+            <section class="panel originals-panel">
+                <div class="panel-header">
+                    <h2>🎵 ROB'S ORIGINALS</h2>
+                    <span class="panel-status found">12 FOUND</span>
+                </div>
+                <div class="panel-content">
+                    <div class="originals-list" id="originals-list">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="detection-info">
+                        <h4>Detection Method:</h4>
+                        <ul>
+                            <li>✅ 24-bit audio = ROB's originals</li>
+                            <li>✅ No metadata = ROB's work</li>
+                            <li>❌ 16-bit = Commercial samples</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity Console -->
+            <section class="panel console-panel">
+                <div class="panel-header">
+                    <h2>📜 ACTIVITY LOG</h2>
+                    <button class="clear-btn" onclick="clearConsole()">Clear</button>
+                </div>
+                <div class="panel-content">
+                    <div class="console-output" id="console-output">
+                        <div class="log-entry success">[INIT] MC96 Mission Control Online</div>
+                        <div class="log-entry info">[SCAN] Loading volume data...</div>
+                        <div class="log-entry success">[OK] 20 volumes detected</div>
+                        <div class="log-entry warning">[ALERT] 3 volumes need attention</div>
+                        <div class="log-entry">[READY] GORUNFREE!!! 🚀</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="control-footer">
+            <div class="footer-mottos">
+                <span>WE GROW, WE SHARE!!!</span>
+                <span>PEACE & LOVE, RESPECT & LIFELUV!!!</span>
+            </div>
+            <div class="footer-credits">
+                <span>CB_01 (LIFELUV ENGR)</span>
+                <span>|</span>
+                <span>For ROB & CAROLINA</span>
+                <span>|</span>
+                <span>COMFORTABLE FOR LIFE - FOREVER</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="avatar_engine.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

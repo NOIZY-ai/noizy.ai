@@ -1,0 +1,189 @@
+{
+  "conversational_patterns": {
+    "greetings": {
+      "formal": [
+        "Good morning, how are you?",
+        "Good afternoon, nice to meet you.",
+        "Good evening, how may I help you?",
+        "Hello, pleased to meet you.",
+        "Greetings, how do you do?"
+      ],
+      "casual": [
+        "Hey! What's up?",
+        "Hi there! How's it going?",
+        "Yo! What's happening?",
+        "Hey! Long time no see!",
+        "Hi! How are things?"
+      ],
+      "professional": [
+        "Hello, I hope you're doing well.",
+        "Good day, how can I assist you?",
+        "Hello, thank you for your time.",
+        "Greetings, I'm here to help.",
+        "Hello, what can I do for you today?"
+      ]
+    },
+    "small_talk": {
+      "weather": [
+        "Nice weather today, isn't it?",
+        "How's the weather where you are?",
+        "Beautiful day, right?",
+        "Hope the weather's treating you well.",
+        "Can't complain about this weather!"
+      ],
+      "work": [
+        "How's work going?",
+        "Busy day at work?",
+        "What do you do for work?",
+        "How's your job?",
+        "Working hard or hardly working?"
+      ],
+      "hobbies": [
+        "What do you like to do in your free time?",
+        "Any hobbies you enjoy?",
+        "What are you into?",
+        "What keeps you busy?",
+        "Got any interests?"
+      ]
+    },
+    "questions": {
+      "information": [
+        "Can you tell me about...",
+        "What do you know about...",
+        "I'd like to learn more about...",
+        "Could you explain...",
+        "What's the deal with..."
+      ],
+      "clarification": [
+        "What do you mean by that?",
+        "Could you clarify?",
+        "I'm not sure I understand.",
+        "Can you elaborate?",
+        "What exactly are you saying?"
+      ],
+      "opinion": [
+        "What do you think about...",
+        "How do you feel about...",
+        "What's your opinion on...",
+        "What are your thoughts on...",
+        "How do you see..."
+      ]
+    },
+    "responses": {
+      "agreement": [
+        "I totally agree!",
+        "That's exactly right!",
+        "You're absolutely correct!",
+        "I couldn't agree more!",
+        "That's a great point!"
+      ],
+      "disagreement": [
+        "I see it differently.",
+        "I have a different view.",
+        "I'm not sure I agree.",
+        "That's an interesting perspective.",
+        "I respect your opinion, but..."
+      ],
+      "uncertainty": [
+        "I'm not entirely sure.",
+        "That's a tough question.",
+        "Let me think about that.",
+        "I'd need to look into that.",
+        "I'm not certain about that."
+      ]
+    },
+    "transitions": {
+      "topic_change": [
+        "Speaking of which...",
+        "That reminds me...",
+        "On a different note...",
+        "Changing the subject...",
+        "By the way..."
+      ],
+      "continuation": [
+        "And then what happened?",
+        "Tell me more about that.",
+        "What happened next?",
+        "Go on...",
+        "Continue..."
+      ],
+      "summary": [
+        "So in summary...",
+        "To recap...",
+        "In other words...",
+        "Basically...",
+        "Long story short..."
+      ]
+    },
+    "emotions": {
+      "positive": [
+        "That's wonderful!",
+        "I'm so happy to hear that!",
+        "That's fantastic!",
+        "How exciting!",
+        "That's great news!"
+      ],
+      "negative": [
+        "I'm sorry to hear that.",
+        "That must be difficult.",
+        "I understand that's tough.",
+        "That sounds challenging.",
+        "I'm here if you need to talk."
+      ],
+      "neutral": [
+        "I see.",
+        "That's interesting.",
+        "I understand.",
+        "Got it.",
+        "Okay."
+      ]
+    },
+    "politeness": {
+      "requests": [
+        "Could you please...",
+        "Would you mind...",
+        "I'd appreciate if you could...",
+        "If it's not too much trouble...",
+        "Could I ask you to..."
+      ],
+      "apologies": [
+        "I'm sorry about that.",
+        "My apologies.",
+        "I apologize for the confusion.",
+        "Sorry for the inconvenience.",
+        "I'm sorry, I didn't mean to..."
+      ],
+      "gratitude": [
+        "Thank you so much!",
+        "I really appreciate it!",
+        "Thanks a lot!",
+        "I'm grateful for your help.",
+        "Thank you, that means a lot!"
+      ]
+    }
+  },
+  "conversation_flows": {
+    "introduction": [
+      "Hello, my name is...",
+      "Nice to meet you, I'm...",
+      "Hi, I'm... What's your name?",
+      "Pleased to meet you, I'm...",
+      "Hey, I'm... How about you?"
+    ],
+    "closing": [
+      "Well, I should get going.",
+      "It was nice talking with you!",
+      "I've got to run, but let's talk again soon!",
+      "Thanks for the conversation!",
+      "Take care, and talk to you later!"
+    ],
+    "checking_in": [
+      "How are you doing?",
+      "How have you been?",
+      "What's new with you?",
+      "How's everything going?",
+      "What's been happening?"
+    ]
+  }
+}
+

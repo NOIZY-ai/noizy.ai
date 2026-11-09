@@ -1,0 +1,280 @@
+{
+  "health_score": 82,
+  "status": "healthy",
+  "scan_time": "3.97s",
+  "system": {
+    "hostname": "GOD.local",
+    "os": "Darwin 24.6.0",
+    "os_version": "Darwin Kernel Version 24.6.0: Mon Dec  8 02:36:39 PST 2025; root:xnu-11417.140.69.705.5~1/RELEASE_ARM64_T6020",
+    "arch": "arm64",
+    "python": "3.14.2",
+    "uptime": "1 day",
+    "timestamp": "2025-12-23T10:42:26.918319"
+  },
+  "cpu": {
+    "status": "good",
+    "score": 100,
+    "cores": {
+      "logical": 24,
+      "physical": 24
+    },
+    "usage": "58%",
+    "breakdown": {
+      "user": "18.37%",
+      "system": "39.73%",
+      "idle": "41.89%"
+    },
+    "model": "Apple M2 Ultra"
+  },
+  "memory": {
+    "status": "good",
+    "score": 100,
+    "total": "192GB",
+    "pressure": "9%",
+    "breakdown": {
+      "free": "10GB",
+      "active": "81GB",
+      "inactive": "81GB",
+      "wired": "8GB",
+      "compressed": "14GB"
+    }
+  },
+  "disk": {
+    "status": "good",
+    "score": 30,
+    "volumes": [
+      {
+        "device": "/dev/disk3s3s1",
+        "size": "1.8Ti",
+        "used": "10Gi",
+        "available": "1.1Ti",
+        "usage": "1%",
+        "mount": "427k 4.3G 0% /",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk3s6",
+        "size": "1.8Ti",
+        "used": "20Ki",
+        "available": "1.1Ti",
+        "usage": "1%",
+        "mount": "0 12G 0% /System/Volumes/VM",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk3s4",
+        "size": "1.8Ti",
+        "used": "6.9Gi",
+        "available": "1.1Ti",
+        "usage": "1%",
+        "mount": "1.5k 12G 0% /System/Volumes/Preboot",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk3s2",
+        "size": "1.8Ti",
+        "used": "81Mi",
+        "available": "1.1Ti",
+        "usage": "1%",
+        "mount": "121 12G 0% /System/Volumes/Update",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk1s2",
+        "size": "500Mi",
+        "used": "6.0Mi",
+        "available": "389Mi",
+        "usage": "2%",
+        "mount": "1 4.0M 0% /System/Volumes/xarts",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk1s1",
+        "size": "500Mi",
+        "used": "51Mi",
+        "available": "389Mi",
+        "usage": "12%",
+        "mount": "72 4.0M 0% /System/Volumes/iSCPreboot",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk1s3",
+        "size": "500Mi",
+        "used": "4.4Mi",
+        "available": "389Mi",
+        "usage": "2%",
+        "mount": "64 4.0M 0% /System/Volumes/Hardware",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk3s1",
+        "size": "1.8Ti",
+        "used": "685Gi",
+        "available": "1.1Ti",
+        "usage": "38%",
+        "mount": "4.3M 12G 0% /System/Volumes/Data",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk5s2",
+        "size": "2.7Ti",
+        "used": "2.4Ti",
+        "available": "315Gi",
+        "usage": "89%",
+        "mount": "1.0k 4.3G 0% /Volumes/SIDNEY",
+        "status": "warning"
+      },
+      {
+        "device": "/dev/disk7s2",
+        "size": "3.6Ti",
+        "used": "924Gi",
+        "available": "2.7Ti",
+        "usage": "25%",
+        "mount": "150k 4.3G 0% /Volumes/4TBSG",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk10",
+        "size": "5.5Ti",
+        "used": "4.6Ti",
+        "available": "834Gi",
+        "usage": "86%",
+        "mount": "2.4M 4.3G 0% /Volumes/6TB",
+        "status": "warning"
+      },
+      {
+        "device": "/dev/disk16s1",
+        "size": "1.8Ti",
+        "used": "2.1Mi",
+        "available": "1.8Ti",
+        "usage": "1%",
+        "mount": "234 19G 0% /Volumes/SOUND_DESIGN",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk13s2",
+        "size": "3.6Ti",
+        "used": "1.4Ti",
+        "available": "2.2Ti",
+        "usage": "40%",
+        "mount": "10k 4.3G 0% /Volumes/JOE",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk11s2",
+        "size": "3.6Ti",
+        "used": "3.0Ti",
+        "available": "607Gi",
+        "usage": "84%",
+        "mount": "2.0M 4.3G 0% /Volumes/4TB BLK",
+        "status": "warning"
+      },
+      {
+        "device": "/dev/disk12s2",
+        "size": "3.6Ti",
+        "used": "356Gi",
+        "available": "3.3Ti",
+        "usage": "10%",
+        "mount": "311k 4.3G 0% /Volumes/RED DRAGON",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk17s1",
+        "size": "1.8Ti",
+        "used": "60Gi",
+        "available": "1.7Ti",
+        "usage": "4%",
+        "mount": "26k 19G 0% /Volumes/SAMPLE_MASTER",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk15s2",
+        "size": "11Ti",
+        "used": "8.4Ti",
+        "available": "2.5Ti",
+        "usage": "78%",
+        "mount": "2.9M 4.3G 0% /Volumes/12TB",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk4s2",
+        "size": "3.6Ti",
+        "used": "3.4Ti",
+        "available": "265Gi",
+        "usage": "93%",
+        "mount": "4.5M 4.3G 0% /Volumes/MAG 4TB",
+        "status": "critical"
+      },
+      {
+        "device": "/dev/disk19s1",
+        "size": "16Gi",
+        "used": "16Gi",
+        "available": "436Mi",
+        "usage": "98%",
+        "mount": "607k 4.5M 12% /Library/Developer/CoreSimulator/Volumes/iOS_23C54",
+        "status": "critical"
+      },
+      {
+        "device": "/dev/disk6s2",
+        "size": "3.6Ti",
+        "used": "517Gi",
+        "available": "3.1Ti",
+        "usage": "14%",
+        "mount": "134k 4.3G 0% /Volumes/4TB Lacie",
+        "status": "good"
+      },
+      {
+        "device": "/dev/disk20s1",
+        "size": "128Mi",
+        "used": "55Mi",
+        "available": "73Mi",
+        "usage": "43%",
+        "mount": "45 4.3G 0% /Volumes/Techtool Pro 21.0.6 Installer",
+        "status": "good"
+      }
+    ],
+    "smart": "VERIFIED"
+  },
+  "network": {
+    "status": "good",
+    "score": 100,
+    "internet": "ONLINE",
+    "latency": "14.726",
+    "dns": "OK",
+    "dns_servers": [
+      "1.1.1.1",
+      "1.0.0.1",
+      "1.1.1.1"
+    ],
+    "local_ip": "10.0.0.71",
+    "public_ip": "2607:fea8:bc9b:a0:2117:ad50:2f:6612"
+  },
+  "processes": {
+    "cpu_hogs": [],
+    "memory_hogs": [],
+    "suspicious": []
+  },
+  "caches": {
+    "total_size": 0,
+    "caches": [
+      {
+        "name": "User Cache",
+        "path": "/Users/m2ultra/Library/Caches",
+        "size": "364M"
+      },
+      {
+        "name": "Logs",
+        "path": "/Users/m2ultra/Library/Logs",
+        "size": "13M"
+      },
+      {
+        "name": "Temp",
+        "path": "/tmp",
+        "size": "0B"
+      }
+    ]
+  },
+  "recommendations": [
+    "\ud83d\udcbe LOW DISK SPACE: Run cache cleanup or delete unused files"
+  ]
+}

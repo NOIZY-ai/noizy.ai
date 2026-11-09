@@ -1,0 +1,5 @@
+#!/bin/bash
+# ULTRA POLYGLOT - Works with Bash
+# For Python: python3 -c "print('Python')"
+# For Ruby: ruby -e "puts 'Ruby'"
+echo "Bash"

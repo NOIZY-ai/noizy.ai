@@ -1,0 +1,620 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/supersonic_pipeline.schema.json",
+  "title": "NOIZYVOX Supersonic AI Pipeline",
+  "description": "Optimized end-to-end pipeline combining all free open-source models",
+  "type": "object",
+  "required": ["pipeline_id", "version"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "pipeline_id": {
+      "type": "string",
+      "pattern": "^sonic_[a-z0-9]{16}$",
+      "description": "Unique identifier for the supersonic pipeline configuration"
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Pipeline version"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable pipeline name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Pipeline description"
+    },
+    "recommended_stack": {
+      "type": "object",
+      "description": "Optimal free open-source stack for NOIZYVOX",
+      "properties": {
+        "tier_1_premium": {
+          "type": "object",
+          "description": "Best quality, requires GPU",
+          "properties": {
+            "tts_primary": { "type": "string", "default": "Fish Speech V1.5" },
+            "tts_fallback": { "type": "string", "default": "XTTS-v2" },
+            "voice_cloning": { "type": "string", "default": "Fish Speech V1.5" },
+            "lip_sync_video": { "type": "string", "default": "LatentSync" },
+            "lip_sync_image": { "type": "string", "default": "Hallo2" },
+            "emotion_text": { "type": "string", "default": "GoEmotions" },
+            "emotion_audio": { "type": "string", "default": "Emotion2Vec" },
+            "asr": { "type": "string", "default": "Whisper Large V3" },
+            "vocoder": { "type": "string", "default": "BigVGAN V2" },
+            "llm": { "type": "string", "default": "LLaMA 3.3 70B" },
+            "embeddings": { "type": "string", "default": "BGE-M3" },
+            "vector_db": { "type": "string", "default": "Qdrant" }
+          }
+        },
+        "tier_2_balanced": {
+          "type": "object",
+          "description": "Good quality, moderate GPU",
+          "properties": {
+            "tts_primary": { "type": "string", "default": "F5-TTS" },
+            "tts_fallback": { "type": "string", "default": "CosyVoice2" },
+            "voice_cloning": { "type": "string", "default": "OpenVoice V2" },
+            "lip_sync_video": { "type": "string", "default": "Wav2Lip" },
+            "lip_sync_image": { "type": "string", "default": "SadTalker" },
+            "emotion_text": { "type": "string", "default": "DistilRoBERTa Emotion" },
+            "emotion_audio": { "type": "string", "default": "SpeechBrain" },
+            "asr": { "type": "string", "default": "Faster-Whisper" },
+            "vocoder": { "type": "string", "default": "HiFi-GAN" },
+            "llm": { "type": "string", "default": "Qwen 2.5 32B" },
+            "embeddings": { "type": "string", "default": "BGE-M3" },
+            "vector_db": { "type": "string", "default": "ChromaDB" }
+          }
+        },
+        "tier_3_edge": {
+          "type": "object",
+          "description": "CPU-friendly, edge deployment",
+          "properties": {
+            "tts_primary": { "type": "string", "default": "Kokoro TTS V1.0" },
+            "tts_fallback": { "type": "string", "default": "Piper TTS" },
+            "voice_cloning": { "type": "string", "default": "None (use prebuilt personas)" },
+            "lip_sync_video": { "type": "string", "default": "Rhubarb (visemes only)" },
+            "lip_sync_image": { "type": "string", "default": "LivePortrait" },
+            "emotion_text": { "type": "string", "default": "DistilBERT Emotion" },
+            "emotion_audio": { "type": "string", "default": "None" },
+            "asr": { "type": "string", "default": "Whisper Tiny" },
+            "vocoder": { "type": "string", "default": "Vocos" },
+            "llm": { "type": "string", "default": "Gemma 2 9B (llama.cpp)" },
+            "embeddings": { "type": "string", "default": "all-MiniLM-L6-v2" },
+            "vector_db": { "type": "string", "default": "SQLite-VSS" }
+          }
+        }
+      }
+    },
+    "active_tier": {
+      "type": "string",
+      "enum": ["tier_1_premium", "tier_2_balanced", "tier_3_edge"],
+      "description": "Currently active tier configuration"
+    },
+    "pipeline_stages": {
+      "type": "array",
+      "description": "Ordered pipeline stages",
+      "items": {
+        "type": "object",
+        "required": ["stage", "models"],
+        "properties": {
+          "stage": { 
+            "type": "string",
+            "description": "Stage identifier"
+          },
+          "description": {
+            "type": "string",
+            "description": "Stage description"
+          },
+          "models": { 
+            "type": "array", 
+            "items": { "type": "string" },
+            "description": "Models used in this stage"
+          },
+          "latency_target_ms": { 
+            "type": "integer",
+            "minimum": 0,
+            "description": "Target latency in milliseconds"
+          },
+          "gpu_required": { 
+            "type": "boolean",
+            "default": false,
+            "description": "Whether GPU is required for this stage"
+          },
+          "can_stream": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether this stage supports streaming output"
+          },
+          "parallelizable": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether this stage can run in parallel with others"
+          },
+          "skip_conditions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Conditions under which this stage can be skipped"
+          }
+        }
+      },
+      "default": [
+        {
+          "stage": "1_script_analysis",
+          "models": ["LLaMA 3.3 70B", "GoEmotions", "BGE-M3"],
+          "description": "Analyze script for emotions, emphasis, pacing",
+          "latency_target_ms": 500,
+          "gpu_required": true,
+          "can_stream": false,
+          "parallelizable": false
+        },
+        {
+          "stage": "2_ssml_generation",
+          "models": ["LLaMA 3.3 70B"],
+          "description": "Generate production SSML with prosody markup",
+          "latency_target_ms": 300,
+          "gpu_required": true,
+          "can_stream": true,
+          "parallelizable": false
+        },
+        {
+          "stage": "3_persona_retrieval",
+          "models": ["BGE-M3", "Qdrant"],
+          "description": "Retrieve persona characteristics for consistency",
+          "latency_target_ms": 50,
+          "gpu_required": false,
+          "can_stream": false,
+          "parallelizable": true
+        },
+        {
+          "stage": "4_voice_synthesis",
+          "models": ["Fish Speech V1.5", "BigVGAN V2"],
+          "description": "Generate speech from SSML",
+          "latency_target_ms": 200,
+          "gpu_required": true,
+          "can_stream": true,
+          "parallelizable": false
+        },
+        {
+          "stage": "5_audio_enhancement",
+          "models": ["DeepFilterNet", "Resemble Enhance"],
+          "description": "Noise reduction and quality enhancement",
+          "latency_target_ms": 100,
+          "gpu_required": false,
+          "can_stream": true,
+          "parallelizable": false
+        },
+        {
+          "stage": "6_quality_assessment",
+          "models": ["UTMOS", "ECAPA-TDNN"],
+          "description": "Validate quality and speaker similarity",
+          "latency_target_ms": 50,
+          "gpu_required": false,
+          "can_stream": false,
+          "parallelizable": true
+        },
+        {
+          "stage": "7_lip_sync_generation",
+          "models": ["LatentSync", "Rhubarb"],
+          "description": "Generate lip sync animation",
+          "latency_target_ms": 500,
+          "gpu_required": true,
+          "can_stream": false,
+          "parallelizable": true,
+          "skip_conditions": ["no_video_output", "audio_only"]
+        },
+        {
+          "stage": "8_watermarking",
+          "models": ["AudioSeal", "Custom spectral"],
+          "description": "Embed provenance watermark",
+          "latency_target_ms": 20,
+          "gpu_required": false,
+          "can_stream": true,
+          "parallelizable": false
+        }
+      ]
+    },
+    "model_registry": {
+      "type": "object",
+      "description": "Detailed model information",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "repo": { "type": "string", "description": "GitHub/HuggingFace repo" },
+          "license": { 
+            "type": "string",
+            "enum": ["MIT", "Apache-2.0", "CC-BY-NC-4.0", "CC-BY-4.0", "GPL-3.0", "BSD-3-Clause", "other"]
+          },
+          "commercial_use": { "type": "boolean" },
+          "model_size_gb": { "type": "number" },
+          "vram_required_gb": { "type": "number" },
+          "quantization_options": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "supported_languages": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "latency_benchmark_ms": {
+            "type": "object",
+            "properties": {
+              "gpu_a100": { "type": "number" },
+              "gpu_4090": { "type": "number" },
+              "gpu_3090": { "type": "number" },
+              "cpu_only": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "performance_benchmarks": {
+      "type": "object",
+      "description": "Performance targets and benchmarks",
+      "properties": {
+        "rtf_target": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0.1,
+          "description": "Real-time factor (0.1 = 10x faster than real-time)"
+        },
+        "first_byte_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 150,
+          "description": "Time to first audio byte for streaming"
+        },
+        "quality_mos_target": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 4.3,
+          "description": "Target MOS score"
+        },
+        "speaker_similarity_target": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.88,
+          "description": "Target speaker embedding similarity"
+        },
+        "word_error_rate_target": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.02,
+          "description": "Target WER for intelligibility"
+        },
+        "gpu_utilization_target": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.85,
+          "description": "Target GPU utilization for efficiency"
+        },
+        "throughput_chars_per_second": {
+          "type": "integer",
+          "description": "Characters processed per second"
+        }
+      }
+    },
+    "cost_comparison": {
+      "type": "object",
+      "description": "Cost savings vs commercial alternatives",
+      "properties": {
+        "elevenlabs_equivalent_cost_per_1m_chars": {
+          "type": "number",
+          "default": 300,
+          "description": "USD cost for ElevenLabs equivalent"
+        },
+        "playht_equivalent_cost_per_1m_chars": {
+          "type": "number",
+          "default": 250,
+          "description": "USD cost for Play.ht equivalent"
+        },
+        "noizyvox_oss_cost_per_1m_chars": {
+          "type": "number",
+          "default": 5,
+          "description": "USD GPU compute cost only"
+        },
+        "savings_percent": {
+          "type": "number",
+          "default": 98.3,
+          "description": "Percentage savings vs commercial"
+        },
+        "break_even_volume_chars": {
+          "type": "integer",
+          "description": "Character volume at which self-hosting breaks even"
+        },
+        "infrastructure_monthly_cost": {
+          "type": "object",
+          "properties": {
+            "cloud_gpu_cost": { "type": "number" },
+            "storage_cost": { "type": "number" },
+            "bandwidth_cost": { "type": "number" },
+            "total": { "type": "number" }
+          }
+        }
+      }
+    },
+    "hardware_requirements": {
+      "type": "object",
+      "description": "Hardware requirements per tier",
+      "properties": {
+        "tier_1_premium": {
+          "type": "object",
+          "properties": {
+            "gpu": { "type": "string", "default": "NVIDIA A100 80GB or RTX 4090 24GB" },
+            "vram_min_gb": { "type": "integer", "default": 24 },
+            "ram_min_gb": { "type": "integer", "default": 64 },
+            "storage_min_gb": { "type": "integer", "default": 200 },
+            "cpu_cores_min": { "type": "integer", "default": 16 }
+          }
+        },
+        "tier_2_balanced": {
+          "type": "object",
+          "properties": {
+            "gpu": { "type": "string", "default": "NVIDIA RTX 3090 or RTX 4080" },
+            "vram_min_gb": { "type": "integer", "default": 12 },
+            "ram_min_gb": { "type": "integer", "default": 32 },
+            "storage_min_gb": { "type": "integer", "default": 100 },
+            "cpu_cores_min": { "type": "integer", "default": 8 }
+          }
+        },
+        "tier_3_edge": {
+          "type": "object",
+          "properties": {
+            "gpu": { "type": "string", "default": "None (CPU only) or Intel Arc" },
+            "vram_min_gb": { "type": "integer", "default": 0 },
+            "ram_min_gb": { "type": "integer", "default": 16 },
+            "storage_min_gb": { "type": "integer", "default": 50 },
+            "cpu_cores_min": { "type": "integer", "default": 4 }
+          }
+        }
+      }
+    },
+    "optimization_settings": {
+      "type": "object",
+      "description": "Pipeline optimization configuration",
+      "properties": {
+        "batching": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "max_batch_size": { "type": "integer", "default": 8 },
+            "max_wait_ms": { "type": "integer", "default": 50 }
+          }
+        },
+        "caching": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "cache_embeddings": { "type": "boolean", "default": true },
+            "cache_ssml": { "type": "boolean", "default": true },
+            "cache_audio_segments": { "type": "boolean", "default": false },
+            "ttl_seconds": { "type": "integer", "default": 3600 }
+          }
+        },
+        "quantization": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "precision": { 
+              "type": "string", 
+              "enum": ["fp32", "fp16", "bf16", "int8", "int4"],
+              "default": "fp16"
+            },
+            "dynamic_quantization": { "type": "boolean", "default": false }
+          }
+        },
+        "streaming": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "chunk_size_tokens": { "type": "integer", "default": 50 },
+            "overlap_tokens": { "type": "integer", "default": 10 }
+          }
+        },
+        "model_loading": {
+          "type": "object",
+          "properties": {
+            "preload_all": { "type": "boolean", "default": false },
+            "lazy_load": { "type": "boolean", "default": true },
+            "unload_idle_seconds": { "type": "integer", "default": 300 },
+            "model_parallelism": { "type": "boolean", "default": false }
+          }
+        }
+      }
+    },
+    "fallback_chain": {
+      "type": "array",
+      "description": "Fallback models if primary fails",
+      "items": {
+        "type": "object",
+        "properties": {
+          "component": { "type": "string" },
+          "primary": { "type": "string" },
+          "fallbacks": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "failover_conditions": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "quality_gates": {
+      "type": "object",
+      "description": "Quality thresholds for pipeline stages",
+      "properties": {
+        "mos_minimum": { "type": "number", "default": 3.8 },
+        "speaker_similarity_minimum": { "type": "number", "default": 0.80 },
+        "intelligibility_minimum": { "type": "number", "default": 0.95 },
+        "emotion_accuracy_minimum": { "type": "number", "default": 0.75 },
+        "retry_on_failure": { "type": "boolean", "default": true },
+        "max_retries": { "type": "integer", "default": 3 },
+        "fallback_on_quality_fail": { "type": "boolean", "default": true }
+      }
+    },
+    "monitoring": {
+      "type": "object",
+      "description": "Pipeline monitoring configuration",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "metrics_endpoint": { "type": "string" },
+        "log_level": {
+          "type": "string",
+          "enum": ["debug", "info", "warning", "error"],
+          "default": "info"
+        },
+        "trace_requests": { "type": "boolean", "default": false },
+        "sample_rate": { "type": "number", "default": 0.1 },
+        "alerting": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "latency_threshold_ms": { "type": "integer", "default": 2000 },
+            "error_rate_threshold": { "type": "number", "default": 0.05 },
+            "quality_drop_threshold": { "type": "number", "default": 0.1 }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" },
+        "environment": {
+          "type": "string",
+          "enum": ["development", "staging", "production"]
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "openai_integration": {
+      "type": "object",
+      "description": "Optional OpenAI integration for hybrid pipeline",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "api_key_env": { "type": "string", "default": "OPENAI_API_KEY" },
+        "fallback_to_openai": {
+          "type": "boolean", 
+          "default": true,
+          "description": "Use OpenAI as fallback when self-hosted fails"
+        },
+        "tts_config": {
+          "type": "object",
+          "properties": {
+            "use_for_premium": { "type": "boolean", "default": true },
+            "model": { 
+              "type": "string", 
+              "enum": ["tts-1", "tts-1-hd", "gpt-4o-mini-tts"],
+              "default": "gpt-4o-mini-tts"
+            },
+            "voice": { 
+              "type": "string",
+              "enum": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"],
+              "default": "nova"
+            },
+            "instruction_mode": { "type": "boolean", "default": true }
+          }
+        },
+        "asr_config": {
+          "type": "object",
+          "properties": {
+            "use_for_quality_critical": { "type": "boolean", "default": true },
+            "model": {
+              "type": "string",
+              "enum": ["whisper-1", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "gpt-4o-transcribe-diarize"],
+              "default": "gpt-4o-mini-transcribe"
+            },
+            "streaming": { "type": "boolean", "default": true }
+          }
+        },
+        "realtime_config": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "model": {
+              "type": "string",
+              "enum": ["gpt-realtime", "gpt-realtime-mini", "gpt-4o-realtime-preview", "gpt-4o-mini-realtime-preview"],
+              "default": "gpt-realtime-mini"
+            },
+            "connection_method": {
+              "type": "string",
+              "enum": ["webrtc", "websocket", "sip"],
+              "default": "websocket"
+            },
+            "voice": { "type": "string", "default": "nova" }
+          }
+        },
+        "cost_thresholds": {
+          "type": "object",
+          "description": "Cost-based routing thresholds",
+          "properties": {
+            "max_openai_spend_daily_usd": { "type": "number", "default": 100 },
+            "prefer_opensource_below_chars": { "type": "integer", "default": 10000 },
+            "force_openai_for_latency_ms": { "type": "integer", "default": 100 }
+          }
+        }
+      }
+    },
+    "hybrid_routing": {
+      "type": "object",
+      "description": "Intelligent routing between open-source and OpenAI",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "routing_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string" },
+              "route_to": { "type": "string", "enum": ["opensource", "openai"] },
+              "reason": { "type": "string" }
+            }
+          },
+          "default": [
+            {
+              "condition": "latency_requirement < 200ms",
+              "route_to": "openai",
+              "reason": "OpenAI Realtime API for lowest latency"
+            },
+            {
+              "condition": "batch_size > 100",
+              "route_to": "opensource",
+              "reason": "Cost efficiency for bulk processing"
+            },
+            {
+              "condition": "persona_type == 'premium'",
+              "route_to": "openai",
+              "reason": "gpt-4o-mini-tts instruction mode for premium personas"
+            },
+            {
+              "condition": "speaker_count > 1",
+              "route_to": "openai",
+              "reason": "gpt-4o-transcribe-diarize for speaker diarization"
+            },
+            {
+              "condition": "default",
+              "route_to": "opensource",
+              "reason": "Default to self-hosted for cost savings"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

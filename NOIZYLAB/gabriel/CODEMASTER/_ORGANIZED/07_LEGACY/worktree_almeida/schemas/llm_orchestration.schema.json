@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/llm_orchestration.schema.json",
+  "title": "NOIZYVOX LLM Orchestration",
+  "description": "Claude/GPT integration for intelligent script enhancement and dramaturgy",
+  "type": "object",
+  "required": ["orchestration_id", "version", "providers"],
+  "properties": {
+    "orchestration_id": {
+      "type": "string",
+      "pattern": "^llm_[a-z0-9]{16}$",
+      "description": "Unique LLM orchestration configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version"
+    },
+    "providers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["provider", "model", "priority"],
+        "properties": {
+          "provider": { 
+            "enum": ["anthropic", "openai", "google", "cohere", "mistral", "llama", "custom"]
+          },
+          "model": { "type": "string" },
+          "version": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 1 },
+          "fallback": { "type": "boolean", "default": false },
+          "rate_limit_rpm": { "type": "integer", "minimum": 1 },
+          "cost_per_1k_tokens": { "type": "number", "minimum": 0 },
+          "max_context_tokens": { "type": "integer", "minimum": 1 },
+          "capabilities": {
+            "type": "array",
+            "items": { 
+              "enum": [
+                "script_enhancement", 
+                "emotion_inference", 
+                "ssml_generation", 
+                "character_consistency", 
+                "translation", 
+                "summarization", 
+                "content_moderation"
+              ]
+            }
+          }
+        }
+      },
+      "minItems": 1,
+      "default": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-4-20250514",
+          "priority": 1,
+          "capabilities": ["script_enhancement", "emotion_inference", "ssml_generation", "character_consistency"]
+        }
+      ]
+    },
+    "dramaturgy_engine": {
+      "type": "object",
+      "description": "AI-powered script analysis and enhancement",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "features": {
+          "type": "object",
+          "properties": {
+            "script_analysis": {
+              "type": "object",
+              "properties": {
+                "emotion_arc_detection": { "type": "boolean", "default": true },
+                "pacing_recommendations": { "type": "boolean", "default": true },
+                "emphasis_suggestions": { "type": "boolean", "default": true },
+                "breath_point_insertion": { "type": "boolean", "default": true },
+                "dramatic_beat_identification": { "type": "boolean", "default": true }
+              }
+            },
+            "script_enhancement": {
+              "type": "object",
+              "properties": {
+                "auto_ssml_generation": { "type": "boolean", "default": true },
+                "prosody_optimization": { "type": "boolean", "default": true },
+                "emotion_tag_insertion": { "type": "boolean", "default": true },
+                "pause_calibration": { "type": "boolean", "default": true },
+                "pronunciation_correction": { "type": "boolean", "default": true }
+              }
+            },
+            "character_direction": {
+              "type": "object",
+              "properties": {
+                "motivation_inference": { "type": "boolean", "default": true },
+                "subtext_analysis": { "type": "boolean", "default": true },
+                "relationship_dynamics": { "type": "boolean", "default": true },
+                "arc_consistency": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "prompts": {
+          "type": "object",
+          "properties": {
+            "system_prompt": {
+              "type": "string",
+              "default": "You are a professional voice dramaturg and SSML engineer for NOIZYVOX. Analyze scripts for emotional beats, pacing, and prosody. Generate production-ready SSML with precise timing, emphasis, and emotional direction. Maintain character consistency across all outputs."
+            },
+            "analysis_prompt_template": { "type": "string" },
+            "enhancement_prompt_template": { "type": "string" },
+            "ssml_generation_prompt_template": { "type": "string" }
+          }
+        }
+      }
+    },
+    "persona_consistency_engine": {
+      "type": "object",
+      "description": "RAG-based persona consistency and memory",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "vector_store": {
+          "type": "object",
+          "properties": {
+            "provider": { 
+              "enum": ["pinecone", "weaviate", "qdrant", "milvus", "chromadb", "pgvector", "custom"]
+            },
+            "embedding_model": { "type": "string", "default": "text-embedding-3-large" },
+            "embedding_dimensions": { "type": "integer", "default": 3072, "minimum": 1 },
+            "index_type": { "enum": ["hnsw", "ivf", "flat"] },
+            "similarity_metric": { "enum": ["cosine", "euclidean", "dot_product"] }
+          }
+        },
+        "persona_knowledge_base": {
+          "type": "object",
+          "properties": {
+            "character_backstory": { "type": "boolean", "default": true },
+            "vocal_characteristics": { "type": "boolean", "default": true },
+            "emotional_range": { "type": "boolean", "default": true },
+            "speech_patterns": { "type": "boolean", "default": true },
+            "catchphrases": { "type": "boolean", "default": true },
+            "pronunciation_preferences": { "type": "boolean", "default": true },
+            "previous_performances": { "type": "boolean", "default": true }
+          }
+        },
+        "retrieval_config": {
+          "type": "object",
+          "properties": {
+            "top_k": { "type": "integer", "default": 10, "minimum": 1 },
+            "similarity_threshold": { "type": "number", "default": 0.75, "minimum": 0, "maximum": 1 },
+            "reranking_enabled": { "type": "boolean", "default": true },
+            "context_window_tokens": { "type": "integer", "default": 4000, "minimum": 1 }
+          }
+        }
+      }
+    },
+    "real_time_adaptation": {
+      "type": "object",
+      "description": "Context-aware real-time adjustments",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "adaptation_triggers": {
+          "type": "array",
+          "items": { 
+            "enum": [
+              "user_feedback", 
+              "emotion_detection", 
+              "context_change", 
+              "audience_response", 
+              "time_of_day", 
+              "platform_context"
+            ]
+          }
+        },
+        "adaptation_parameters": {
+          "type": "object",
+          "properties": {
+            "pacing_adjustment_range": { "type": "number", "default": 0.2, "minimum": 0, "maximum": 1 },
+            "energy_adjustment_range": { "type": "number", "default": 0.3, "minimum": 0, "maximum": 1 },
+            "formality_adjustment": { "type": "boolean", "default": true },
+            "vocabulary_adaptation": { "type": "boolean", "default": true }
+          }
+        },
+        "feedback_loop": {
+          "type": "object",
+          "properties": {
+            "implicit_signals": { 
+              "type": "array", 
+              "items": { 
+                "enum": ["skip_rate", "replay_rate", "completion_rate", "engagement_time"]
+              }
+            },
+            "explicit_signals": { 
+              "type": "array", 
+              "items": { 
+                "enum": ["rating", "feedback_text", "preference_selection"]
+              }
+            },
+            "learning_rate": { "type": "number", "default": 0.01, "minimum": 0, "maximum": 1 },
+            "adaptation_delay_ms": { "type": "integer", "default": 100, "minimum": 0 }
+          }
+        }
+      }
+    },
+    "chain_of_thought": {
+      "type": "object",
+      "description": "Transparent reasoning for creative decisions",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "expose_reasoning": { "type": "boolean", "default": false },
+        "reasoning_format": { "enum": ["structured", "narrative", "minimal"] },
+        "include_alternatives": { "type": "boolean", "default": true },
+        "confidence_scores": { "type": "boolean", "default": true }
+      }
+    },
+    "multi_turn_context": {
+      "type": "object",
+      "description": "Conversation memory for interactive sessions",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "max_turns": { "type": "integer", "default": 50, "minimum": 1 },
+        "summarization_threshold_turns": { "type": "integer", "default": 20, "minimum": 1 },
+        "context_compression": { "type": "boolean", "default": true },
+        "emotional_state_tracking": { "type": "boolean", "default": true }
+      }
+    },
+    "guardrails": {
+      "type": "object",
+      "properties": {
+        "content_filtering": { "type": "boolean", "default": true },
+        "persona_boundary_enforcement": { "type": "boolean", "default": true },
+        "artist_consent_verification": { "type": "boolean", "default": true },
+        "output_validation": { "type": "boolean", "default": true },
+        "hallucination_detection": { "type": "boolean", "default": true },
+        "max_generation_attempts": { "type": "integer", "default": 3, "minimum": 1 }
+      }
+    }
+  }
+}

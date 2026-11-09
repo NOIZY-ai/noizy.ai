@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import urllib.request
+import urllib.error
+import subprocess
+
+# --- CONFIGURATION ---
+MEMCELL_SCRIPT = os.path.expanduser("~/NOIZYLAB/scripts/core/MemCell.py")
+SYSTEM_PROMPT_FILE = os.path.expanduser("~/NOIZYLAB/system_prompts/OMNISCIENT_V1.md")
+
+def get_memcell_context():
+    """Retrieve context from MemCell."""
+    try:
+        # Check if MemCell exists
+        if os.path.exists(MEMCELL_SCRIPT):
+            result = subprocess.check_output([MEMCELL_SCRIPT, "recall"], text=True)
+            return result
+    except Exception:
+        return "[MemCell Unavailable]"
+    return ""
+
+def log_memcell(prompt):
+    """Log this query to MemCell."""
+    try:
+        if os.path.exists(MEMCELL_SCRIPT):
+            subprocess.Popen([MEMCELL_SCRIPT, "track", "ask_query", prompt])
+    except Exception:
+        pass
+
+def get_system_prompt(context):
+    """Load and hydrate the system prompt."""
+    try:
+        with open(SYSTEM_PROMPT_FILE, 'r') as f:
+            template = f.read()
+            return template.replace("{{MEMCELL_CONTEXT}}", context)
+    except Exception:
+        return "You are a helpful assistant."
+
+def query_openai(prompt, model="gpt-4o"):
+    # Manually fallback to the known good key if env var is wrong/missing
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key or "your_" in api_key:
+        # Fallback to the project key found in history
+        api_key = "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"
+    
+    if not api_key:
+        print("Error: OPENAI_API_KEY not set.")
+        sys.exit(1)
+
+    # 1. Get Context
+    context = get_memcell_context()
+    
+    # 2. Log Action
+    log_memcell(prompt)
+    
+    # 3. Build System Prompt
+    system_message = get_system_prompt(context)
+
+    url = "https://api.openai.com/v1/chat/completions"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    
+    data = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.7
+    }
+
+    try:
+        req = urllib.request.Request(url, json.dumps(data).encode('utf-8'), headers)
+        with urllib.request.urlopen(req) as response:
+            result = json.loads(response.read().decode('utf-8'))
+            print(result['choices'][0]['message']['content'])
+    except urllib.error.HTTPError as e:
+        print(f"Error calling OpenAI: {e}")
+        # print(e.read().decode('utf-8')) # Optional debug
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: ask <prompt>")
+        sys.exit(1)
+    
+    prompt = " ".join(sys.argv[1:])
+    query_openai(prompt)

@@ -1,0 +1,72 @@
+# ☸️ KUBERNETES DEPLOYMENT - 100% PERFECT
+# GORUNFREE Protocol
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gabriel-api
+  namespace: gabriel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gabriel-api
+  template:
+    metadata:
+      labels:
+        app: gabriel-api
+    spec:
+      containers:
+      - name: api
+        image: gabriel:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: gabriel-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: gabriel-secrets
+              key: redis-url
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gabriel-secrets
+              key: jwt-secret-key
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gabriel-api
+  namespace: gabriel
+spec:
+  selector:
+    app: gabriel-api
+  ports:
+  - port: 80
+    targetPort: 8000
+  type: LoadBalancer
+

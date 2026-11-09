@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MC96 MISSION CONTROL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- BOOT SEQUENCE -->
+    <div id="boot-screen" class="boot-screen">
+        <div class="boot-content">
+            <div class="boot-logo">MC96</div>
+            <div class="boot-text">MISSION CONTROL INITIALIZING...</div>
+            <div class="boot-progress">
+                <div class="boot-progress-bar"></div>
+            </div>
+            <div class="boot-status">CONNECTING TO GABRIEL...</div>
+        </div>
+    </div>
+
+    <!-- MAIN PORTAL -->
+    <div id="portal" class="portal hidden">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-mc">MC</span>
+                    <span class="logo-96">96</span>
+                </div>
+                <div class="system-name">MISSION CONTROL</div>
+            </div>
+            <div class="header-center">
+                <div class="status-indicator online">
+                    <span class="status-dot"></span>
+                    <span class="status-text">GABRIEL ONLINE</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="clock" id="clock">00:00:00</div>
+                <div class="date" id="date">2025-12-17</div>
+            </div>
+        </header>
+
+        <!-- MAIN GRID -->
+        <main class="main-grid">
+            <!-- GABRIEL AI PANEL -->
+            <section class="panel gabriel-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🧠</div>
+                    <h2>GABRIEL AI</h2>
+                    <div class="panel-status online">ACTIVE</div>
+                </div>
+                <div class="panel-content">
+                    <div class="avatar-container">
+                        <div class="avatar-orb">
+                            <div class="avatar-core"></div>
+                            <div class="avatar-ring ring-1"></div>
+                            <div class="avatar-ring ring-2"></div>
+                            <div class="avatar-ring ring-3"></div>
+                        </div>
+                        <div class="avatar-pulse"></div>
+                    </div>
+                    <div class="ai-metrics">
+                        <div class="metric">
+                            <span class="metric-label">INTELLIGENCE</span>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 98%"></div>
+                            </div>
+                            <span class="metric-value">98%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">LATENCY</span>
+                            <div class="metric-bar latency">
+                                <div class="metric-fill" style="width: 12%"></div>
+                            </div>
+                            <span class="metric-value">12ms</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">MEMORY</span>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 76%"></div>
+                            </div>
+                            <span class="metric-value">76%</span>
+                        </div>
+                    </div>
+                    <div class="ai-chat">
+                        <div class="chat-output" id="chat-output">
+                            <div class="chat-message system">GABRIEL: Mission Control online. All systems nominal.</div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" id="chat-input" placeholder="Command GABRIEL..." />
+                            <button id="chat-send" class="btn-send">▶</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MEMCELL TRACKING PANEL -->
+            <section class="panel memcell-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">📊</div>
+                    <h2>MEMCELL TRACKER</h2>
+                    <div class="panel-status">SHIRL | ENGR</div>
+                </div>
+                <div class="panel-content">
+                    <div class="overlap-grid">
+                        <div class="overlap-card shirl">
+                            <div class="overlap-header">SHIRL TRACKS</div>
+                            <div class="overlap-count" id="shirl-count">0</div>
+                            <div class="overlap-label">Overlapping Events</div>
+                        </div>
+                        <div class="overlap-card engr">
+                            <div class="overlap-header">ENGR TRACKS</div>
+                            <div class="overlap-count" id="engr-count">0</div>
+                            <div class="overlap-label">Overlapping Events</div>
+                        </div>
+                    </div>
+                    <div class="timeline-container">
+                        <h3>DATE/TIME OVERLAPS</h3>
+                        <div class="timeline" id="timeline">
+                            <!-- Dynamic timeline entries -->
+                        </div>
+                    </div>
+                    <div class="memcell-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="total-overlaps">258</span>
+                            <span class="stat-label">Total Overlaps</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="golden-threads">12</span>
+                            <span class="stat-label">Golden Threads</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="sync-rate">99.7%</span>
+                            <span class="stat-label">Sync Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NETWORK TOPOLOGY -->
+            <section class="panel network-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🌐</div>
+                    <h2>NETWORK</h2>
+                    <div class="panel-status online">DGS1210-10</div>
+                </div>
+                <div class="panel-content">
+                    <div class="network-map">
+                        <div class="node ipad">
+                            <div class="node-icon">📱</div>
+                            <div class="node-label">iPad</div>
+                            <div class="node-status online">Connected</div>
+                        </div>
+                        <div class="connection-line c1"></div>
+                        <div class="node switch">
+                            <div class="node-icon">🔌</div>
+                            <div class="node-label">DGS1210-10</div>
+                            <div class="node-status online">Active</div>
+                        </div>
+                        <div class="connection-line c2"></div>
+                        <div class="connection-line c3"></div>
+                        <div class="node planar">
+                            <div class="node-icon">🖥️</div>
+                            <div class="node-label">Planar2485</div>
+                            <div class="node-status online">Online</div>
+                        </div>
+                        <div class="node gabriel">
+                            <div class="node-icon">💻</div>
+                            <div class="node-label">HP-OMEN</div>
+                            <div class="node-status online">GABRIEL</div>
+                        </div>
+                    </div>
+                    <div class="network-stats">
+                        <div class="net-stat">
+                            <span class="net-label">Throughput</span>
+                            <span class="net-value">2.4 Gbps</span>
+                        </div>
+                        <div class="net-stat">
+                            <span class="net-label">Latency</span>
+                            <span class="net-value">&lt;1ms</span>
+                        </div>
+                        <div class="net-stat">
+                            <span class="net-label">Packets</span>
+                            <span class="net-value" id="packets">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TURBO ULTIMATE STATUS -->
+            <section class="panel turbo-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">⚡</div>
+                    <h2>TURBO ULTIMATE</h2>
+                    <div class="panel-status">v1.0</div>
+                </div>
+                <div class="panel-content">
+                    <div class="turbo-modules">
+                        <div class="module-item active">
+                            <span class="module-status">✅</span>
+                            <span class="module-name">OMEGA REGEX</span>
+                        </div>
+                        <div class="module-item active">
+                            <span class="module-status">✅</span>
+                            <span class="module-name">DEEP MMAP</span>
+                        </div>
+                        <div class="module-item active">
+                            <span class="module-status">✅</span>
+                            <span class="module-name">ARCHITECT</span>
+                        </div>
+                        <div class="module-item active">
+                            <span class="module-status">✅</span>
+                            <span class="module-name">HEALER</span>
+                        </div>
+                        <div class="module-item active">
+                            <span class="module-status">✅</span>
+                            <span class="module-name">DATE TRACKER</span>
+                        </div>
+                        <div class="module-item active">
+                            <span class="module-status">✅</span>
+                            <span class="module-name">CENTRALIZER</span>
+                        </div>
+                    </div>
+                    <div class="turbo-actions">
+                        <button class="turbo-btn" onclick="runTurbo('scan')">🔍 SCAN</button>
+                        <button class="turbo-btn" onclick="runTurbo('optimize')">⚡ OPTIMIZE</button>
+                        <button class="turbo-btn danger" onclick="runTurbo('nuke')">💥 NUKE</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SYSTEM VIBE -->
+            <section class="panel vibe-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🎭</div>
+                    <h2>SYSTEM VIBE</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="vibe-display">
+                        <div class="vibe-emoji" id="vibe-emoji">🔥</div>
+                        <div class="vibe-text" id="vibe-text">MAXIMUM POWER</div>
+                    </div>
+                    <div class="vibe-meter">
+                        <div class="vibe-fill" id="vibe-fill"></div>
+                    </div>
+                    <div class="prompt-status">
+                        <div class="prompt-item">
+                            <span>Prompt Effectiveness</span>
+                            <span class="value">100%</span>
+                        </div>
+                        <div class="prompt-item">
+                            <span>AI Integration</span>
+                            <span class="value">100%</span>
+                        </div>
+                        <div class="prompt-item">
+                            <span>Intuitive Intelligence</span>
+                            <span class="value">MAXIMIZED</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- QUICK ACTIONS -->
+            <section class="panel actions-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🎯</div>
+                    <h2>QUICK ACTIONS</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="action-grid">
+                        <button class="action-btn" onclick="executeAction('sync')">
+                            <span class="action-icon">🔄</span>
+                            <span class="action-label">SYNC ALL</span>
+                        </button>
+                        <button class="action-btn" onclick="executeAction('backup')">
+                            <span class="action-icon">💾</span>
+                            <span class="action-label">BACKUP</span>
+                        </button>
+                        <button class="action-btn" onclick="executeAction('heal')">
+                            <span class="action-icon">🩹</span>
+                            <span class="action-label">HEAL</span>
+                        </button>
+                        <button class="action-btn" onclick="executeAction('voice')">
+                            <span class="action-icon">🎤</span>
+                            <span class="action-label">VOICE</span>
+                        </button>
+                        <button class="action-btn" onclick="executeAction('vision')">
+                            <span class="action-icon">👁️</span>
+                            <span class="action-label">VISION</span>
+                        </button>
+                        <button class="action-btn godmode" onclick="executeAction('godmode')">
+                            <span class="action-icon">👑</span>
+                            <span class="action-label">GOD MODE</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-left">
+                <span class="version">MC96 ECOUNIVERSE v3.0</span>
+            </div>
+            <div class="footer-center">
+                <span class="tagline">MAXIMUM EFFECTIVENESS • ZERO LATENCY • 100% AI INTEGRATION</span>
+            </div>
+            <div class="footer-right">
+                <span class="connection">iPad ↔ Planar2485 ↔ GABRIEL</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="toast hidden">
+        <span class="toast-icon">✅</span>
+        <span class="toast-message"></span>
+    </div>
+
+    <script src="mission-control.js"></script>
+</body>
+</html>

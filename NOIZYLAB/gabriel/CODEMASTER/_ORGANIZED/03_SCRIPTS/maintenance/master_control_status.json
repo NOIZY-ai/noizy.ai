@@ -1,0 +1,113 @@
+{
+  "timestamp": "2025-12-24T23:13:51.550136",
+  "volumes": {
+    "total": 28,
+    "critical": 2,
+    "network": 8,
+    "critical_volumes": [
+      "607k 4.5M 12% /Library/Developer/CoreSimulatoriOS_23C54",
+      "480M 8.4M 98% 4TB Blue Fish"
+    ],
+    "status": "WARNING"
+  },
+  "network": {
+    "volumes": 8,
+    "status": "OK",
+    "network_volumes": [
+      {
+        "device": "//rsp@RSP._smb._tcp.local/4TB%20Big%20Fish",
+        "mount": "232M 256M 48% /Volumes/4TB Big Fish",
+        "server": "rsp",
+        "size": "3.6Ti",
+        "used": "1.7Ti",
+        "available": "1.9Ti",
+        "usage": "48%",
+        "status": "\u2705 GOOD"
+      },
+      {
+        "device": "//rsp@RSP._smb._tcp.local/4TB%20Blue%20Fish",
+        "mount": "480M 8.4M 98% /Volumes/4TB Blue Fish",
+        "server": "rsp",
+        "size": "3.6Ti",
+        "used": "3.6Ti",
+        "available": "64Gi",
+        "usage": "99%",
+        "status": "\ud83d\udd34 CRITICAL"
+      },
+      {
+        "device": "//rsp@RSP._smb._tcp.local/4TB%20FISH%20SG",
+        "mount": "395M 93M 81% /Volumes/4TB FISH SG",
+        "server": "rsp",
+        "size": "3.6Ti",
+        "used": "2.9Ti",
+        "available": "710Gi",
+        "usage": "81%",
+        "status": "\u2705 GOOD"
+      },
+      {
+        "device": "//rsp@RSP._smb._tcp.local/EW",
+        "mount": "227M 17M 93% /Volumes/EW",
+        "server": "rsp",
+        "size": "931Gi",
+        "used": "865Gi",
+        "available": "66Gi",
+        "usage": "93%",
+        "status": "\ud83d\udfe1 WARNING"
+      },
+      {
+        "device": "//rsp@RSP._smb._tcp.local/FISH",
+        "mount": "450M 38M 92% /Volumes/FISH",
+        "server": "rsp",
+        "size": "1.8Ti",
+        "used": "1.7Ti",
+        "available": "145Gi",
+        "usage": "93%",
+        "status": "\ud83d\udfe1 WARNING"
+      },
+      {
+        "device": "//rsp@RSP._smb._tcp.local/RSP",
+        "mount": "450M 38M 92% /Volumes/RSP",
+        "server": "rsp",
+        "size": "1.8Ti",
+        "used": "1.7Ti",
+        "available": "145Gi",
+        "usage": "93%",
+        "status": "\ud83d\udfe1 WARNING"
+      },
+      {
+        "device": "//rsp@RSP._smb._tcp.local/RSP_Fish%E2%80%99s%20Public%20Folder",
+        "mount": "450M 38M 92% /Volumes/RSP_Fish\u2019s Public Folder",
+        "server": "rsp",
+        "size": "1.8Ti",
+        "used": "1.7Ti",
+        "available": "145Gi",
+        "usage": "93%",
+        "status": "\ud83d\udfe1 WARNING"
+      },
+      {
+        "device": "//rsp@RSP._smb._tcp.local/RSP%E2%80%99s%20Public%20Folder",
+        "mount": "450M 38M 92% /Volumes/RSP\u2019s Public Folder",
+        "server": "rsp",
+        "size": "1.8Ti",
+        "used": "1.7Ti",
+        "available": "145Gi",
+        "usage": "93%",
+        "status": "\ud83d\udfe1 WARNING"
+      }
+    ]
+  },
+  "hpomen": {
+    "connected": true,
+    "volumes": 8,
+    "status": "CONNECTED"
+  },
+  "cleanup": {
+    "opportunities": 0,
+    "details": []
+  },
+  "performance": {
+    "disk_io_ms": 0.36,
+    "status": "OK"
+  },
+  "health_score": 60
+}

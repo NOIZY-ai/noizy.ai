@@ -1,0 +1,22 @@
+”{
+    "mcpServers": {
+        "noizylab": {
+            "command": "python3",
+            "args": [
+                "/Users/m2ultra/NOIZYLAB/UNIFIED_MCP/noizylab_mcp.py"
+            ]
+        },
+        "turbo": {
+            "command": "python3",
+            "args": [
+                "/Users/m2ultra/NOIZYLAB/TURBO/turbo_mcp.py"
+            ]
+        },
+        "gabriel": {
+            "command": "python3",
+            "args": [
+                "/Users/m2ultra/NOIZYLAB/GABRIEL/gabriel_mcp_v2.py"
+            ]
+        }
+    }
+}”*cascade08"(a1b6a0eed5fda92b075b21780c1e15f048a239dd2:file:///Users/m2ultra/NOIZYLAB/TURBO/mcp_config_turbo.json:file:///Users/m2ultra/NOIZYLAB

@@ -1,0 +1,144 @@
+name: CODECLEANER - Code Quality Check
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for proper analysis
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install analysis tools
+      run: |
+        pip install --upgrade pip
+        pip install black isort pylint flake8 mypy bandit safety
+    
+    - name: Check for broken symlinks
+      run: |
+        echo "🔍 Checking for broken symlinks..."
+        BROKEN=$(find . -type l ! -exec test -e {} \; -print 2>/dev/null | wc -l)
+        if [ "$BROKEN" -gt 0 ]; then
+          echo "❌ Found $BROKEN broken symlink(s):"
+          find . -type l ! -exec test -e {} \; -print 2>/dev/null
+          exit 1
+        else
+          echo "✅ No broken symlinks found"
+        fi
+    
+    - name: Check Python syntax
+      run: |
+        echo "🔍 Checking Python syntax..."
+        ERRORS=0
+        for file in $(find gabriel -name "*.py" -type f); do
+          if ! python3 -m py_compile "$file" 2>/dev/null; then
+            echo "❌ Syntax error in: $file"
+            ERRORS=$((ERRORS + 1))
+          fi
+        done
+        if [ "$ERRORS" -gt 0 ]; then
+          echo "❌ Found $ERRORS file(s) with syntax errors"
+          exit 1
+        else
+          echo "✅ All Python files have valid syntax"
+        fi
+    
+    - name: Check for large files
+      run: |
+        echo "🔍 Checking for large files (>5MB)..."
+        LARGE=$(find . -type f -size +5M ! -path "./.git/*" | wc -l)
+        if [ "$LARGE" -gt 0 ]; then
+          echo "⚠️  Found $LARGE large file(s):"
+          find . -type f -size +5M ! -path "./.git/*" -exec ls -lh {} \;
+          echo "Consider using Git LFS for files >5MB"
+        else
+          echo "✅ No large files found"
+        fi
+    
+    - name: Check for empty files
+      run: |
+        echo "🔍 Checking for empty Python/shell files..."
+        EMPTY=$(find gabriel -type f \( -name "*.py" -o -name "*.sh" \) -size 0 | wc -l)
+        if [ "$EMPTY" -gt 0 ]; then
+          echo "⚠️  Found $EMPTY empty file(s):"
+          find gabriel -type f \( -name "*.py" -o -name "*.sh" \) -size 0
+        else
+          echo "✅ No empty code files found"
+        fi
+    
+    - name: Check shell script permissions
+      run: |
+        echo "🔍 Checking shell script execute permissions..."
+        NO_EXEC=$(find gabriel -name "*.sh" -type f ! -executable | wc -l)
+        if [ "$NO_EXEC" -gt 0 ]; then
+          echo "⚠️  Found $NO_EXEC shell script(s) without execute permission"
+          echo "Run: find gabriel -name '*.sh' -type f -exec chmod +x {} \;"
+        else
+          echo "✅ All shell scripts are executable"
+        fi
+    
+    - name: Check for hardcoded paths
+      run: |
+        echo "🔍 Checking for hardcoded macOS paths..."
+        HARDCODED=$(grep -r "/Users/m2ultra" gabriel --include="*.py" --include="*.sh" | wc -l || true)
+        if [ "$HARDCODED" -gt 0 ]; then
+          echo "⚠️  Found $HARDCODED line(s) with hardcoded macOS paths"
+          echo "Consider using environment variables or relative paths"
+        else
+          echo "✅ No hardcoded paths found"
+        fi
+    
+    - name: Run Black (Python formatter check)
+      run: |
+        echo "🔍 Checking Python code formatting with Black..."
+        black --check gabriel/ 2>&1 || echo "⚠️  Code formatting issues found. Run: black gabriel/"
+      continue-on-error: true
+    
+    - name: Run isort (Import sorter check)
+      run: |
+        echo "🔍 Checking import sorting with isort..."
+        isort --check-only gabriel/ 2>&1 || echo "⚠️  Import sorting issues found. Run: isort gabriel/"
+      continue-on-error: true
+    
+    - name: Run Flake8 (Linter)
+      run: |
+        echo "🔍 Running Flake8 linter..."
+        flake8 gabriel/ --count --max-line-length=100 --statistics 2>&1 || echo "⚠️  Linting issues found"
+      continue-on-error: true
+    
+    - name: Run Bandit (Security check)
+      run: |
+        echo "🔍 Running Bandit security scanner..."
+        bandit -r gabriel/ -f json -o bandit-report.json 2>&1 || echo "⚠️  Security issues found"
+      continue-on-error: true
+    
+    - name: Generate Summary Report
+      if: always()
+      run: |
+        echo "# 🏥 CODECLEANER Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Repository Health Check" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- Python Files: $(find gabriel -name '*.py' | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- Shell Scripts: $(find gabriel -name '*.sh' | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- Total Files: $(find gabriel -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "See CODECLEANER_AUDIT_REPORT.md for full details" >> $GITHUB_STEP_SUMMARY

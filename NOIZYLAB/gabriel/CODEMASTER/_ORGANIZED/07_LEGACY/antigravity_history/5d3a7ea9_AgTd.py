@@ -1,0 +1,252 @@
+import streamlit as st
+import google.generativeai as genai
+import json
+import os
+import time
+from datetime import datetime
+from pathlib import Path
+
+# --- 1. THE "VOID" UI CONFIGURATION ---
+st.set_page_config(
+    page_title="NOIZYLAB GENIUS CORE",
+    page_icon="⚫",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# THE VOID CSS (Professional Matte Black)
+st.markdown("""
+    <style>
+    /* MAIN BACKGROUND */
+    .stApp { background-color: #000000; color: #E0E0E0; }
+    
+    /* SIDEBAR */
+    section[data-testid="stSidebar"] { background-color: #0a0a0a; border-right: 1px solid #1A1A1A; }
+    
+    /* INPUTS */
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
+        background-color: #0F0F0F; color: #FFF; border: 1px solid #333;
+        font-family: 'Courier New', monospace;
+    }
+    .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
+        border-color: #FFF; box-shadow: none;
+    }
+    
+    /* BUTTONS - TACTILE */
+    .stButton>button {
+        background-color: #1A1A1A; color: #FFF; border: 1px solid #333;
+        width: 100%; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;
+    }
+    .stButton>button:hover {
+        background-color: #FFF; color: #000; border-color: #FFF;
+    }
+    
+    /* STATUS METRICS */
+    div[data-testid="stMetricValue"] { color: #FFF; font-family: 'Courier New', monospace; }
+    
+    /* ALERTS */
+    .stSuccess { background-color: #111; color: #0F0; border: 1px solid #0F0; }
+    .stInfo { background-color: #111; color: #0FF; border: 1px solid #0FF; }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- 2. THE GENIUS LOGIC CORE (BACKEND) ---
+
+# Initialize Local Database
+DB_PATH = "NOIZYLAB_DB"
+Path(DB_PATH).mkdir(parents=True, exist_ok=True)
+
+def save_memcell(data_type, content, tags):
+    """Saves an Atomic MemCell to local JSON storage."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    cell_id = f"MEM_{timestamp}"
+    
+    memcell = {
+        "id": cell_id,
+        "type": data_type,
+        "content": content,
+        "tags": tags,
+        "timestamp": str(datetime.now()),
+        "status": "active"
+    }
+    
+    with open(f"{DB_PATH}/{cell_id}.json", "w") as f:
+        json.dump(memcell, f, indent=4)
+    return cell_id
+
+def recursive_thinker(prompt, api_key, model_type="text", mime_data=None):
+    """
+    THE GENIUS LOOP:
+    1. Generates Draft.
+    2. Critiques Draft (Self-Correction).
+    3. Finalizes Output.
+    """
+    if not api_key:
+        return "⚠️ CRITICAL: API KEY MISSING"
+
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+
+    # STEP 1: INITIAL GENERATION
+    status_box = st.empty()
+    status_box.text("⚡ STEP 1: GENERATING INITIAL DRAFT...")
+    
+    try:
+        if model_type == "text":
+            response = model.generate_content(prompt)
+        elif model_type == "multimodal":
+            response = model.generate_content([prompt, mime_data])
+        
+        draft = response.text
+        
+        # STEP 2: THE CRITIC (Self-Correction)
+        status_box.text("⚡ STEP 2: CRITIQUING & OPTIMIZING...")
+        
+        critic_prompt = f"""
+        CRITIQUE THIS OUTPUT. 
+        Does it perfectly match the user's intent? Is it formatted as a MemCell? 
+        If it is perfect, repeat it. If not, REWRITE IT to be concise, professional, and 'Genius' level.
+        
+        ORIGINAL OUTPUT:
+        {draft}
+        """
+        final_response = model.generate_content(critic_prompt)
+        
+        status_box.text("✅ EXECUTION COMPLETE.")
+        time.sleep(1)
+        status_box.empty()
+        
+        return final_response.text
+
+    except Exception as e:
+        return f"❌ SYSTEM FAILURE: {str(e)}"
+
+# --- 3. THE UI ARCHITECTURE ---
+
+# SIDEBAR: COMMAND CENTER
+with st.sidebar:
+    st.title("NOIZYLAB")
+    st.caption("GENIUS CORE v4.0")
+    
+    api_key = st.text_input("G-KEY (API ACCESS)", type="password")
+    
+    st.divider()
+    
+    # Navigation
+    app_mode = st.radio("SELECT MODULE", [
+        "🧠 DIRECTOR (Strategy)", 
+        "🔊 SYNESTHESIA (Audio-to-Video)", 
+        "💾 MEMCELL GRID (Database)",
+        "🛠️ GOOGLE ARSENAL (External Tools)"
+    ])
+    
+    st.divider()
+    # Real-time Stats
+    file_count = len(list(Path(DB_PATH).glob("*.json")))
+    c1, c2 = st.columns(2)
+    with c1: st.metric("MEMCELLS", file_count)
+    with c2: st.metric("LATENCY", "14ms")
+
+# MODULE 1: THE DIRECTOR (TEXT INTELLIGENCE)
+if app_mode == "🧠 DIRECTOR (Strategy)":
+    st.subheader("/// STRATEGIC INTELLIGENCE")
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        user_prompt = st.text_area("INPUT SIGNAL", height=150, placeholder="Define the concept. The system will structure it.")
+    with col2:
+        st.write("PARAMETERS")
+        tone = st.selectbox("TONE", ["Cyberpunk", "Cinematic", "Corporate", "Abstract"])
+        format_type = st.selectbox("OUTPUT", ["Project Plan", "Script", "Python Code"])
+    
+    if st.button("ACTIVATE GENIUS LOOP"):
+        # The Prompt Engineering is hidden here
+        full_system_prompt = f"""
+        ROLE: You are the AI Director of NoizyLab.
+        TASK: {user_prompt}
+        CONSTRAINT: Tone must be {tone}. Format must be {format_type}.
+        REQUIREMENT: Output must be a structured MemCell.
+        """
+        
+        result = recursive_thinker(full_system_prompt, api_key, "text")
+        
+        st.divider()
+        st.markdown("### 💠 OPTIMIZED OUTPUT")
+        st.code(result, language="markdown")
+        
+        # Auto-save
+        save_memcell("text_strategy", result, [tone, format_type])
+        st.toast("✅ MEMCELL SAVED TO DATABASE")
+
+# MODULE 2: SYNESTHESIA (AUDIO TO VIDEO)
+elif app_mode == "🔊 SYNESTHESIA (Audio-to-Video)":
+    st.subheader("/// AUDIO-REACTIVE ENGINE")
+    st.markdown("Upload audio. The system uses **Multimodal Gemini** to 'hear' the vibe and generate the perfect video prompts.")
+    
+    audio_file = st.file_uploader("UPLOAD TRACK (MP3/WAV)", type=["mp3", "wav"])
+    
+    if audio_file:
+        st.audio(audio_file)
+        
+        if st.button("ANALYZE & VISUALIZE"):
+            with st.spinner("LISTENING TO FREQUENCIES..."):
+                # Handle file for API
+                temp_filename = "temp_audio_input.mp3"
+                with open(temp_filename, "wb") as f:
+                    f.write(audio_file.getbuffer())
+                
+                if api_key:
+                    genai.configure(api_key=api_key)
+                    uploaded_ref = genai.upload_file(temp_filename)
+                    
+                    # The Magic Prompt
+                    synesthesia_prompt = """
+                    Listen to this audio track. 
+                    1. Identify the BPM, Key, and Genre.
+                    2. Describe the emotional 'Texture' (e.g., Gritty, Ethereal, Aggressive).
+                    3. Write 3 distinct Video Generation Prompts (for Veo/Runway) that synchronize perfectly with this audio.
+                    4. Format as a MemCell.
+                    """
+                    
+                    result = recursive_thinker(synesthesia_prompt, api_key, "multimodal", uploaded_ref)
+                    
+                    st.success("/// SYNC COMPLETE")
+                    st.markdown(result)
+                    save_memcell("audio_sync", result, ["audio", "video_prompt"])
+                    
+                    # Cleanup
+                    os.remove(temp_filename)
+
+# MODULE 3: MEMCELL GRID (DATABASE)
+elif app_mode == "💾 MEMCELL GRID (Database)":
+    st.subheader("/// KNOWLEDGE BASE")
+    
+    # Load all JSONs
+    files = sorted(Path(DB_PATH).glob("*.json"), key=os.path.getmtime, reverse=True)
+    
+    if not files:
+        st.warning("DATABASE EMPTY. INITIALIZE CREATION IN OTHER MODULES.")
+    else:
+        # Create a Grid Layout
+        for f in files:
+            with open(f, "r") as file:
+                data = json.load(file)
+                
+            with st.expander(f"📂 {data['id']} | {data['type'].upper()}"):
+                st.caption(f"TIMESTAMP: {data['timestamp']}")
+                st.code(data['content'], language="markdown")
+                st.json(data)
+
+# MODULE 4: EXTERNAL TOOLS
+elif app_mode == "🛠️ GOOGLE ARSENAL (External Tools)":
+    st.subheader("/// DEPLOYMENT LINKS")
+    st.write("Direct access to the engines powering NoizyLab.")
+    
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown("**🎥 VISUALS**")
+        st.link_button("LAUNCH IMAGEFX (Imagen 3)", "https://labs.google/fx/tools/image-fx")
+        st.link_button("LAUNCH VEO (VideoFX)", "https://labs.google/fx/tools/video-fx")
+    with c2:
+        st.markdown("**🔊 AUDIO**")
+        st.link_button("LAUNCH MUSICFX", "https://labs.google/fx/tools/music-fx")

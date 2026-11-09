@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GABRIEL :: 3D AVATAR SYSTEM</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        #ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ffcc;
+            text-shadow: 0 0 10px #00ffcc;
+            pointer-events: none;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+
+        .status {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+    <!-- CDN Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+    <div id="ui-overlay">
+        <h1>GABRIEL <span class="blink">///</span> LIVE</h1>
+        <div class="status">
+            SYSTEM: ONLINE<br>
+            LATENCY: 0MS<br>
+            MEMCELL: CONNECTED (V4)<br>
+            MODE: GOD_MODE
+        </div>
+    </div>
+    <div id="canvas-container"></div>
+
+    <script>
+        // SCENE SETUP
+        const scene = new THREE.Scene();
+        // Fog for depth
+        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // LIGHTS
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0x00ffcc, 1, 100);
+        pointLight.position.set(2, 2, 2);
+        scene.add(pointLight);
+
+        const pointLight2 = new THREE.PointLight(0xff00ff, 1, 100);
+        pointLight2.position.set(-2, -2, 2);
+        scene.add(pointLight2);
+
+        // GEOMETRY (THE SOUL)
+        // Icosahedron representing the core intelligence
+        const geometry = new THREE.IcosahedronGeometry(1.5, 1);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            wireframe: true,
+            emissive: 0x00ffcc,
+            emissiveIntensity: 0.5,
+            roughness: 0.1,
+            metalness: 0.8
+        });
+        const core = new THREE.Mesh(geometry, material);
+        scene.add(core);
+
+        // PARTICLES (THE DATA)
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 500;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 20;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8
+        });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        // OPTIMIZATION: PRE-ALLOCATED COLORS (Zero GC)
+        const COLOR_DEFAULT = new THREE.Color(0x050505);
+        const COLOR_GENERATING = new THREE.Color(0x111111);
+        const COLOR_PLAYING = new THREE.Color(0x000022);
+        const EMISSIVE_SPEAKING = new THREE.Color(0x00ff00);
+        const EMISSIVE_DEFAULT = new THREE.Color(0x00ffcc);
+
+        // ANIMATION LOOP
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Rotate Core
+            core.rotation.x += 0.005;
+            core.rotation.y += 0.005;
+
+            // Pulse Effect (Simulated Vibe)
+            const scale = 1 + Math.sin(time * 2) * 0.1;
+            core.scale.set(scale, scale, scale);
+            material.emissiveIntensity = 0.5 + Math.sin(time * 5) * 0.3;
+
+            // Rotate Particles
+            particlesMesh.rotation.y = -time * 0.1;
+
+            renderer.render(scene, camera);
+        }
+
+        // RESIZE HANDLER
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ... (Animation Loop)
+        animate();
+
+        // 🌉 BRIDGE CONNECTION (NERVOUS SYSTEM)
+        const ws = new WebSocket("ws://localhost:8000/ws/central_nervous_system");
+
+        ws.onopen = () => {
+            console.log("✅ CONNECTED TO GABRIEL BRIDGE");
+            document.querySelector('.status').innerHTML += "<br>BRIDGE: CONNECTED";
+
+            // Send Handshake
+            ws.send(JSON.stringify({ source: "AVATAR", status: "ONLINE" }));
+        };
+
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("📥 RECEIVED:", data);
+
+            // STUDIO HUD UPDATE
+            const hud = document.querySelector('.status');
+
+            if (data.source === "PRODUCER") {
+                hud.innerHTML = `<span style="color: #ff00ff;">[PRODUCER]</span> ${data.message || 'Thinking...'}`;
+                if (data.type === 'CREATIVE_BRIEF') {
+                    hud.innerHTML += `<br><span style="font-size: 0.8em; color: #888;">BRIEF: ${data.data.mood} ${data.data.genre} @ ${data.data.bpm}BPM</span>`;
+                }
+            } else if (data.source === "AUDIO_DIMENSION") {
+                hud.innerHTML += `<br><span style="color: #00ffff;">[AUDIO]</span> ${data.status}: ${data.message}`;
+                // Visual Reaction to Audio Status
+                if (data.status === "GENERATING") {
+                    scene.background = COLOR_GENERATING;
+                    core.rotation.x += 0.5; // Fixed: cube -> core
+                } else if (data.status === "PLAYING") {
+                    scene.background = COLOR_PLAYING;
+                    material.wireframe = true;
+                }
+            }
+
+            // VOICE REACTION (Preserved)
+            if (data.source === "VOICE" || data.type === "VOICE_ACTIVE") {
+                // Pulse Hard
+                material.emissive.copy(EMISSIVE_SPEAKING); // Zero GC
+                material.emissiveIntensity = 2.0;
+                setTimeout(() => {
+                    material.emissive.copy(EMISSIVE_DEFAULT);
+                    material.emissiveIntensity = 0.5;
+                }, 200);
+            }
+        };
+
+        ws.onclose = () => {
+            document.querySelector('.status').innerHTML += "<br>BRIDGE: DISCONNECTED";
+        };
+    </script>
+</body>
+
+</html>

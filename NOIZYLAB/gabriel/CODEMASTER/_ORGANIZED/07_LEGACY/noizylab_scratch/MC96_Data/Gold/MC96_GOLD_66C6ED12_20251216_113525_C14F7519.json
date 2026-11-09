@@ -1,0 +1,27 @@
+{
+  "GOLD_ID": "GOLD_66c6ed12",
+  "Title": "[ANTIGRAVITY] Global Rules",
+  "Body": "Memory Protocol: MemCell is Truth: Persistent facts = MemCell (id, provenance, timestamp, confidence, checksum). Never overwrite (merge/diff). Separate Preference/Fact/Inference.",
+  "Tags": [
+    "CORE",
+    "DOCTRINE",
+    "FAT_MEMORY",
+    "GLOBAL_RULES"
+  ],
+  "Provenance": [
+    {
+      "id": "GLOBAL_DOCTRINE_GR-03",
+      "source": "MEMCELL_CORE",
+      "timestamp": "2025-12-16T11:35:24.997329-05:00"
+    }
+  ],
+  "Meta": {
+    "Confidence": 80,
+    "LastVerified": "2025-12-16T11:35:25.038210-05:00",
+    "DriftRisk": "LOW",
+    "DriftTypes": [],
+    "GateStatus": "ACTIVE",
+    "Actionability": "WATCH",
+    "Trigger": "Confidence: 80"
+  }
+}

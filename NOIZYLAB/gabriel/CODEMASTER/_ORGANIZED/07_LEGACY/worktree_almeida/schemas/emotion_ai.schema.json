@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/emotion_ai.schema.json",
+  "title": "NOIZYVOX Emotion AI",
+  "description": "Real-time emotion detection, synthesis, and adaptation",
+  "type": "object",
+  "required": ["emotion_engine_id", "version"],
+  "properties": {
+    "emotion_engine_id": {
+      "type": "string",
+      "pattern": "^emo_[a-z0-9]{16}$",
+      "description": "Unique emotion engine configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "description": "Configuration version"
+    },
+    "emotion_taxonomy": {
+      "type": "object",
+      "properties": {
+        "primary_emotions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["joy", "sadness", "anger", "fear", "surprise", "disgust", "contempt", "neutral"]
+        },
+        "secondary_emotions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [
+            "awe", "admiration", "adoration", "amusement", "anxiety", "awkwardness",
+            "boredom", "calmness", "confusion", "craving", "determination", "disappointment",
+            "ecstasy", "embarrassment", "empathy", "entrancement", "envy", "excitement",
+            "gratitude", "grief", "guilt", "hope", "horror", "interest", "longing",
+            "love", "nostalgia", "pride", "relief", "romance", "satisfaction", "shame",
+            "sympathy", "tenderness", "triumph", "trust", "wonder", "worry"
+          ]
+        },
+        "dimensional_model": {
+          "type": "object",
+          "properties": {
+            "valence": { 
+              "type": "object", 
+              "properties": { 
+                "min": { "type": "number" }, 
+                "max": { "type": "number" } 
+              }, 
+              "default": { "min": -1, "max": 1 } 
+            },
+            "arousal": { 
+              "type": "object", 
+              "properties": { 
+                "min": { "type": "number" }, 
+                "max": { "type": "number" } 
+              }, 
+              "default": { "min": -1, "max": 1 } 
+            },
+            "dominance": { 
+              "type": "object", 
+              "properties": { 
+                "min": { "type": "number" }, 
+                "max": { "type": "number" } 
+              }, 
+              "default": { "min": -1, "max": 1 } 
+            }
+          }
+        },
+        "intensity_levels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["subtle", "mild", "moderate", "strong", "intense", "extreme"]
+        }
+      }
+    },
+    "text_emotion_analysis": {
+      "type": "object",
+      "description": "Emotion inference from input text",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_name": { "type": "string" },
+              "model_type": { "enum": ["transformer", "llm", "ensemble", "rule_based"] },
+              "accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+              "latency_ms": { "type": "number", "minimum": 0 }
+            }
+          }
+        },
+        "features": {
+          "type": "object",
+          "properties": {
+            "sentence_level": { "type": "boolean", "default": true },
+            "word_level": { "type": "boolean", "default": true },
+            "context_aware": { "type": "boolean", "default": true },
+            "sarcasm_detection": { "type": "boolean", "default": true },
+            "implicit_emotion": { "type": "boolean", "default": true },
+            "cultural_adaptation": { "type": "boolean", "default": true }
+          }
+        },
+        "output_format": {
+          "type": "object",
+          "properties": {
+            "primary_emotion": { "type": "boolean", "default": true },
+            "emotion_probabilities": { "type": "boolean", "default": true },
+            "dimensional_values": { "type": "boolean", "default": true },
+            "emotion_trajectory": { "type": "boolean", "default": true },
+            "suggested_prosody": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "emotion_synthesis": {
+      "type": "object",
+      "description": "Emotion-to-voice synthesis mapping",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "synthesis_method": { "enum": ["parametric", "neural", "hybrid", "diffusion"] },
+        "emotion_to_prosody_mapping": {
+          "type": "object",
+          "description": "Mapping emotions to prosodic parameters",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "pitch_shift_percent": { "type": "number" },
+              "pitch_range_multiplier": { "type": "number", "minimum": 0 },
+              "rate_multiplier": { "type": "number", "minimum": 0 },
+              "energy_multiplier": { "type": "number", "minimum": 0 },
+              "breathiness": { "type": "number", "minimum": 0, "maximum": 1 },
+              "tremolo_amount": { "type": "number", "minimum": 0, "maximum": 1 },
+              "articulation_style": { "type": "string" },
+              "pause_tendency": { "type": "number" }
+            }
+          }
+        },
+        "emotion_blending": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "max_simultaneous_emotions": { "type": "integer", "default": 3, "minimum": 1 },
+            "blending_method": { "enum": ["linear", "weighted", "attention", "neural"] },
+            "transition_smoothing_ms": { "type": "integer", "default": 200, "minimum": 0 }
+          }
+        },
+        "micro_expressions": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "hesitation_markers": { "type": "boolean", "default": true },
+            "breath_variations": { "type": "boolean", "default": true },
+            "pitch_wobble": { "type": "boolean", "default": true },
+            "volume_fluctuations": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "emotion_transfer": {
+      "type": "object",
+      "description": "Transfer emotion from reference to synthesis",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "reference_types": {
+          "type": "array",
+          "items": { 
+            "enum": ["audio_clip", "text_description", "dimensional_values", "emotion_label", "video_reference"]
+          }
+        },
+        "style_encoder": {
+          "type": "object",
+          "properties": {
+            "architecture": { "enum": ["gst", "vae", "flow", "diffusion"] },
+            "embedding_dim": { "type": "integer", "default": 256, "minimum": 1 },
+            "disentanglement": { "type": "boolean", "default": true }
+          }
+        },
+        "intensity_control": {
+          "type": "object",
+          "properties": {
+            "global_intensity": { "type": "number", "minimum": 0, "maximum": 2, "default": 1 },
+            "per_emotion_intensity": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "real_time_emotion_tracking": {
+      "type": "object",
+      "description": "Track emotion changes during playback/interaction",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "tracking_sources": {
+          "type": "array",
+          "items": { 
+            "enum": ["user_voice", "user_text", "physiological", "facial", "context"]
+          }
+        },
+        "user_voice_analysis": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "features": {
+              "type": "array",
+              "items": { 
+                "enum": ["pitch", "energy", "mfcc", "spectral", "prosodic", "linguistic"]
+              }
+            },
+            "update_rate_hz": { "type": "number", "default": 10, "minimum": 1 },
+            "latency_ms": { "type": "number", "default": 50, "minimum": 0 }
+          }
+        },
+        "adaptation_response": {
+          "type": "object",
+          "properties": {
+            "mirror_user_emotion": { "type": "boolean", "default": false },
+            "complement_user_emotion": { "type": "boolean", "default": true },
+            "maintain_character": { "type": "boolean", "default": true },
+            "escalation_handling": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "emotion_memory": {
+      "type": "object",
+      "description": "Long-term emotional context tracking",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "session_emotion_history": { "type": "boolean", "default": true },
+        "cross_session_patterns": { "type": "boolean", "default": true },
+        "emotional_arc_tracking": { "type": "boolean", "default": true },
+        "relationship_emotion_modeling": { "type": "boolean", "default": true }
+      }
+    }
+  }
+}

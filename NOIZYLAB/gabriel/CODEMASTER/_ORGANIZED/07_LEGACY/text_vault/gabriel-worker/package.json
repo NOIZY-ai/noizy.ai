@@ -1,0 +1,18 @@
+{
+  "name": "gabriel-worker",
+  "version": "1.0.0",
+  "description": "GABRIEL - Claude's Eternal Memory Keeper",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail gabriel"
+  },
+  "author": "Rob Plowman <rsplowman@icloud.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.22.1"
+  }
+}

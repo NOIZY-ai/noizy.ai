@@ -1,0 +1,149 @@
+#!/bin/bash
+#
+# GABRIEL SERVICE MANAGER
+# Controls launchd services for GABRIEL
+#
+set -e
+
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+SERVER_PLIST="$HOME/Library/LaunchAgents/com.gabriel.server.plist"
+BRIDGE_PLIST="$HOME/Library/LaunchAgents/com.gabriel.bridge.plist"
+
+show_status() {
+    echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║  🤖 GABRIEL SERVICE STATUS                                  ║${NC}"
+    echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+
+    # Check launchd status
+    SERVER_STATUS=$(launchctl list | grep "com.gabriel.server" 2>/dev/null)
+    BRIDGE_STATUS=$(launchctl list | grep "com.gabriel.bridge" 2>/dev/null)
+
+    if [ -n "$SERVER_STATUS" ]; then
+        PID=$(echo "$SERVER_STATUS" | awk '{print $1}')
+        if [ "$PID" != "-" ] && [ -n "$PID" ]; then
+            echo -e "  ${GREEN}✅ GABRIEL Server: RUNNING (PID $PID)${NC}"
+        else
+            echo -e "  ${YELLOW}⏳ GABRIEL Server: LOADED (not running)${NC}"
+        fi
+    else
+        echo -e "  ${RED}❌ GABRIEL Server: NOT LOADED${NC}"
+    fi
+
+    if [ -n "$BRIDGE_STATUS" ]; then
+        PID=$(echo "$BRIDGE_STATUS" | awk '{print $1}')
+        if [ "$PID" != "-" ] && [ -n "$PID" ]; then
+            echo -e "  ${GREEN}✅ Network Bridge: RUNNING (PID $PID)${NC}"
+        else
+            echo -e "  ${YELLOW}⏳ Network Bridge: LOADED (not running)${NC}"
+        fi
+    else
+        echo -e "  ${RED}❌ Network Bridge: NOT LOADED${NC}"
+    fi
+
+    echo ""
+
+    # Check ports
+    echo -e "${CYAN}Ports:${NC}"
+    if lsof -i :5174 2>/dev/null | grep -q LISTEN; then
+        echo -e "  ${GREEN}✅ Port 5174: LISTENING${NC}"
+    else
+        echo -e "  ${RED}❌ Port 5174: NOT LISTENING${NC}"
+    fi
+
+    if lsof -i :5175 2>/dev/null | grep -q LISTEN; then
+        echo -e "  ${GREEN}✅ Port 5175: LISTENING${NC}"
+    else
+        echo -e "  ${RED}❌ Port 5175: NOT LISTENING${NC}"
+    fi
+
+    echo ""
+    echo -e "${CYAN}Auto-start: ENABLED (RunAtLoad + KeepAlive)${NC}"
+    echo -e "${CYAN}Services will restart automatically if they crash${NC}"
+}
+
+start_services() {
+    echo -e "${CYAN}🚀 Starting GABRIEL services...${NC}"
+
+    if [ -f "$SERVER_PLIST" ]; then
+        launchctl load "$SERVER_PLIST" 2>/dev/null || true
+        echo -e "  ${GREEN}✅ Server service loaded${NC}"
+    else
+        echo -e "  ${RED}❌ Server plist not found${NC}"
+    fi
+
+    if [ -f "$BRIDGE_PLIST" ]; then
+        launchctl load "$BRIDGE_PLIST" 2>/dev/null || true
+        echo -e "  ${GREEN}✅ Bridge service loaded${NC}"
+    else
+        echo -e "  ${RED}❌ Bridge plist not found${NC}"
+    fi
+
+    sleep 2
+    show_status
+}
+
+stop_services() {
+    echo -e "${CYAN}🛑 Stopping GABRIEL services...${NC}"
+
+    launchctl unload "$SERVER_PLIST" 2>/dev/null || true
+    launchctl unload "$BRIDGE_PLIST" 2>/dev/null || true
+
+    # Force kill if still running
+    pkill -f "mc96_server" 2>/dev/null || true
+    pkill -f "network_bridge" 2>/dev/null || true
+
+    echo -e "  ${GREEN}✅ Services stopped${NC}"
+}
+
+restart_services() {
+    stop_services
+    sleep 1
+    start_services
+}
+
+show_logs() {
+    LOGDIR="/Users/m2ultra/NOIZYLAB/GABRIEL/logs"
+    echo -e "${CYAN}📋 Recent logs:${NC}"
+    echo ""
+    echo -e "${YELLOW}=== Server Log ===${NC}"
+    tail -20 "$LOGDIR/server.log" 2>/dev/null || echo "No server logs"
+    echo ""
+    echo -e "${YELLOW}=== Bridge Log ===${NC}"
+    tail -20 "$LOGDIR/bridge.log" 2>/dev/null || echo "No bridge logs"
+}
+
+case "$1" in
+    status)
+        show_status
+        ;;
+    start)
+        start_services
+        ;;
+    stop)
+        stop_services
+        ;;
+    restart)
+        restart_services
+        ;;
+    logs)
+        show_logs
+        ;;
+    *)
+        echo -e "${CYAN}GABRIEL Service Manager${NC}"
+        echo ""
+        echo "Usage: gabriel-service {status|start|stop|restart|logs}"
+        echo ""
+        echo "Commands:"
+        echo "  status   - Show service status"
+        echo "  start    - Start all services"
+        echo "  stop     - Stop all services"
+        echo "  restart  - Restart all services"
+        echo "  logs     - Show recent logs"
+        ;;
+esac

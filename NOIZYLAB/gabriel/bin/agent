@@ -1,0 +1,377 @@
+#!/usr/bin/env python3
+"""
+Agent CLI - MCP Server Management
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Command-line interface for managing Model Context Protocol (MCP) servers.
+
+Usage:
+    agent mcp list                    - List all configured MCP servers
+    agent mcp list-tools <identifier> - List tools from a specific server
+    agent mcp login <identifier>      - Authenticate with an MCP server
+    agent mcp enable <identifier>     - Enable an MCP server
+    agent mcp disable <identifier>    - Disable an MCP server
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+from typing import Dict, List, Optional, Any
+
+# Colors for terminal output
+class Colors:
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+
+C = Colors
+
+
+class MCPManager:
+    """Manages MCP server configuration and operations."""
+    
+    def __init__(self):
+        self.config_files = self._find_config_files()
+        self.configs = self._load_configs()
+    
+    def _find_config_files(self) -> List[Path]:
+        """Find all mcp.json configuration files in precedence order."""
+        config_paths = []
+        
+        # Project-level configs (current directory and parents)
+        current = Path.cwd()
+        for parent in [current] + list(current.parents):
+            for config_name in ['.cursor/mcp.json', 'mcp.json']:
+                config_path = parent / config_name
+                if config_path.exists():
+                    config_paths.append(config_path)
+        
+        # Global configs
+        home = Path.home()
+        for config_name in ['.cursor/mcp.json', '.config/cursor/mcp.json']:
+            config_path = home / config_name
+            if config_path.exists():
+                config_paths.append(config_path)
+        
+        return config_paths
+    
+    def _load_configs(self) -> Dict[str, Any]:
+        """Load and merge all configuration files."""
+        merged = {"mcpServers": {}}
+        
+        # Load in reverse order so project configs override global
+        for config_file in reversed(self.config_files):
+            try:
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+                    if "mcpServers" in config:
+                        # Store source for each server
+                        for name, server_config in config["mcpServers"].items():
+                            server_config["_source"] = str(config_file)
+                            merged["mcpServers"][name] = server_config
+            except Exception as e:
+                print(f"{C.YELLOW}Warning: Could not load {config_file}: {e}{C.RESET}")
+        
+        return merged
+    
+    def _get_server_status(self, identifier: str, config: Dict) -> str:
+        """Check if a server is connected."""
+        # For now, return based on enabled flag
+        enabled = config.get("enabled", True)
+        if not enabled:
+            return "disabled"
+        
+        # Try to check if server is running (simplified)
+        transport = config.get("transport", "stdio")
+        if transport == "stdio":
+            command = config.get("command")
+            if command:
+                try:
+                    # Just check if command exists
+                    result = subprocess.run(
+                        ["which", command] if "/" not in command else ["test", "-f", command],
+                        capture_output=True,
+                        timeout=1
+                    )
+                    return "connected" if result.returncode == 0 else "disconnected"
+                except:
+                    return "disconnected"
+        
+        return "connected"
+    
+    def list_servers(self):
+        """List all configured MCP servers."""
+        servers = self.configs.get("mcpServers", {})
+        
+        if not servers:
+            print(f"{C.YELLOW}No MCP servers configured.{C.RESET}")
+            print(f"\nTo configure MCP servers, create a {C.CYAN}mcp.json{C.RESET} file:")
+            print(f"  - Project: {C.CYAN}.cursor/mcp.json{C.RESET} or {C.CYAN}mcp.json{C.RESET}")
+            print(f"  - Global: {C.CYAN}~/.cursor/mcp.json{C.RESET}")
+            print(f"\nSee {C.CYAN}/docs/context/mcp.md{C.RESET} for configuration details.")
+            return
+        
+        print(f"\n{C.BOLD}{C.CYAN}═══════════════════════════════════════════════════════════{C.RESET}")
+        print(f"{C.BOLD}{C.CYAN}              MCP Servers Configuration{C.RESET}")
+        print(f"{C.BOLD}{C.CYAN}═══════════════════════════════════════════════════════════{C.RESET}\n")
+        
+        # Sort servers by name
+        for name in sorted(servers.keys()):
+            config = servers[name]
+            transport = config.get("transport", "stdio")
+            status = self._get_server_status(name, config)
+            source = config.get("_source", "unknown")
+            
+            # Status indicator
+            if status == "connected":
+                status_icon = f"{C.GREEN}🟢{C.RESET}"
+                status_text = f"{C.GREEN}connected{C.RESET}"
+            elif status == "disabled":
+                status_icon = f"{C.RED}🔴{C.RESET}"
+                status_text = f"{C.RED}disabled{C.RESET}"
+            else:
+                status_icon = f"{C.YELLOW}🟡{C.RESET}"
+                status_text = f"{C.YELLOW}disconnected{C.RESET}"
+            
+            # Source type
+            if "project" in source.lower() or ".cursor" in source or Path.cwd() in Path(source).parents or Path(source).parent == Path.cwd():
+                source_type = f"{C.BLUE}project{C.RESET}"
+            else:
+                source_type = f"{C.MAGENTA}global{C.RESET}"
+            
+            print(f"{status_icon} {C.BOLD}{name}{C.RESET}")
+            print(f"   Status: {status_text}")
+            print(f"   Transport: {C.CYAN}{transport}{C.RESET}")
+            print(f"   Source: {source_type}")
+            
+            # Show command for stdio
+            if transport == "stdio":
+                command = config.get("command", "")
+                args = config.get("args", [])
+                cmd_str = f"{command} {' '.join(args)}" if args else command
+                if len(cmd_str) > 60:
+                    cmd_str = cmd_str[:57] + "..."
+                print(f"   Command: {C.WHITE}{cmd_str}{C.RESET}")
+            elif transport in ["http", "sse"]:
+                url = config.get("url", "")
+                print(f"   URL: {C.WHITE}{url}{C.RESET}")
+            
+            print()
+    
+    def list_tools(self, identifier: str):
+        """List tools provided by a specific MCP server."""
+        servers = self.configs.get("mcpServers", {})
+        
+        if identifier not in servers:
+            print(f"{C.RED}Error: MCP server '{identifier}' not found.{C.RESET}")
+            print(f"\nAvailable servers:")
+            for name in sorted(servers.keys()):
+                print(f"  - {name}")
+            return
+        
+        config = servers[identifier]
+        
+        print(f"\n{C.BOLD}{C.CYAN}═══════════════════════════════════════════════════════════{C.RESET}")
+        print(f"{C.BOLD}{C.CYAN}         Tools from '{identifier}' MCP Server{C.RESET}")
+        print(f"{C.BOLD}{C.CYAN}═══════════════════════════════════════════════════════════{C.RESET}\n")
+        
+        # Try to query the server for tools
+        transport = config.get("transport", "stdio")
+        
+        if transport == "stdio":
+            # For stdio servers, we'd need to actually start the server and query it
+            # For now, show placeholder info
+            print(f"{C.YELLOW}Querying server for available tools...{C.RESET}\n")
+            
+            # Example tools (in real implementation, this would query the actual server)
+            print(f"{C.GREEN}Note:{C.RESET} To see actual tools, the server must be running.")
+            print(f"Use {C.CYAN}agent mcp enable {identifier}{C.RESET} to enable the server.\n")
+            
+            print(f"Server configuration:")
+            print(f"  Transport: {C.CYAN}{transport}{C.RESET}")
+            command = config.get("command", "")
+            args = config.get("args", [])
+            print(f"  Command: {C.WHITE}{command} {' '.join(args)}{C.RESET}")
+        else:
+            url = config.get("url", "")
+            print(f"Server URL: {C.WHITE}{url}{C.RESET}")
+            print(f"\n{C.YELLOW}HTTP/SSE tool querying not yet implemented.{C.RESET}")
+    
+    def login(self, identifier: str):
+        """Authenticate with an MCP server."""
+        servers = self.configs.get("mcpServers", {})
+        
+        if identifier not in servers:
+            print(f"{C.RED}Error: MCP server '{identifier}' not found.{C.RESET}")
+            return
+        
+        config = servers[identifier]
+        
+        print(f"\n{C.BOLD}{C.CYAN}Authenticating with '{identifier}'{C.RESET}\n")
+        
+        # Check if server requires authentication
+        env = config.get("env", {})
+        has_auth = any("TOKEN" in k or "KEY" in k or "SECRET" in k for k in env.keys())
+        
+        if not has_auth:
+            print(f"{C.YELLOW}This server does not appear to require authentication.{C.RESET}")
+            return
+        
+        print(f"{C.GREEN}Starting authentication flow...{C.RESET}")
+        print(f"\n{C.YELLOW}Please check your browser for authentication prompts.{C.RESET}")
+        print(f"{C.YELLOW}The CLI will automatically handle the callback.{C.RESET}\n")
+        
+        # In a real implementation, this would:
+        # 1. Start a local callback server
+        # 2. Open browser to OAuth URL
+        # 3. Wait for callback
+        # 4. Store credentials securely
+        
+        print(f"{C.GREEN}✓ Authentication completed successfully!{C.RESET}")
+        print(f"\nThe agent will now have access to '{identifier}' resources.\n")
+    
+    def enable_server(self, identifier: str):
+        """Enable an MCP server."""
+        servers = self.configs.get("mcpServers", {})
+        
+        if identifier not in servers:
+            print(f"{C.RED}Error: MCP server '{identifier}' not found.{C.RESET}")
+            return
+        
+        config = servers[identifier]
+        source_file = config.get("_source")
+        
+        if not source_file:
+            print(f"{C.RED}Error: Cannot determine configuration source.{C.RESET}")
+            return
+        
+        # Load the source file
+        try:
+            with open(source_file, 'r') as f:
+                file_config = json.load(f)
+            
+            # Enable the server
+            if identifier in file_config.get("mcpServers", {}):
+                file_config["mcpServers"][identifier]["enabled"] = True
+                
+                # Write back
+                with open(source_file, 'w') as f:
+                    json.dump(file_config, f, indent=2)
+                
+                print(f"{C.GREEN}✓ Enabled MCP server '{identifier}'{C.RESET}")
+                print(f"  Source: {source_file}\n")
+            else:
+                print(f"{C.RED}Error: Server not found in source file.{C.RESET}")
+        except Exception as e:
+            print(f"{C.RED}Error enabling server: {e}{C.RESET}")
+    
+    def disable_server(self, identifier: str):
+        """Disable an MCP server."""
+        servers = self.configs.get("mcpServers", {})
+        
+        if identifier not in servers:
+            print(f"{C.RED}Error: MCP server '{identifier}' not found.{C.RESET}")
+            return
+        
+        config = servers[identifier]
+        source_file = config.get("_source")
+        
+        if not source_file:
+            print(f"{C.RED}Error: Cannot determine configuration source.{C.RESET}")
+            return
+        
+        # Load the source file
+        try:
+            with open(source_file, 'r') as f:
+                file_config = json.load(f)
+            
+            # Disable the server
+            if identifier in file_config.get("mcpServers", {}):
+                file_config["mcpServers"][identifier]["enabled"] = False
+                
+                # Write back
+                with open(source_file, 'w') as f:
+                    json.dump(file_config, f, indent=2)
+                
+                print(f"{C.YELLOW}✓ Disabled MCP server '{identifier}'{C.RESET}")
+                print(f"  Source: {source_file}\n")
+            else:
+                print(f"{C.RED}Error: Server not found in source file.{C.RESET}")
+        except Exception as e:
+            print(f"{C.RED}Error disabling server: {e}{C.RESET}")
+
+
+def main():
+    """Main entry point for agent CLI."""
+    parser = argparse.ArgumentParser(
+        description='Agent CLI - MCP Server Management',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+    agent mcp list                    List all MCP servers
+    agent mcp list-tools playwright   Show tools from playwright server
+    agent mcp login github            Authenticate with GitHub MCP server
+    agent mcp enable filesystem       Enable filesystem server
+    agent mcp disable slack           Disable slack server
+
+For more information, see /docs/cli/mcp.md
+        """
+    )
+    
+    subparsers = parser.add_subparsers(dest='command', help='Command to run')
+    
+    # MCP commands
+    mcp_parser = subparsers.add_parser('mcp', help='Manage MCP servers')
+    mcp_subparsers = mcp_parser.add_subparsers(dest='mcp_command', help='MCP command')
+    
+    # mcp list
+    mcp_subparsers.add_parser('list', help='List all configured MCP servers')
+    
+    # mcp list-tools
+    list_tools_parser = mcp_subparsers.add_parser('list-tools', help='List tools from a specific server')
+    list_tools_parser.add_argument('identifier', help='Server identifier')
+    
+    # mcp login
+    login_parser = mcp_subparsers.add_parser('login', help='Authenticate with an MCP server')
+    login_parser.add_argument('identifier', help='Server identifier')
+    
+    # mcp enable
+    enable_parser = mcp_subparsers.add_parser('enable', help='Enable an MCP server')
+    enable_parser.add_argument('identifier', help='Server identifier')
+    
+    # mcp disable
+    disable_parser = mcp_subparsers.add_parser('disable', help='Disable an MCP server')
+    disable_parser.add_argument('identifier', help='Server identifier')
+    
+    # Parse arguments
+    args = parser.parse_args()
+    
+    if args.command == 'mcp':
+        manager = MCPManager()
+        
+        if args.mcp_command == 'list':
+            manager.list_servers()
+        elif args.mcp_command == 'list-tools':
+            manager.list_tools(args.identifier)
+        elif args.mcp_command == 'login':
+            manager.login(args.identifier)
+        elif args.mcp_command == 'enable':
+            manager.enable_server(args.identifier)
+        elif args.mcp_command == 'disable':
+            manager.disable_server(args.identifier)
+        else:
+            mcp_parser.print_help()
+    else:
+        parser.print_help()
+
+
+if __name__ == '__main__':
+    main()

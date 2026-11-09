@@ -1,0 +1,232 @@
+
+import streamlit as st
+import asyncio
+import os
+import time
+
+# Set Page Config
+st.set_page_config(
+    page_title="NOIZYVOX AGENCY",
+    page_icon="🎙️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Custom CSS for "The Stage" Aesthetic
+st.markdown("""
+<style>
+    .stApp {
+        background-color: #0e1117;
+        color: #fafafa;
+    }
+    .stTextInput > div > div > input {
+        background-color: #262730;
+        color: #ffffff;
+    }
+    .stTextArea > div > div > textarea {
+        background-color: #262730;
+        color: #ffffff;
+    }
+    h1 {
+        font-family: 'Helvetica Neue', sans-serif;
+        font-weight: 700;
+        background: -webkit-linear-gradient(45deg, #00C9FF, #92FE9D);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .status-box {
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+        margin-bottom: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Import Agency Logic
+# We need to add the current dir to path to import unified_agency
+import sys
+sys.path.append("/Users/m2ultra/NOIZYLAB/GABRIEL")
+
+try:
+    from unified_agency import Agency
+    AGENCY_AVAILABLE = True
+except ImportError as e:
+    st.error(f"Failed to load Agency: {e}")
+    AGENCY_AVAILABLE = False
+
+def get_agency():
+    if "agency" not in st.session_state:
+        st.session_state.agency = Agency()
+    return st.session_state.agency
+
+async def run_direction(text, force_agent=None):
+    agency = get_agency()
+    
+    with st.status("🎬 lights... Camera... ACTION!", expanded=True) as status:
+        st.write("🧠 Casting Director is analyzing script...")
+        actor, emotion, sfx, reason = agency.cast_actor(text, force_agent)
+        
+        st.write(f"🎭 **Cast**: {actor.name}")
+        st.write(f"💭 **Reason**: {reason}")
+        st.write(f"❤️ **Emotion**: {emotion}")
+        st.write(f"🔊 **SFX**: {sfx}")
+        
+        status.update(label="🎙️ Recording in progress...", state="running")
+        
+        # Run the async speak method
+        # We need to run this in the event loop
+        audio_file = await actor.speak(text, emotion, sfx)
+        
+        status.update(label="✅ It's a wrap!", state="complete", expanded=False)
+        
+    return actor, emotion, sfx, reason, audio_file
+
+# --- SIDEBAR ---
+with st.sidebar:
+    st.title("🎛️ CONTROL ROOM")
+    st.markdown("---")
+    
+    st.header("Pipeline Status")
+    
+    # Check RVC
+    rvc_path = "/Users/m2ultra/NOIZYLAB/GABRIEL/bin/rvc_runner.py"
+    if os.path.exists(rvc_path):
+        st.success("RVC Inference: ONLINE (MPS)")
+    else:
+        st.error("RVC Inference: OFFLINE")
+
+    # Check Model
+    model_path = os.environ.get("RVC_MODEL_PATH", "/Users/m2ultra/NOIZYLAB/GABRIEL/bin/models/gabriel_rvc.pth")
+    if os.path.exists(model_path):
+        st.success(f"Model Loaded: {os.path.basename(model_path)}")
+    else:
+        st.warning("⚠️ No Custom Model Found (Using Raw TTS)")
+        
+    st.markdown("---")
+    st.write("v18.0.1 - THE STAGE")
+
+# --- MAIN STAGE ---
+st.title("NOIZYVOX AGENCY")
+st.caption("Where AI Voices Come Alive. Directed by Gemini. Powered by RVC + DeepFilter.")
+
+if AGENCY_AVAILABLE:
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        script = st.text_area("✍️ The Script", height=150, placeholder="Enter dialogue here...")
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("🎬 ACTION (Auto-Cast)", type="primary", use_container_width=True):
+                if script:
+                    actor, emotion, sfx, reason, audio = asyncio.run(run_direction(script))
+                    st.session_state["last_run"] = {
+                        "script": script,
+                        "actor": actor.name,
+                        "audio": audio,
+                        "reason": reason,
+                        "emotion": emotion,
+                        "sfx": sfx
+                    }
+        with c2:
+            override = st.selectbox("Force Actor", ["Auto", "Gabriel", "Riva", "Jamie"])
+            if st.button("🎥 FORCE DIRECT", use_container_width=True):
+                if script:
+                    forced = None if override == "Auto" else override
+                    actor, emotion, sfx, reason, audio = asyncio.run(run_direction(script, forced))
+                    st.session_state["last_run"] = {
+                        "script": script,
+                        "actor": actor.name,
+                        "audio": audio,
+                        "reason": reason,
+                        "emotion": emotion,
+                        "sfx": sfx
+                    }
+
+    with col2:
+        st.markdown("### 📽️ The Takes")
+        if "last_run" in st.session_state:
+            run = st.session_state["last_run"]
+            
+            # Display Card
+            st.markdown(f"""
+            <div class="status-box">
+                <h3>{run['actor']}</h3>
+                <p><i>"{run['reason']}"</i></p>
+                <hr>
+                <p><b>Emotion:</b> {run['emotion']}</p>
+                <p><b>SFX:</b> {run['sfx']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.audio(run['audio'])
+            
+            with st.expander("📝 Script History"):
+                st.info(run['script'])
+
+elif MODE == "Recruiter":
+    from dataset_engine import Recorder, DatasetProcessor
+    
+    st.title("🎤 THE RECRUITER")
+    st.caption("Autonomous Dataset Generator. Build your Digital Twin.")
+    
+    # Session Config
+    session_name = st.text_input("Session Name (e.g., 'your_name')", value="user_voice")
+    dataset_base = "/Users/m2ultra/NOIZYLAB/GABRIEL/voice_data"
+    session_dir = os.path.join(dataset_base, session_name)
+    
+    processor = DatasetProcessor(session_dir)
+    recorder = Recorder()
+    
+    if "interview_step" not in st.session_state:
+        st.session_state.interview_step = 0
+        
+    QUESTIONS = [
+        {"q": "Please count from one to ten clearly and steadily.", "emo": "neutral", "dur": 10},
+        {"q": "Tell me a secret you have never told anyone.", "emo": "whisper", "dur": 8},
+        {"q": "Imagine you won the lottery! Shout it out!", "emo": "joy", "dur": 6},
+        {"q": "You are furious at a machine. Yell at it!", "emo": "anger", "dur": 6},
+        {"q": "Describe the most beautiful place you've ever seen.", "emo": "neutral", "dur": 10}
+    ]
+    
+    step = st.session_state.interview_step
+    
+    if step < len(QUESTIONS):
+        q = QUESTIONS[step]
+        st.subheader(f"Step {step+1}/{len(QUESTIONS)}")
+        st.info(f"🗣️ Gabriel Asks: {q['q']}")
+        
+        # Gabriel Speaks First
+        if st.button("🔊 Hear Question"):
+             asyncio.run(get_agency().agents[0].speak(q['q']))
+             
+        st.write(f"**Target Emotion:** {q['emo']} | **Duration:** {q['dur']}s")
+        
+        if st.button("🔴 RECORD ANSWER", type="primary"):
+            with st.spinner(f"Recording for {q['dur']}s..."):
+                raw_path = os.path.join(processor.raw_dir, f"take_{step:03d}.wav")
+                recorder.record(q['dur'], raw_path)
+                st.success("Stopped.")
+                
+                # Auto-Process
+                # For a real transcript we need Whisper, but for now we just label it with the prompt text
+                # Ideally we transcribe here. V19.1 update?
+                # Using the PROMPT as the transcript for now (imperfect but functional for RVC which ignores text mostly)
+                out_path = processor.process_raw_sample(raw_path, q['q'], session_name)
+                st.audio(out_path)
+                
+            st.session_state.interview_step += 1
+            st.rerun()
+            
+    else:
+        st.success("🎉 INTERVIEW COMPLETE!")
+        st.write(f"Dataset generated at: `{session_dir}/processed`")
+        if st.button("Reset Session"):
+            st.session_state.interview_step = 0
+            st.rerun()
+
+else:
+    st.error("System Offline. Please check unified_agency.py")
+

@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"name": "NOIZYLAB",
+			"path": ".."
+		},
+		{
+			"path": "../../../../../../Volumes/JOE"
+		}
+	],
+	"settings": {
+		"editor.largeFileOptimizations": true,
+		"typescript.tsserver.maxTsServerMemory": 8192,
+		"terminal.integrated.scrollback": 100000,
+		"terminal.integrated.gpuAcceleration": "on",
+		"search.maxResults": 50000,
+		"workbench.startupEditor": "none",
+		"workbench.editor.enablePreview": false,
+		"git.ignoreLimitWarning": true
+	}
+}

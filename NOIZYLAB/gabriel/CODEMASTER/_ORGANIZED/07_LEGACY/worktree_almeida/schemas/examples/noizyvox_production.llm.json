@@ -1,0 +1,161 @@
+{
+  "orchestration_id": "llm_a1b2c3d4e5f6g7h8",
+  "version": "2.1.0",
+  "providers": [
+    {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "version": "2025-05-14",
+      "priority": 1,
+      "fallback": false,
+      "rate_limit_rpm": 1000,
+      "cost_per_1k_tokens": 0.003,
+      "max_context_tokens": 200000,
+      "capabilities": [
+        "script_enhancement",
+        "emotion_inference",
+        "ssml_generation",
+        "character_consistency",
+        "content_moderation"
+      ]
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "version": "2024-11-20",
+      "priority": 2,
+      "fallback": true,
+      "rate_limit_rpm": 500,
+      "cost_per_1k_tokens": 0.005,
+      "max_context_tokens": 128000,
+      "capabilities": [
+        "script_enhancement",
+        "emotion_inference",
+        "ssml_generation",
+        "translation"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "version": "2024-12",
+      "priority": 3,
+      "fallback": true,
+      "rate_limit_rpm": 2000,
+      "cost_per_1k_tokens": 0.00025,
+      "max_context_tokens": 1000000,
+      "capabilities": [
+        "summarization",
+        "translation"
+      ]
+    }
+  ],
+  "dramaturgy_engine": {
+    "enabled": true,
+    "features": {
+      "script_analysis": {
+        "emotion_arc_detection": true,
+        "pacing_recommendations": true,
+        "emphasis_suggestions": true,
+        "breath_point_insertion": true,
+        "dramatic_beat_identification": true
+      },
+      "script_enhancement": {
+        "auto_ssml_generation": true,
+        "prosody_optimization": true,
+        "emotion_tag_insertion": true,
+        "pause_calibration": true,
+        "pronunciation_correction": true
+      },
+      "character_direction": {
+        "motivation_inference": true,
+        "subtext_analysis": true,
+        "relationship_dynamics": true,
+        "arc_consistency": true
+      }
+    },
+    "prompts": {
+      "system_prompt": "You are a professional voice dramaturg and SSML engineer for NOIZYVOX. Analyze scripts for emotional beats, pacing, and prosody. Generate production-ready SSML with precise timing, emphasis, and emotional direction. Maintain character consistency across all outputs.",
+      "analysis_prompt_template": "Analyze the following script for {{persona_name}}:\n\n{{script_content}}\n\nIdentify: 1) Emotional arc 2) Key beats 3) Suggested pauses 4) Emphasis points 5) Breath markers",
+      "enhancement_prompt_template": "Enhance this script for {{persona_name}} with the following voice characteristics:\n{{voice_profile}}\n\nScript:\n{{script_content}}\n\nApply appropriate prosody, pacing, and emotional direction.",
+      "ssml_generation_prompt_template": "Convert the following enhanced script to production-ready SSML for {{persona_name}}:\n\n{{enhanced_script}}\n\nUse NOIZYVOX SSML extensions including <nv:emotion>, <nv:style>, and <nv:persona>."
+    }
+  },
+  "persona_consistency_engine": {
+    "enabled": true,
+    "vector_store": {
+      "provider": "pinecone",
+      "embedding_model": "text-embedding-3-large",
+      "embedding_dimensions": 3072,
+      "index_type": "hnsw",
+      "similarity_metric": "cosine"
+    },
+    "persona_knowledge_base": {
+      "character_backstory": true,
+      "vocal_characteristics": true,
+      "emotional_range": true,
+      "speech_patterns": true,
+      "catchphrases": true,
+      "pronunciation_preferences": true,
+      "previous_performances": true
+    },
+    "retrieval_config": {
+      "top_k": 10,
+      "similarity_threshold": 0.78,
+      "reranking_enabled": true,
+      "context_window_tokens": 8000
+    }
+  },
+  "real_time_adaptation": {
+    "enabled": true,
+    "adaptation_triggers": [
+      "user_feedback",
+      "emotion_detection",
+      "context_change",
+      "audience_response"
+    ],
+    "adaptation_parameters": {
+      "pacing_adjustment_range": 0.25,
+      "energy_adjustment_range": 0.35,
+      "formality_adjustment": true,
+      "vocabulary_adaptation": true
+    },
+    "feedback_loop": {
+      "implicit_signals": [
+        "skip_rate",
+        "replay_rate",
+        "completion_rate",
+        "engagement_time"
+      ],
+      "explicit_signals": [
+        "rating",
+        "feedback_text",
+        "preference_selection"
+      ],
+      "learning_rate": 0.015,
+      "adaptation_delay_ms": 50
+    }
+  },
+  "chain_of_thought": {
+    "enabled": true,
+    "expose_reasoning": false,
+    "reasoning_format": "structured",
+    "include_alternatives": true,
+    "confidence_scores": true
+  },
+  "multi_turn_context": {
+    "enabled": true,
+    "max_turns": 100,
+    "summarization_threshold_turns": 30,
+    "context_compression": true,
+    "emotional_state_tracking": true
+  },
+  "guardrails": {
+    "content_filtering": true,
+    "persona_boundary_enforcement": true,
+    "artist_consent_verification": true,
+    "output_validation": true,
+    "hallucination_detection": true,
+    "max_generation_attempts": 3
+  }
+}

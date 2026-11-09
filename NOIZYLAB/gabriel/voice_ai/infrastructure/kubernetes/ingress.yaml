@@ -1,0 +1,30 @@
+# ☸️ INGRESS CONFIGURATION - 100% PERFECT
+# GORUNFREE Protocol
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gabriel-ingress
+  namespace: gabriel
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.gabriel.noizylab.com
+    secretName: gabriel-tls
+  rules:
+  - host: api.gabriel.noizylab.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gabriel-api
+            port:
+              number: 80
+

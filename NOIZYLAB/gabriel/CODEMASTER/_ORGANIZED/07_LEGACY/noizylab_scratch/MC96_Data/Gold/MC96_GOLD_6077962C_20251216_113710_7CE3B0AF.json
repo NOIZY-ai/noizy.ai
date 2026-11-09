@@ -1,0 +1,27 @@
+{
+  "GOLD_ID": "GOLD_6077962c",
+  "Title": "[ANTIGRAVITY] Global Rules",
+  "Body": "Operating Style: Tight & Structured: Output: tight bullets + commands + file paths. Always produce: Plan, Next Action, Artifact. Code changes must include tests/rollback.",
+  "Tags": [
+    "CORE",
+    "DOCTRINE",
+    "FAT_MEMORY",
+    "GLOBAL_RULES"
+  ],
+  "Provenance": [
+    {
+      "id": "GLOBAL_DOCTRINE_GR-02",
+      "source": "MEMCELL_CORE",
+      "timestamp": "2025-12-16T11:35:24.997329-05:00"
+    }
+  ],
+  "Meta": {
+    "Confidence": 80,
+    "LastVerified": "2025-12-16T11:37:10.171723-05:00",
+    "DriftRisk": "LOW",
+    "DriftTypes": [],
+    "GateStatus": "ACTIVE",
+    "Actionability": "WATCH",
+    "Trigger": "Confidence: 80"
+  }
+}

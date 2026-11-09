@@ -1,0 +1,120 @@
+{
+  "deployment_id": "ent_a1b2c3d4e5f6g7h8",
+  "organization": {
+    "org_id": "org_acme_gaming_2024",
+    "name": "Acme Gaming Studios",
+    "industry": "gaming",
+    "size": "enterprise",
+    "primary_contact": {
+      "name": "James Wilson",
+      "email": "james.wilson@acmegaming.com",
+      "phone": "+1-555-0123"
+    }
+  },
+  "deployment_type": "cloud_dedicated",
+  "infrastructure": {
+    "cloud_provider": "aws",
+    "regions": ["us-west-2", "eu-west-1", "ap-northeast-1"],
+    "vpc_peering": true,
+    "private_link": true,
+    "dedicated_compute": {
+      "gpu_type": "A100",
+      "gpu_count": 8,
+      "cpu_cores": 256,
+      "memory_gb": 1024,
+      "storage_tb": 10,
+      "reserved": true
+    },
+    "kubernetes": {
+      "enabled": true,
+      "distribution": "eks",
+      "namespace": "noizyvox-prod",
+      "helm_chart_version": "3.2.1"
+    }
+  },
+  "security": {
+    "sso": {
+      "enabled": true,
+      "providers": ["okta", "azure_ad"],
+      "scim_provisioning": true
+    },
+    "rbac": {
+      "enabled": true,
+      "custom_roles": true,
+      "role_hierarchy": true,
+      "default_roles": ["admin", "developer", "content_creator", "qa_tester", "viewer", "billing_admin"]
+    },
+    "encryption": {
+      "at_rest": "customer_managed_keys",
+      "in_transit": "mtls",
+      "key_management": "byok",
+      "key_rotation_days": 30
+    },
+    "compliance": {
+      "certifications": ["soc2_type2", "iso27001", "gdpr", "ccpa"],
+      "data_residency": ["us", "eu", "ap"],
+      "audit_logging": true,
+      "log_retention_days": 730,
+      "log_export": "splunk"
+    },
+    "network": {
+      "ip_allowlist": [
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+        "203.0.113.0/24"
+      ],
+      "waf_enabled": true,
+      "ddos_protection": true,
+      "rate_limiting_custom": true
+    }
+  },
+  "personas": {
+    "access_model": "curated_subset",
+    "custom_personas": {
+      "enabled": true,
+      "max_custom_personas": 250,
+      "training_included": true,
+      "fine_tuning_hours": 500
+    },
+    "persona_isolation": true
+  },
+  "support": {
+    "tier": "dedicated",
+    "sla_response_hours": {
+      "critical": 0.5,
+      "high": 2,
+      "medium": 4,
+      "low": 8
+    },
+    "dedicated_csm": true,
+    "dedicated_slack_channel": true,
+    "onboarding_hours": 40,
+    "training_sessions": 8,
+    "quarterly_business_reviews": true
+  },
+  "billing": {
+    "model": "committed_spend",
+    "commitment_usd": 500000,
+    "term_months": 36,
+    "overage_rate_multiplier": 1.15,
+    "payment_terms_days": 45,
+    "invoice_frequency": "monthly",
+    "purchase_order_required": true
+  },
+  "integrations": {
+    "api_gateway": "kong",
+    "ci_cd": ["github_actions", "jenkins"],
+    "monitoring": ["datadog", "prometheus", "grafana"],
+    "secrets_management": "vault",
+    "custom_webhooks": true
+  },
+  "disaster_recovery": {
+    "rpo_hours": 0.25,
+    "rto_hours": 1,
+    "backup_frequency": "continuous",
+    "backup_retention_days": 180,
+    "multi_region_failover": true,
+    "dr_testing_frequency": "quarterly"
+  }
+}

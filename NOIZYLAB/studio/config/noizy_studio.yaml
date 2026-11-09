@@ -1,0 +1,356 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+#  NOIZY STUDIO MASTER CONFIGURATION
+#  The Complete Audio Production Pipeline
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+#  "Every voice that enters this system leaves transformed,
+#   protected, and ready for the world."
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+studio:
+  name: "NOIZY STUDIO"
+  version: "2.0.0"
+  created: "2026-03-23"
+  philosophy: "Human voices, machine precision, creative freedom"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  HARDWARE INVENTORY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+devices:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # THE GOD MACHINE
+  # ─────────────────────────────────────────────────────────────────────────────
+  god:
+    name: "God"
+    type: "Mac Studio"
+    chip: "M2 Ultra"
+    ram: "192GB"
+    role: "Master Hub / DAW / AI Processing"
+    ip: "192.168.1.100"  # Set to your actual IP
+    capabilities:
+      - "Audio Hijack master sessions"
+      - "Logic Pro X primary DAW"
+      - "AI model inference (local)"
+      - "Real-time audio processing"
+      - "Multi-device orchestration"
+    audio_interfaces:
+      - "Built-in Audio"
+      - "Neumann Interface"  # Your Neumann connection
+    software:
+      - "Logic Pro X"
+      - "Audio Hijack 4"
+      - "Loopback"
+      - "SoundSource"
+      - "Satellite (receiver)"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # MACBOOK PRO - MOBILE STATION
+  # ─────────────────────────────────────────────────────────────────────────────
+  macbook:
+    name: "MacBook Pro"
+    type: "MacBook Pro"
+    ram: "16GB"
+    role: "Mobile Recording / Secondary DAW / Windsurf+Cascade"
+    capabilities:
+      - "Field recording"
+      - "Logic Pro X mobile"
+      - "Windsurf IDE"
+      - "Cascade AI"
+      - "Audio relay to God"
+    software:
+      - "Logic Pro X"
+      - "Audio Hijack 4"
+      - "Windsurf"
+      - "Satellite (sender/receiver)"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # IPAD PRO 12.9" (2ND GEN)
+  # ─────────────────────────────────────────────────────────────────────────────
+  ipad:
+    name: "iPad Pro 12.9"
+    type: "iPad Pro"
+    generation: "2nd Gen"
+    display: "12.9 inch"
+    role: "Portable Voice Capture / Control Surface"
+    satellite_name: "iPad Pro 12.9"
+    capabilities:
+      - "Voice recording via Satellite"
+      - "Logic Remote (control surface)"
+      - "GarageBand mobile recording"
+      - "Teleprompter for scripts"
+      - "Mobile NOIZY.AI access"
+    apps:
+      - "Satellite"
+      - "Logic Remote"
+      - "GarageBand"
+      - "Voice Memos"
+      - "Ferrite Recording Studio"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # IPHONE 15 PRO MAX
+  # ─────────────────────────────────────────────────────────────────────────────
+  iphone:
+    name: "iPhone 15 Pro Max"
+    type: "iPhone"
+    model: "15 Pro Max"
+    role: "Ultra-Mobile Recording / Field Capture"
+    satellite_name: "iPhone 15 Pro Max"
+    capabilities:
+      - "Voice recording via Satellite"
+      - "Spatial Audio recording"
+      - "Field interviews"
+      - "Quick voice memos"
+      - "Remote session monitoring"
+    apps:
+      - "Satellite"
+      - "Voice Memos"
+      - "GarageBand"
+      - "Shure MOTIV"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # NEUMANN MICROPHONE
+  # ─────────────────────────────────────────────────────────────────────────────
+  neumann:
+    name: "Neumann"
+    type: "Condenser Microphone"
+    model: "TLM 103"  # Update to your actual model
+    connection: "XLR → Audio Interface → God"
+    role: "Primary Voice Capture"
+    settings:
+      pattern: "Cardioid"
+      phantom_power: true
+      gain_db: 35  # Adjust to your preference
+      highpass: false  # Handle in Logic
+    placement:
+      distance_inches: 6-8
+      angle: "Slightly off-axis"
+      pop_filter: true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  AUDIO ROUTING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+routing:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # PRIMARY RECORDING CHAINS
+  # ─────────────────────────────────────────────────────────────────────────────
+
+  neumann_to_logic:
+    name: "Neumann → Logic Pro X"
+    source: "neumann"
+    destination: "god"
+    path:
+      - device: "Neumann Microphone"
+        connection: "XLR"
+      - device: "Audio Interface"
+        connection: "USB-C/Thunderbolt"
+      - device: "God (Mac Studio)"
+        software: "Logic Pro X"
+        channel: "Audio 1"
+    settings:
+      sample_rate: 96000
+      bit_depth: 24
+      buffer_size: 128
+      latency_mode: "low"
+
+  ipad_satellite:
+    name: "iPad → Satellite → God"
+    source: "ipad"
+    destination: "god"
+    path:
+      - device: "iPad Pro 12.9"
+        app: "Satellite"
+        source: "Microphone"  # or specific app
+      - transport: "WiFi Network"
+        protocol: "Satellite"
+      - device: "God (Mac Studio)"
+        software: "Audio Hijack"
+        session: "NOIZY iPad Satellite"
+    settings:
+      sample_rate: 48000
+      bit_depth: 24
+      latency_ms: "<20"
+
+  iphone_satellite:
+    name: "iPhone → Satellite → God"
+    source: "iphone"
+    destination: "god"
+    path:
+      - device: "iPhone 15 Pro Max"
+        app: "Satellite"
+        source: "Microphone"
+      - transport: "WiFi Network"
+        protocol: "Satellite"
+      - device: "God (Mac Studio)"
+        software: "Audio Hijack"
+        session: "NOIZY iPhone Satellite"
+    settings:
+      sample_rate: 48000
+      bit_depth: 24
+      latency_ms: "<20"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # MACBOOK RELAY
+  # ─────────────────────────────────────────────────────────────────────────────
+
+  macbook_to_god:
+    name: "MacBook → God (Network Audio)"
+    source: "macbook"
+    destination: "god"
+    path:
+      - device: "MacBook Pro"
+        software: "Audio Hijack / Loopback"
+      - transport: "Ethernet/WiFi"
+        protocol: "Network Audio"
+      - device: "God (Mac Studio)"
+        software: "Audio Hijack"
+    use_cases:
+      - "Field recordings relay"
+      - "Windsurf/Cascade audio feed"
+      - "Secondary mic input"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  LOGIC PRO X CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+logic_pro_x:
+
+  project_settings:
+    sample_rate: 96000
+    bit_depth: 24
+    tempo: 120  # Default, adjust per project
+    time_signature: "4/4"
+
+  default_tracks:
+    - name: "Neumann Vox"
+      type: "audio"
+      input: "Input 1"  # Neumann
+      output: "Stereo Out"
+      plugins:
+        - "Channel EQ"
+        - "Compressor"
+        - "DeEsser"
+        - "Space Designer (subtle room)"
+
+    - name: "iPad Satellite"
+      type: "audio"
+      input: "Loopback iPad"  # Via Loopback virtual device
+      output: "Stereo Out"
+      plugins:
+        - "Channel EQ"
+        - "Noise Gate"
+
+    - name: "iPhone Satellite"
+      type: "audio"
+      input: "Loopback iPhone"
+      output: "Stereo Out"
+      plugins:
+        - "Channel EQ"
+        - "Noise Gate"
+
+  channel_strip_presets:
+    noizy_voice:
+      name: "NOIZY Voice"
+      eq:
+        highpass: 80  # Hz
+        low_shelf: { freq: 200, gain: -2 }
+        mid_1: { freq: 800, gain: 2, q: 1.5 }
+        mid_2: { freq: 3000, gain: 3, q: 1.0 }
+        high_shelf: { freq: 8000, gain: 2 }
+      compressor:
+        threshold: -18
+        ratio: 3
+        attack: 10
+        release: 100
+        makeup: 3
+      deesser:
+        frequency: 6000
+        threshold: -20
+
+  export_settings:
+    master:
+      format: "WAV"
+      sample_rate: 96000
+      bit_depth: 24
+    web:
+      format: "MP3"
+      bitrate: 320
+    podcast:
+      format: "WAV"
+      sample_rate: 44100
+      bit_depth: 16
+      loudness: -16  # LUFS
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  AI INTEGRATION (WINDSURF & CASCADE)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+ai_integration:
+
+  windsurf:
+    role: "AI-Assisted Code & Audio Script Development"
+    capabilities:
+      - "Generate audio processing scripts"
+      - "Create Logic Pro X automation"
+      - "Build NOIZY.AI features"
+      - "Transcription post-processing"
+    audio_input:
+      source: "Loopback Windsurf Input"
+      purpose: "Voice commands to Windsurf"
+
+  cascade:
+    role: "Advanced AI Reasoning for Audio Projects"
+    capabilities:
+      - "Complex audio workflow design"
+      - "Multi-track arrangement suggestions"
+      - "Voice analysis and optimization"
+      - "NOIZY brand strategy"
+    audio_input:
+      source: "Loopback Cascade Input"
+      purpose: "Voice-driven AI collaboration"
+
+  audio_to_ai_pipeline:
+    description: "Route audio from any source to AI tools"
+    steps:
+      1: "Record via Neumann/iPad/iPhone"
+      2: "Process in Logic Pro X"
+      3: "Export to NOIZYLAB/audio/"
+      4: "Transcribe via Whisper (local)"
+      5: "Feed to Windsurf/Cascade for processing"
+    transcription:
+      engine: "Whisper Large v3"
+      location: "Local (God)"
+      output: "NOIZYLAB/transcripts/"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  OUTPUT DIRECTORIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+directories:
+  base: "~/NOIZYLAB/audio"
+  structure:
+    satellite_captures:
+      ipad: "~/NOIZYLAB/audio/satellite_captures/ipad"
+      iphone: "~/NOIZYLAB/audio/satellite_captures/iphone"
+      mixed: "~/NOIZYLAB/audio/satellite_captures/mixed"
+    neumann_recordings: "~/NOIZYLAB/audio/neumann"
+    logic_exports: "~/NOIZYLAB/audio/logic_exports"
+    transcripts: "~/NOIZYLAB/audio/transcripts"
+    talespin: "~/NOIZYLAB/audio/talespin"
+    final_masters: "~/NOIZYLAB/audio/masters"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  QUICK COMMANDS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+commands:
+  setup_all: "./studio/scripts/noizy_studio.sh setup"
+  start_all: "./studio/scripts/noizy_studio.sh start"
+  stop_all: "./studio/scripts/noizy_studio.sh stop"
+  status: "./studio/scripts/noizy_studio.sh status"
+  logic_new_session: "./studio/scripts/noizy_studio.sh logic-new"
+  transcribe: "./studio/scripts/noizy_studio.sh transcribe <file>"

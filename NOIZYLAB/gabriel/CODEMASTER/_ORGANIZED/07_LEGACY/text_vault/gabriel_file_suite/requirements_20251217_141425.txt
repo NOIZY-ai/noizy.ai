@@ -1,0 +1,31 @@
+# GABRIEL File Suite - Production Requirements
+
+# Core Dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.10.0
+
+# AI Classification (Optional - install if using Claude AI)
+# anthropic>=0.40.0
+
+# Dashboard UI
+streamlit>=1.40.0
+plotly>=5.24.0
+pandas>=2.2.0
+requests>=2.32.0
+
+# Data Visualization
+matplotlib>=3.9.0
+seaborn>=0.13.0
+
+# Configuration
+pyyaml>=6.0.0
+python-dotenv>=1.0.0
+
+# Utilities
+python-magic>=0.4.27  # MIME type detection (optional)
+
+# Development Tools (optional)
+black>=24.10.0
+flake8>=7.1.0
+pytest>=8.3.0

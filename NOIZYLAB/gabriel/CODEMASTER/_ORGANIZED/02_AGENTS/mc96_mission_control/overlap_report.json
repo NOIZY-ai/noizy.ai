@@ -1,0 +1,63 @@
+{
+  "generated": "2025-12-17T17:25:38.047852",
+  "total": 3545,
+  "types": {
+    "SHIRL": 81,
+    "ENGR": 42,
+    "UNKNOWN": 3422
+  },
+  "overlaps": 269,
+  "golden": 2,
+  "top": [
+    {
+      "time": "2018-12-09 20:03",
+      "count": 467,
+      "golden": false
+    },
+    {
+      "time": "2019-12-12 14:36",
+      "count": 211,
+      "golden": false
+    },
+    {
+      "time": "2022-03-12 14:04",
+      "count": 208,
+      "golden": true
+    },
+    {
+      "time": "2019-12-12 14:34",
+      "count": 161,
+      "golden": false
+    },
+    {
+      "time": "2019-12-12 14:35",
+      "count": 138,
+      "golden": false
+    },
+    {
+      "time": "2022-03-12 14:05",
+      "count": 84,
+      "golden": false
+    },
+    {
+      "time": "2018-02-06 21:54",
+      "count": 79,
+      "golden": false
+    },
+    {
+      "time": "2014-12-11 06:12",
+      "count": 62,
+      "golden": false
+    },
+    {
+      "time": "2004-12-30 12:37",
+      "count": 62,
+      "golden": false
+    },
+    {
+      "time": "2019-09-22 16:56",
+      "count": 60,
+      "golden": false
+    }
+  ]
+}

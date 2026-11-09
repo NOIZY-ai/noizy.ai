@@ -1,0 +1,64 @@
+[
+  // HOT ROD AI Quick Access Keybindings
+
+  // === CLAUDE CODE ===
+  {
+    "key": "cmd+shift+c",
+    "command": "claude-code.startChat",
+    "when": "editorTextFocus"
+  },
+
+  // === QUICK AI ACTIONS ===
+  {
+    "key": "cmd+k cmd+e",
+    "command": "editor.action.quickFix",
+    "when": "editorHasCodeActionsProvider && editorTextFocus"
+  },
+  {
+    "key": "cmd+k cmd+i",
+    "command": "editor.action.showHover",
+    "when": "editorTextFocus"
+  },
+
+  // === TERMINAL ===
+  {
+    "key": "cmd+`",
+    "command": "workbench.action.terminal.toggleTerminal"
+  },
+  {
+    "key": "cmd+shift+`",
+    "command": "workbench.action.terminal.new"
+  },
+
+  // === FILE NAVIGATION ===
+  {
+    "key": "cmd+p",
+    "command": "workbench.action.quickOpen"
+  },
+  {
+    "key": "cmd+shift+p",
+    "command": "workbench.action.showCommands"
+  },
+
+  // === GIT ===
+  {
+    "key": "cmd+shift+g",
+    "command": "workbench.view.scm"
+  },
+  {
+    "key": "cmd+k cmd+g",
+    "command": "git.commitAll"
+  },
+
+  // === SPLIT EDITORS ===
+  {
+    "key": "cmd+\\",
+    "command": "workbench.action.splitEditor"
+  },
+
+  // === FOCUS MODES ===
+  {
+    "key": "cmd+k z",
+    "command": "workbench.action.toggleZenMode"
+  }
+]

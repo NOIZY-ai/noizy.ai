@@ -1,0 +1,204 @@
+{
+    "name": "NOIZYLAB AI Automation Flows",
+    "version": "1.0",
+    "description": "Pre-built Power Automate templates for AI workflow automation",
+    "flows": [
+        {
+            "id": "ai-email-processor",
+            "name": "AI Email Processor",
+            "trigger": "When a new email arrives",
+            "description": "Automatically process emails with AI, extract key info, and respond",
+            "steps": [
+                {
+                    "action": "Get email content",
+                    "connector": "Outlook"
+                },
+                {
+                    "action": "Analyze sentiment",
+                    "connector": "AI Builder",
+                    "config": {
+                        "model": "Sentiment Analysis"
+                    }
+                },
+                {
+                    "action": "Extract key phrases",
+                    "connector": "Azure Cognitive Services"
+                },
+                {
+                    "action": "Generate response draft",
+                    "connector": "Azure OpenAI",
+                    "config": {
+                        "model": "gpt-4",
+                        "prompt": "Draft a professional response to: {{email_content}}"
+                    }
+                },
+                {
+                    "action": "Save to SharePoint",
+                    "connector": "SharePoint"
+                },
+                {
+                    "action": "Notify on Teams",
+                    "connector": "Teams"
+                }
+            ]
+        },
+        {
+            "id": "document-intelligence",
+            "name": "Document Intelligence Pipeline",
+            "trigger": "When a file is uploaded to OneDrive",
+            "description": "Extract data from documents, classify, and organize",
+            "steps": [
+                {
+                    "action": "Get file content",
+                    "connector": "OneDrive"
+                },
+                {
+                    "action": "Extract text (OCR)",
+                    "connector": "AI Builder",
+                    "config": {
+                        "model": "Document Processing"
+                    }
+                },
+                {
+                    "action": "Classify document type",
+                    "connector": "AI Builder",
+                    "config": {
+                        "model": "Category Classification"
+                    }
+                },
+                {
+                    "action": "Extract entities",
+                    "connector": "Azure OpenAI"
+                },
+                {
+                    "action": "Update database",
+                    "connector": "Dataverse"
+                }
+            ]
+        },
+        {
+            "id": "content-generation",
+            "name": "AI Content Generator",
+            "trigger": "When triggered manually",
+            "description": "Generate video, audio, and avatar content automatically",
+            "steps": [
+                {
+                    "action": "Get content brief",
+                    "connector": "Forms"
+                },
+                {
+                    "action": "Generate script",
+                    "connector": "Azure OpenAI",
+                    "config": {
+                        "model": "gpt-4",
+                        "prompt": "Write a video script about: {{topic}}"
+                    }
+                },
+                {
+                    "action": "Generate voiceover",
+                    "connector": "HTTP",
+                    "config": {
+                        "url": "https://api.elevenlabs.io/v1/text-to-speech",
+                        "method": "POST"
+                    }
+                },
+                {
+                    "action": "Create avatar video",
+                    "connector": "HTTP",
+                    "config": {
+                        "url": "https://api.heygen.com/v2/video/generate",
+                        "method": "POST"
+                    }
+                },
+                {
+                    "action": "Upload to SharePoint",
+                    "connector": "SharePoint"
+                },
+                {
+                    "action": "Post to Teams",
+                    "connector": "Teams"
+                }
+            ]
+        },
+        {
+            "id": "meeting-summarizer",
+            "name": "AI Meeting Summarizer",
+            "trigger": "When a Teams meeting ends",
+            "description": "Automatically summarize meetings and extract action items",
+            "steps": [
+                {
+                    "action": "Get meeting transcript",
+                    "connector": "Teams"
+                },
+                {
+                    "action": "Summarize with AI",
+                    "connector": "Azure OpenAI",
+                    "config": {
+                        "model": "gpt-4",
+                        "prompt": "Summarize this meeting transcript and extract action items: {{transcript}}"
+                    }
+                },
+                {
+                    "action": "Create tasks",
+                    "connector": "Planner"
+                },
+                {
+                    "action": "Send summary email",
+                    "connector": "Outlook"
+                }
+            ]
+        },
+        {
+            "id": "social-media-ai",
+            "name": "AI Social Media Manager",
+            "trigger": "Scheduled (daily)",
+            "description": "Generate and schedule social media content with AI",
+            "steps": [
+                {
+                    "action": "Get content calendar",
+                    "connector": "SharePoint"
+                },
+                {
+                    "action": "Generate post content",
+                    "connector": "Azure OpenAI"
+                },
+                {
+                    "action": "Generate image",
+                    "connector": "HTTP",
+                    "config": {
+                        "url": "https://api.openai.com/v1/images/generations",
+                        "method": "POST"
+                    }
+                },
+                {
+                    "action": "Schedule post",
+                    "connector": "HTTP",
+                    "config": {
+                        "url": "Buffer/Hootsuite API"
+                    }
+                }
+            ]
+        }
+    ],
+    "connectors_required": [
+        "Office 365 Outlook",
+        "Microsoft Teams",
+        "SharePoint",
+        "OneDrive for Business",
+        "AI Builder",
+        "Azure OpenAI Service",
+        "HTTP",
+        "Microsoft Planner",
+        "Microsoft Forms",
+        "Dataverse"
+    ],
+    "setup_instructions": [
+        "1. Go to https://make.powerautomate.com",
+        "2. Sign in with Microsoft 365 account",
+        "3. Click 'Create' > 'Instant cloud flow'",
+        "4. Use Copilot: 'Describe what you want to automate'",
+        "5. Connect required services when prompted",
+        "6. Configure API keys in flow variables",
+        "7. Test and enable the flow"
+    ]
+}

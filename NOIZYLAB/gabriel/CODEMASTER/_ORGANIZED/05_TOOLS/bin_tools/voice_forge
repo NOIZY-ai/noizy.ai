@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+import os
+import sys
+import time
+import subprocess
+import tempfile
+
+# VOICE FORGE: GABRIEL SYSTEM OMEGA
+# MLX-Whisper powered local transcription
+# ============================================
+
+ENV_PATH = "/Users/m2ultra/.ai-env/bin/activate"
+
+def log(msg, color="white"):
+    colors = {"cyan": "\033[96m", "green": "\033[92m", "yellow": "\033[93m", "red": "\033[91m", "white": "\033[0m"}
+    print(f"{colors.get(color, '')}{msg}\033[0m")
+
+def record_audio(duration=5):
+    """Record audio using sox or rec if available"""
+    temp_wav = os.path.join(tempfile.gettempdir(), "gabriel_voice.wav")
+    log(f"🎤 Recording for {duration} seconds...", "yellow")
+    # Using 'rec' from SoX or 'ffmpeg' if available
+    try:
+        subprocess.run(["ffmpeg", "-y", "-f", "avfoundation", "-i", ":0", "-t", str(duration), temp_wav], 
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        return temp_wav
+    except:
+        log("❌ ffmpeg failed. Ensure microphone access is granted.", "red")
+        return None
+
+def transcribe(audio_path, model="tiny"):
+    """Transcribe using mlx-whisper in the .ai-env"""
+    log(f"🧠 Transcribing ({model})...", "cyan")
+    try:
+        # Construct the command to run in the virtualenv
+        cmd = f"source {ENV_PATH} && mlx_whisper --model {model} --audio {audio_path}"
+        result = subprocess.check_output(cmd, shell=True, executable="/bin/zsh").decode()
+        return result.strip()
+    except Exception as e:
+        log(f"❌ Transcription error: {e}", "red")
+        return None
+
+def main():
+    log("=== GABRIEL VOICE FORGE ===", "cyan")
+    if len(sys.argv) > 1 and sys.argv[1] == "listen":
+        audio = record_audio()
+        if audio:
+            text = transcribe(audio)
+            if text:
+                log(f"📝 Result: {text}", "green")
+                # Send to API Server
+                try:
+                    import requests
+                    requests.post("http://localhost:5174/api/voice/post", json={"text": text}, timeout=2)
+                except:
+                    log("⚠️ Could not send to dashboard server.", "yellow")
+    else:
+        print("Usage: voice_forge listen")
+
+if __name__ == "__main__":
+    main()

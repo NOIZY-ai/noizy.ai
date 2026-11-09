@@ -1,0 +1,687 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/openai_voice_complete.schema.json",
+  "title": "NOIZYVOX OpenAI Voice Modelling Complete",
+  "description": "Complete OpenAI voice technology stack with all models, APIs, SDKs, and recommendations",
+  "type": "object",
+  "required": ["integration_id", "version"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "integration_id": {
+      "type": "string",
+      "pattern": "^oai_[a-z0-9]{16}$",
+      "description": "Unique identifier for the OpenAI voice integration"
+    },
+    "version": {
+      "type": "string",
+      "default": "2025.2.0",
+      "description": "Configuration version"
+    },
+    "name": {
+      "type": "string",
+      "description": "Integration configuration name"
+    },
+    "openai_audio_model_family": {
+      "type": "object",
+      "description": "Complete OpenAI audio model ecosystem",
+      "properties": {
+        "text_to_speech_models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_id": { "type": "string" },
+              "generation": { "type": "string" },
+              "description": { "type": "string" },
+              "quality_tier": { 
+                "type": "string",
+                "enum": ["standard", "high-definition", "premium"]
+              },
+              "latency": { "type": "string" },
+              "sample_rate_hz": { "type": "integer" },
+              "pricing_per_1m_chars_usd": { "type": "number" },
+              "voices": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "output_formats": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "max_input_chars": { "type": "integer" },
+              "streaming": { "type": "boolean" },
+              "speed_control": {
+                "type": "object",
+                "properties": {
+                  "min": { "type": "number" },
+                  "max": { "type": "number" },
+                  "default": { "type": "number" }
+                }
+              },
+              "instruction_guided": { "type": "boolean" },
+              "instruction_capabilities": {
+                "type": "object",
+                "properties": {
+                  "emotion_control": { "type": "boolean" },
+                  "speaking_style": { "type": "boolean" },
+                  "character_voice": { "type": "boolean" },
+                  "pacing_control": { "type": "boolean" },
+                  "emphasis_control": { "type": "boolean" },
+                  "accent_hints": { "type": "boolean" }
+                }
+              },
+              "instruction_examples": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "best_for": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "limitations": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "noizyvox_recommendation": { "type": "string" }
+            }
+          }
+        },
+        "speech_to_text_models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_id": { "type": "string" },
+              "generation": { "type": "string" },
+              "description": { "type": "string" },
+              "languages_supported": { "type": "integer" },
+              "pricing_per_minute_usd": { "type": "number" },
+              "max_file_size_mb": { "type": "integer" },
+              "supported_formats": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "output_formats": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "features": {
+                "type": "object",
+                "additionalProperties": { "type": "boolean" }
+              },
+              "word_error_rate": { "type": "string" },
+              "best_for": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "noizyvox_recommendation": { "type": "string" }
+            }
+          }
+        },
+        "realtime_speech_models": {
+          "type": "array",
+          "description": "Native speech-to-speech models for voice agents",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_id": { "type": "string" },
+              "generation": { "type": "string" },
+              "description": { "type": "string" },
+              "type": { "type": "string" },
+              "latency": { "type": "string" },
+              "pricing": {
+                "type": "object",
+                "properties": {
+                  "audio_input_per_minute_usd": { "type": "number" },
+                  "audio_output_per_minute_usd": { "type": "number" },
+                  "text_input_per_1m_tokens_usd": { "type": "number" },
+                  "text_output_per_1m_tokens_usd": { "type": "number" },
+                  "cached_text_input_per_1m_tokens_usd": { "type": "number" }
+                }
+              },
+              "voices": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "exclusive_voices": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "audio_formats": {
+                "type": "object",
+                "properties": {
+                  "input": { "type": "array", "items": { "type": "string" } },
+                  "output": { "type": "array", "items": { "type": "string" } }
+                }
+              },
+              "features": {
+                "type": "object",
+                "additionalProperties": { "type": "boolean" }
+              },
+              "context_window_tokens": { "type": "integer" },
+              "max_output_tokens": { "type": "integer" },
+              "best_for": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "noizyvox_recommendation": { "type": "string" }
+            }
+          }
+        },
+        "audio_preview_models": {
+          "type": "array",
+          "description": "Audio-capable chat completion models",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_id": { "type": "string" },
+              "description": { "type": "string" },
+              "capabilities": {
+                "type": "object",
+                "additionalProperties": { "type": "boolean" }
+              },
+              "pricing": {
+                "type": "object",
+                "properties": {
+                  "audio_input_per_1m_tokens_usd": { "type": "number" },
+                  "audio_output_per_1m_tokens_usd": { "type": "number" },
+                  "text_input_per_1m_tokens_usd": { "type": "number" },
+                  "text_output_per_1m_tokens_usd": { "type": "number" }
+                }
+              },
+              "use_cases": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "voice_engine_preview": {
+      "type": "object",
+      "description": "OpenAI Voice Engine - Custom voice cloning (limited access)",
+      "properties": {
+        "status": { "type": "string" },
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "voice_cloning": {
+              "type": "object",
+              "properties": {
+                "min_audio_sample_seconds": { "type": "integer" },
+                "quality": { "type": "string" },
+                "languages": { "type": "string" },
+                "emotion_transfer": { "type": "boolean" },
+                "speaker_verification": { "type": "boolean" }
+              }
+            },
+            "safety_measures": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "access_requirements": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "noizyvox_recommendation": { "type": "string" }
+      }
+    },
+    "voice_characteristics": {
+      "type": "object",
+      "description": "Complete voice preset library with characteristics",
+      "properties": {
+        "standard_voices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "voice_id": { "type": "string" },
+              "gender": { "type": "string" },
+              "age_range": { "type": "string" },
+              "character_traits": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "tonal_qualities": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "pitch_range": { "type": "string" },
+              "speaking_rate": { "type": "string" },
+              "best_content_types": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "emotion_range": { "type": "string" },
+              "availability": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "noizyvox_recommendation": { "type": "string" }
+            }
+          }
+        },
+        "extended_voices": {
+          "type": "array",
+          "description": "Additional voices in gpt-4o-mini-tts and realtime",
+          "items": {
+            "type": "object",
+            "properties": {
+              "voice_id": { "type": "string" },
+              "gender": { "type": "string" },
+              "character_traits": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "best_content_types": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "availability": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "exclusive_realtime_voices": {
+          "type": "array",
+          "description": "Premium voices only in Realtime API",
+          "items": {
+            "type": "object",
+            "properties": {
+              "voice_id": { "type": "string" },
+              "gender": { "type": "string" },
+              "character_traits": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "best_content_types": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "availability": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "premium": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "instruction_guided_synthesis": {
+      "type": "object",
+      "description": "Advanced instruction-based voice control (gpt-4o-mini-tts)",
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "emotion_control": {
+              "type": "object",
+              "properties": {
+                "supported_emotions": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "instruction_patterns": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "speaking_style_control": {
+              "type": "object",
+              "properties": {
+                "supported_styles": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "instruction_patterns": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "pacing_control": {
+              "type": "object",
+              "properties": {
+                "options": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "instruction_patterns": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "character_voice": {
+              "type": "object",
+              "properties": {
+                "instruction_patterns": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "example_characters": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "noizyvox_persona_mapping": {
+          "type": "object",
+          "description": "Map NOIZYVOX persona packs to OpenAI instructions",
+          "properties": {
+            "instruction_template": { "type": "string" },
+            "example_mapping": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    },
+    "api_architecture": {
+      "type": "object",
+      "description": "Complete API endpoint architecture",
+      "properties": {
+        "rest_endpoints": {
+          "type": "object",
+          "properties": {
+            "text_to_speech": {
+              "type": "object",
+              "properties": {
+                "endpoint": { "type": "string" },
+                "method": { "type": "string" },
+                "content_type": { "type": "string" },
+                "response_type": { "type": "string" },
+                "request_schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            },
+            "transcription": {
+              "type": "object",
+              "properties": {
+                "endpoint": { "type": "string" },
+                "method": { "type": "string" },
+                "content_type": { "type": "string" },
+                "request_schema": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            },
+            "translation": {
+              "type": "object",
+              "properties": {
+                "endpoint": { "type": "string" },
+                "method": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        },
+        "websocket_endpoints": {
+          "type": "object",
+          "properties": {
+            "realtime_api": {
+              "type": "object",
+              "properties": {
+                "endpoint": { "type": "string" },
+                "query_params": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                },
+                "headers": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                },
+                "protocol": { "type": "string" },
+                "audio_format": { "type": "string" }
+              }
+            }
+          }
+        },
+        "webrtc_endpoints": {
+          "type": "object",
+          "properties": {
+            "session_creation": {
+              "type": "object",
+              "properties": {
+                "endpoint": { "type": "string" },
+                "description": { "type": "string" },
+                "response": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sdk_ecosystem": {
+      "type": "object",
+      "description": "Official and community SDKs",
+      "properties": {
+        "official_sdks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "package": { "type": "string" },
+              "installation": { "type": "string" },
+              "github": { "type": "string" },
+              "documentation": { "type": "string" },
+              "audio_support": {
+                "type": "object",
+                "additionalProperties": { "type": "boolean" }
+              },
+              "features": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "azure_openai_sdk": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "languages": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "github": { "type": "string" },
+            "documentation": { "type": "string" },
+            "features": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "fine_tuning_capabilities": {
+      "type": "object",
+      "description": "Custom model training and fine-tuning",
+      "properties": {
+        "whisper_fine_tuning": {
+          "type": "object",
+          "properties": {
+            "availability": { "type": "string" },
+            "use_cases": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "process": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "noizyvox_recommendation": { "type": "string" }
+          }
+        },
+        "text_model_fine_tuning": {
+          "type": "object",
+          "properties": {
+            "available_models": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "api_endpoint": { "type": "string" },
+            "data_format": { "type": "string" },
+            "use_cases_for_voice": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "noizyvox_recommendation": { "type": "string" }
+          }
+        }
+      }
+    },
+    "pricing_complete": {
+      "type": "object",
+      "description": "Complete pricing matrix (USD)",
+      "properties": {
+        "text_to_speech": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "per_1m_characters": { "type": "number" },
+              "per_1k_characters": { "type": "number" },
+              "streaming": { "type": "string" },
+              "instructions": { "type": "string" }
+            }
+          }
+        },
+        "speech_to_text": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "per_minute": { "type": "number" },
+              "per_hour": { "type": "number" }
+            }
+          }
+        },
+        "realtime_api": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "audio_input_per_minute": { "type": "number" },
+              "audio_output_per_minute": { "type": "number" },
+              "text_input_per_1m_tokens": { "type": "number" },
+              "text_output_per_1m_tokens": { "type": "number" },
+              "cached_input_per_1m_tokens": { "type": "number" }
+            }
+          }
+        },
+        "audio_in_chat": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "audio_input_per_1m_tokens": { "type": "number" },
+              "audio_output_per_1m_tokens": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "noizyvox_recommendations": {
+      "type": "object",
+      "description": "Strategic recommendations for NOIZYVOX integration",
+      "properties": {
+        "tier_1_premium_production": {
+          "type": "object",
+          "description": "Highest quality for enterprise and premium personas",
+          "properties": {
+            "tts_model": { "type": "string" },
+            "tts_rationale": { "type": "string" },
+            "asr_model": { "type": "string" },
+            "asr_rationale": { "type": "string" },
+            "realtime_model": { "type": "string" },
+            "realtime_rationale": { "type": "string" },
+            "estimated_cost_per_1m_chars": { "type": "number" }
+          }
+        },
+        "tier_2_balanced": {
+          "type": "object",
+          "description": "Good quality with cost optimization",
+          "properties": {
+            "tts_model": { "type": "string" },
+            "asr_model": { "type": "string" },
+            "realtime_model": { "type": "string" },
+            "estimated_cost_per_1m_chars": { "type": "number" }
+          }
+        },
+        "tier_3_high_volume": {
+          "type": "object",
+          "description": "Maximum cost efficiency",
+          "properties": {
+            "tts_model": { "type": "string" },
+            "asr_model": { "type": "string" },
+            "fallback_to_oss": { "type": "boolean" },
+            "estimated_cost_per_1m_chars": { "type": "number" }
+          }
+        },
+        "persona_pack_strategy": {
+          "type": "object",
+          "properties": {
+            "primary_tts": { "type": "string" },
+            "voice_selection": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "instruction_usage": { "type": "string" },
+            "hybrid_approach": { "type": "string" }
+          }
+        },
+        "agentic_voice_strategy": {
+          "type": "object",
+          "properties": {
+            "primary_model": { "type": "string" },
+            "fallback_model": { "type": "string" },
+            "function_calling": { "type": "boolean" },
+            "vad_mode": { "type": "string" }
+          }
+        }
+      }
+    },
+    "implementation_examples": {
+      "type": "object",
+      "description": "Code examples for integration",
+      "properties": {
+        "python_tts_streaming": { "type": "string" },
+        "python_realtime_agent": { "type": "string" },
+        "javascript_webrtc": { "type": "string" },
+        "persona_instruction_generator": { "type": "string" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" },
+        "openai_api_version": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

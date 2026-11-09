@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "gabriel": {
+      "command": "python3",
+      "args": ["/Users/m2ultra/NOIZYLAB/GABRIEL/mcp_servers/gabriel_mcp/server.py"],
+      "env": {
+        "PYTHONPATH": "/Users/m2ultra/NOIZYLAB/GABRIEL"
+      }
+    }
+  }
+}

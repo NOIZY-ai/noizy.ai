@@ -1,0 +1,1037 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/openai_voice_integration.schema.json",
+  "title": "NOIZYVOX OpenAI Voice Integration",
+  "description": "Complete OpenAI voice API, SDK, and model integration for professional voice synthesis, ASR, and realtime agents - December 2025",
+  "type": "object",
+  "required": ["integration_id", "version", "provider"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "integration_id": {
+      "type": "string",
+      "pattern": "^oai_voice_[a-z0-9]{16}$",
+      "description": "Unique identifier for OpenAI voice integration"
+    },
+    "version": {
+      "type": "string",
+      "default": "2.0.0",
+      "description": "Integration version"
+    },
+    "provider": {
+      "type": "string",
+      "const": "openai",
+      "description": "Voice provider identifier"
+    },
+    "api_configuration": {
+      "type": "object",
+      "description": "OpenAI API configuration",
+      "properties": {
+        "api_key": {
+          "type": "string",
+          "pattern": "^sk-[a-zA-Z0-9-_]+$",
+          "description": "OpenAI API key (stored securely)"
+        },
+        "organization_id": {
+          "type": "string",
+          "pattern": "^org-[a-zA-Z0-9]+$",
+          "description": "OpenAI organization ID"
+        },
+        "base_url": {
+          "type": "string",
+          "format": "uri",
+          "default": "https://api.openai.com/v1",
+          "description": "OpenAI API base URL"
+        },
+        "azure_endpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Azure OpenAI endpoint (optional)"
+        },
+        "azure_deployment_name": {
+          "type": "string",
+          "description": "Azure OpenAI deployment name"
+        },
+        "api_version": {
+          "type": "string",
+          "default": "2024-12-01",
+          "description": "API version"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "default": 30000,
+          "minimum": 1000,
+          "maximum": 120000
+        },
+        "max_retries": {
+          "type": "integer",
+          "default": 3,
+          "minimum": 0,
+          "maximum": 10
+        }
+      }
+    },
+    "tts_models": {
+      "type": "object",
+      "description": "Text-to-Speech model configurations",
+      "properties": {
+        "tts_1": {
+          "type": "object",
+          "description": "Standard TTS model optimized for speed",
+          "properties": {
+            "model_id": { "type": "string", "const": "tts-1" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Fast, real-time applications" },
+            "max_input_chars": { "type": "integer", "default": 4096 },
+            "supported_voices": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"]
+            },
+            "supported_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["mp3", "opus", "aac", "flac", "wav", "pcm"]
+            },
+            "speed_range": {
+              "type": "object",
+              "properties": {
+                "min": { "type": "number", "default": 0.25 },
+                "max": { "type": "number", "default": 4.0 },
+                "default": { "type": "number", "default": 1.0 }
+              }
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "per_1m_chars": { "type": "number", "default": 15.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            },
+            "streaming_enabled": { "type": "boolean", "default": false },
+            "instruction_guided": { "type": "boolean", "default": false }
+          }
+        },
+        "tts_1_hd": {
+          "type": "object",
+          "description": "HD TTS model optimized for quality",
+          "properties": {
+            "model_id": { "type": "string", "const": "tts-1-hd" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Studio quality, audiobooks, premium content" },
+            "max_input_chars": { "type": "integer", "default": 4096 },
+            "supported_voices": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"]
+            },
+            "supported_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["mp3", "opus", "aac", "flac", "wav", "pcm"]
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "per_1m_chars": { "type": "number", "default": 30.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            },
+            "streaming_enabled": { "type": "boolean", "default": false },
+            "instruction_guided": { "type": "boolean", "default": false }
+          }
+        },
+        "gpt_4o_mini_tts": {
+          "type": "object",
+          "description": "Instruction-guided TTS powered by GPT-4o mini",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-4o-mini-tts" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Custom personas, emotions, theatrical performances" },
+            "max_input_chars": { "type": "integer", "default": 4096 },
+            "instruction_guided": { "type": "boolean", "default": true },
+            "supported_voices": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"]
+            },
+            "supported_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["mp3", "opus", "aac", "flac", "wav", "pcm"]
+            },
+            "streaming_enabled": { "type": "boolean", "default": true },
+            "stream_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["sse", "audio"]
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 0.60 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 12.00 },
+                "per_minute_audio": { "type": "number", "default": 0.015 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            },
+            "instruction_examples": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [
+                "Speak with a warm, friendly tone",
+                "Use an excited, enthusiastic voice",
+                "Deliver this as a dramatic reading",
+                "Speak softly and calmly, like a meditation guide",
+                "Use a professional news anchor delivery",
+                "Add emphasis on key points like a motivational speaker"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "asr_models": {
+      "type": "object",
+      "description": "Automatic Speech Recognition (Speech-to-Text) models",
+      "properties": {
+        "whisper_1": {
+          "type": "object",
+          "description": "General-purpose speech recognition (Whisper V2)",
+          "properties": {
+            "model_id": { "type": "string", "const": "whisper-1" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "General transcription, 99 languages" },
+            "supported_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"]
+            },
+            "max_file_size_mb": { "type": "integer", "default": 25 },
+            "supported_languages": { "type": "integer", "default": 99 },
+            "response_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["json", "text", "srt", "verbose_json", "vtt"]
+            },
+            "timestamp_granularities": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["word", "segment"]
+            },
+            "translation_supported": { "type": "boolean", "default": true },
+            "streaming_supported": { "type": "boolean", "default": false },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "per_minute": { "type": "number", "default": 0.006 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_4o_transcribe": {
+          "type": "object",
+          "description": "High-accuracy transcription powered by GPT-4o",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-4o-transcribe" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Best accuracy, complex audio, noisy environments" },
+            "supported_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"]
+            },
+            "response_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["json"]
+            },
+            "streaming_supported": { "type": "boolean", "default": true },
+            "logprobs_supported": { "type": "boolean", "default": true },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 2.50 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 10.00 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 6.00 },
+                "per_minute": { "type": "number", "default": 0.006 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_4o_mini_transcribe": {
+          "type": "object",
+          "description": "Fast, cost-efficient transcription powered by GPT-4o mini",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-4o-mini-transcribe" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "High volume, cost-sensitive transcription" },
+            "supported_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"]
+            },
+            "response_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["json"]
+            },
+            "streaming_supported": { "type": "boolean", "default": true },
+            "logprobs_supported": { "type": "boolean", "default": true },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 1.25 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 5.00 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 3.00 },
+                "per_minute": { "type": "number", "default": 0.003 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_4o_transcribe_diarize": {
+          "type": "object",
+          "description": "Transcription with speaker diarization",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-4o-transcribe-diarize" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Multi-speaker conversations, interviews, meetings" },
+            "max_speakers": { "type": "integer", "default": 4 },
+            "known_speaker_references": { "type": "boolean", "default": true },
+            "reference_audio_min_seconds": { "type": "integer", "default": 2 },
+            "reference_audio_max_seconds": { "type": "integer", "default": 10 },
+            "response_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["json", "text", "diarized_json"]
+            },
+            "chunking_strategy": {
+              "type": "object",
+              "properties": {
+                "auto": { "type": "boolean", "default": true },
+                "vad_enabled": { "type": "boolean", "default": true },
+                "required_for_long_audio": { "type": "boolean", "default": true },
+                "long_audio_threshold_seconds": { "type": "integer", "default": 30 }
+              }
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 2.50 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 10.00 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 6.00 },
+                "per_minute": { "type": "number", "default": 0.006 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "realtime_models": {
+      "type": "object",
+      "description": "Realtime API models for speech-to-speech interactions",
+      "properties": {
+        "gpt_realtime": {
+          "type": "object",
+          "description": "Latest realtime model for voice agents (GA)",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-realtime" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Production voice agents, low-latency conversations" },
+            "supported_voices": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse", "cedar", "marin"]
+            },
+            "connection_methods": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["webrtc", "websocket", "sip"]
+            },
+            "features": {
+              "type": "object",
+              "properties": {
+                "function_calling": { "type": "boolean", "default": true },
+                "agent_handoff": { "type": "boolean", "default": true },
+                "vad": { "type": "boolean", "default": true },
+                "interruption_handling": { "type": "boolean", "default": true },
+                "multimodal_input": { "type": "boolean", "default": true },
+                "image_input": { "type": "boolean", "default": true }
+              }
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 4.00 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 16.00 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 32.00 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 64.00 },
+                "image_input_per_1m_tokens": { "type": "number", "default": 5.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_realtime_mini": {
+          "type": "object",
+          "description": "Cost-efficient realtime model",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-realtime-mini" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "High volume voice agents, cost-sensitive deployments" },
+            "supported_voices": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse", "cedar", "marin"]
+            },
+            "connection_methods": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["webrtc", "websocket", "sip"]
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 0.60 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 2.40 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 10.00 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 20.00 },
+                "image_input_per_1m_tokens": { "type": "number", "default": 0.80 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_4o_realtime_preview": {
+          "type": "object",
+          "description": "GPT-4o Realtime Preview (legacy)",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-4o-realtime-preview" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Preview features, compatibility with existing integrations" },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 5.00 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 20.00 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 40.00 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 80.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_4o_mini_realtime_preview": {
+          "type": "object",
+          "description": "GPT-4o mini Realtime Preview (legacy)",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-4o-mini-realtime-preview" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Cost-efficient preview realtime" },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 0.60 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 2.40 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 10.00 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 20.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "audio_models": {
+      "type": "object",
+      "description": "Chat Completions audio models for non-realtime audio I/O",
+      "properties": {
+        "gpt_audio": {
+          "type": "object",
+          "description": "Audio model for Chat Completions API",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-audio" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Audio input/output in chat completions" },
+            "modalities": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["text", "audio"]
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 2.50 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 10.00 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 32.00 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 64.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_audio_mini": {
+          "type": "object",
+          "description": "Cost-efficient audio model",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-audio-mini" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Cost-efficient audio in chat completions" },
+            "modalities": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["text", "audio"]
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 0.60 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 2.40 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 10.00 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 20.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        },
+        "gpt_4o_audio_preview": {
+          "type": "object",
+          "description": "GPT-4o Audio Preview (legacy)",
+          "properties": {
+            "model_id": { "type": "string", "const": "gpt-4o-audio-preview" },
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Audio I/O in existing chat applications" },
+            "modalities": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["text", "audio"]
+            },
+            "pricing": {
+              "type": "object",
+              "properties": {
+                "text_input_per_1m_tokens": { "type": "number", "default": 2.50 },
+                "text_output_per_1m_tokens": { "type": "number", "default": 10.00 },
+                "audio_input_per_1m_tokens": { "type": "number", "default": 40.00 },
+                "audio_output_per_1m_tokens": { "type": "number", "default": 80.00 },
+                "unit": { "type": "string", "default": "USD" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "voice_presets": {
+      "type": "object",
+      "description": "OpenAI built-in voice presets",
+      "properties": {
+        "alloy": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "alloy" },
+            "gender": { "type": "string", "default": "neutral" },
+            "character": { "type": "string", "default": "Balanced, versatile" },
+            "best_for": { "type": "string", "default": "General narration, default choice" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "ash": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "ash" },
+            "gender": { "type": "string", "default": "male" },
+            "character": { "type": "string", "default": "Clear, professional" },
+            "best_for": { "type": "string", "default": "Business content, presentations" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "ballad": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "ballad" },
+            "gender": { "type": "string", "default": "neutral" },
+            "character": { "type": "string", "default": "Lyrical, expressive" },
+            "best_for": { "type": "string", "default": "Storytelling, creative content" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "coral": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "coral" },
+            "gender": { "type": "string", "default": "female" },
+            "character": { "type": "string", "default": "Warm, engaging" },
+            "best_for": { "type": "string", "default": "Marketing, customer engagement" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "echo": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "echo" },
+            "gender": { "type": "string", "default": "male" },
+            "character": { "type": "string", "default": "Warm, conversational" },
+            "best_for": { "type": "string", "default": "Podcasts, storytelling" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "fable": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "fable" },
+            "gender": { "type": "string", "default": "female" },
+            "character": { "type": "string", "default": "Expressive, dramatic" },
+            "best_for": { "type": "string", "default": "Audiobooks, character voices" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "onyx": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "onyx" },
+            "gender": { "type": "string", "default": "male" },
+            "character": { "type": "string", "default": "Deep, authoritative" },
+            "best_for": { "type": "string", "default": "Documentaries, news, announcements" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "nova": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "nova" },
+            "gender": { "type": "string", "default": "female" },
+            "character": { "type": "string", "default": "Friendly, upbeat" },
+            "best_for": { "type": "string", "default": "Customer service, tutorials" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "sage": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "sage" },
+            "gender": { "type": "string", "default": "neutral" },
+            "character": { "type": "string", "default": "Wise, measured" },
+            "best_for": { "type": "string", "default": "Educational content, explanations" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "shimmer": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "shimmer" },
+            "gender": { "type": "string", "default": "female" },
+            "character": { "type": "string", "default": "Soft, soothing" },
+            "best_for": { "type": "string", "default": "Meditation, ASMR, relaxation" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "verse": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "verse" },
+            "gender": { "type": "string", "default": "neutral" },
+            "character": { "type": "string", "default": "Poetic, rhythmic" },
+            "best_for": { "type": "string", "default": "Poetry, artistic content" },
+            "available_in": { "type": "array", "default": ["tts", "realtime", "audio"] }
+          }
+        },
+        "cedar": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "cedar" },
+            "gender": { "type": "string", "default": "male" },
+            "character": { "type": "string", "default": "Rich, resonant" },
+            "best_for": { "type": "string", "default": "Realtime voice agents" },
+            "available_in": { "type": "array", "default": ["realtime"] }
+          }
+        },
+        "marin": {
+          "type": "object",
+          "properties": {
+            "voice_id": { "type": "string", "const": "marin" },
+            "gender": { "type": "string", "default": "female" },
+            "character": { "type": "string", "default": "Bright, articulate" },
+            "best_for": { "type": "string", "default": "Realtime voice agents" },
+            "available_in": { "type": "array", "default": ["realtime"] }
+          }
+        }
+      }
+    },
+    "voice_agent_architecture": {
+      "type": "object",
+      "description": "Voice agent architecture configurations",
+      "properties": {
+        "speech_to_speech": {
+          "type": "object",
+          "description": "Direct speech-to-speech using Realtime API",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Low-latency, natural conversations" },
+            "model": { "type": "string", "default": "gpt-realtime" },
+            "advantages": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [
+                "Lowest latency",
+                "Natural conversation flow",
+                "Understands emotion and intent from audio",
+                "Handles interruptions naturally",
+                "Single model handles everything"
+              ]
+            },
+            "best_for": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [
+                "Interactive customer service",
+                "Language tutoring",
+                "Conversational search",
+                "Voice assistants"
+              ]
+            }
+          }
+        },
+        "chained": {
+          "type": "object",
+          "description": "ASR → LLM → TTS pipeline",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Predictable, controlled responses" },
+            "pipeline": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["gpt-4o-transcribe", "gpt-4.1", "gpt-4o-mini-tts"]
+            },
+            "advantages": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [
+                "Full transcript control",
+                "Predictable responses",
+                "Easy to extend existing LLM apps",
+                "Robust function calling"
+              ]
+            },
+            "best_for": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [
+                "Structured workflows",
+                "Customer support with scripts",
+                "Sales and triage",
+                "Compliance-sensitive applications"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "realtime_connection": {
+      "type": "object",
+      "description": "Realtime API connection configurations",
+      "properties": {
+        "webrtc": {
+          "type": "object",
+          "description": "WebRTC connection for browser/client apps",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Browser-based voice agents, client-side apps" },
+            "ephemeral_key_url": { "type": "string", "default": "https://api.openai.com/v1/realtime/sessions" },
+            "ice_servers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "urls": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "websocket": {
+          "type": "object",
+          "description": "WebSocket connection for server-side apps",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Server-side agents, telephony, consistent latency" },
+            "endpoint": { "type": "string", "default": "wss://api.openai.com/v1/realtime" }
+          }
+        },
+        "sip": {
+          "type": "object",
+          "description": "SIP connection for VoIP telephony",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "use_case": { "type": "string", "default": "Phone systems, call centers" },
+            "twilio_integration": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "sdks": {
+      "type": "object",
+      "description": "Official OpenAI SDKs",
+      "properties": {
+        "python": {
+          "type": "object",
+          "properties": {
+            "package": { "type": "string", "default": "openai" },
+            "install_command": { "type": "string", "default": "pip install openai" },
+            "min_version": { "type": "string", "default": "1.50.0" },
+            "repo": { "type": "string", "default": "https://github.com/openai/openai-python" }
+          }
+        },
+        "javascript": {
+          "type": "object",
+          "properties": {
+            "package": { "type": "string", "default": "openai" },
+            "install_command": { "type": "string", "default": "npm install openai" },
+            "min_version": { "type": "string", "default": "4.60.0" },
+            "repo": { "type": "string", "default": "https://github.com/openai/openai-node" }
+          }
+        },
+        "agents_python": {
+          "type": "object",
+          "properties": {
+            "package": { "type": "string", "default": "openai-agents" },
+            "install_command": { "type": "string", "default": "pip install openai-agents" },
+            "repo": { "type": "string", "default": "https://github.com/openai/openai-agents-python" },
+            "voice_support": { "type": "boolean", "default": true }
+          }
+        },
+        "agents_javascript": {
+          "type": "object",
+          "properties": {
+            "package": { "type": "string", "default": "@openai/agents" },
+            "install_command": { "type": "string", "default": "npm install @openai/agents" },
+            "repo": { "type": "string", "default": "https://github.com/openai/openai-agents-js" },
+            "voice_support": { "type": "boolean", "default": true },
+            "realtime_agents": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "noizyvox_recommendations": {
+      "type": "object",
+      "description": "NOIZYVOX-specific recommendations for OpenAI integration",
+      "properties": {
+        "tts_strategy": {
+          "type": "object",
+          "properties": {
+            "premium_quality": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "gpt-4o-mini-tts" },
+                "reason": { "type": "string", "default": "Instruction-guided for custom personas and emotions" },
+                "estimated_cost_1m_chars": { "type": "number", "default": 12.00 }
+              }
+            },
+            "standard_production": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "tts-1-hd" },
+                "reason": { "type": "string", "default": "Studio quality without instruction overhead" },
+                "estimated_cost_1m_chars": { "type": "number", "default": 30.00 }
+              }
+            },
+            "high_volume": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "tts-1" },
+                "reason": { "type": "string", "default": "Fast, cost-efficient for high throughput" },
+                "estimated_cost_1m_chars": { "type": "number", "default": 15.00 }
+              }
+            },
+            "hybrid_recommendation": {
+              "type": "string",
+              "default": "Use open-source Fish Speech for bulk generation, OpenAI gpt-4o-mini-tts for premium persona work"
+            }
+          }
+        },
+        "asr_strategy": {
+          "type": "object",
+          "properties": {
+            "best_accuracy": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "gpt-4o-transcribe" },
+                "reason": { "type": "string", "default": "Highest accuracy, noisy environments" },
+                "estimated_cost_per_hour": { "type": "number", "default": 0.36 }
+              }
+            },
+            "multi_speaker": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "gpt-4o-transcribe-diarize" },
+                "reason": { "type": "string", "default": "Speaker identification up to 4 speakers" },
+                "estimated_cost_per_hour": { "type": "number", "default": 0.36 }
+              }
+            },
+            "cost_efficient": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "gpt-4o-mini-transcribe" },
+                "reason": { "type": "string", "default": "50% cheaper, good accuracy" },
+                "estimated_cost_per_hour": { "type": "number", "default": 0.18 }
+              }
+            },
+            "hybrid_recommendation": {
+              "type": "string",
+              "default": "Use Faster-Whisper (open-source) for bulk, OpenAI gpt-4o-transcribe for quality-critical"
+            }
+          }
+        },
+        "voice_agent_strategy": {
+          "type": "object",
+          "properties": {
+            "production_agents": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "gpt-realtime" },
+                "reason": { "type": "string", "default": "GA model, best price-performance" }
+              }
+            },
+            "high_volume_agents": {
+              "type": "object",
+              "properties": {
+                "model": { "type": "string", "default": "gpt-realtime-mini" },
+                "reason": { "type": "string", "default": "6x cheaper than full model" }
+              }
+            },
+            "telephony": {
+              "type": "object",
+              "properties": {
+                "connection": { "type": "string", "default": "sip" },
+                "reason": { "type": "string", "default": "Direct VoIP integration" }
+              }
+            },
+            "browser_agents": {
+              "type": "object",
+              "properties": {
+                "connection": { "type": "string", "default": "webrtc" },
+                "sdk": { "type": "string", "default": "@openai/agents" },
+                "reason": { "type": "string", "default": "Lowest latency for browser apps" }
+              }
+            }
+          }
+        },
+        "cost_optimization": {
+          "type": "object",
+          "properties": {
+            "batch_processing": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "discount": { "type": "string", "default": "50% off standard pricing" },
+                "latency": { "type": "string", "default": "Up to 24 hours" }
+              }
+            },
+            "flex_processing": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "discount": { "type": "string", "default": "Variable, higher latency" }
+              }
+            },
+            "caching": {
+              "type": "object",
+              "properties": {
+                "prompt_caching": { "type": "boolean", "default": true },
+                "audio_caching": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hybrid_architecture": {
+      "type": "object",
+      "description": "Recommended hybrid OpenAI + Open Source architecture",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "strategy": {
+          "type": "string",
+          "default": "Use open-source for bulk operations, OpenAI for premium/realtime"
+        },
+        "tts_pipeline": {
+          "type": "object",
+          "properties": {
+            "bulk_generation": { "type": "string", "default": "Fish Speech V1.5 (self-hosted)" },
+            "premium_personas": { "type": "string", "default": "OpenAI gpt-4o-mini-tts" },
+            "edge_deployment": { "type": "string", "default": "Kokoro TTS V1.0" }
+          }
+        },
+        "asr_pipeline": {
+          "type": "object",
+          "properties": {
+            "bulk_transcription": { "type": "string", "default": "Faster-Whisper (self-hosted)" },
+            "realtime_transcription": { "type": "string", "default": "OpenAI gpt-4o-mini-transcribe" },
+            "diarization": { "type": "string", "default": "OpenAI gpt-4o-transcribe-diarize" }
+          }
+        },
+        "voice_agent_pipeline": {
+          "type": "object",
+          "properties": {
+            "premium_agents": { "type": "string", "default": "OpenAI gpt-realtime" },
+            "high_volume": { "type": "string", "default": "OpenAI gpt-realtime-mini" },
+            "self_hosted": { "type": "string", "default": "LLaMA 3.3 70B + Fish Speech + Faster-Whisper" }
+          }
+        },
+        "estimated_savings": {
+          "type": "object",
+          "properties": {
+            "tts_bulk": { "type": "string", "default": "90%+ vs OpenAI-only" },
+            "asr_bulk": { "type": "string", "default": "95%+ vs OpenAI-only" },
+            "realtime_agents": { "type": "string", "default": "Use OpenAI for production reliability" }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "description": "Official documentation and resources",
+      "properties": {
+        "documentation": {
+          "type": "object",
+          "properties": {
+            "audio_guide": { "type": "string", "default": "https://platform.openai.com/docs/guides/audio" },
+            "tts_guide": { "type": "string", "default": "https://platform.openai.com/docs/guides/text-to-speech" },
+            "stt_guide": { "type": "string", "default": "https://platform.openai.com/docs/guides/speech-to-text" },
+            "realtime_guide": { "type": "string", "default": "https://platform.openai.com/docs/guides/realtime" },
+            "voice_agents_guide": { "type": "string", "default": "https://platform.openai.com/docs/guides/voice-agents" },
+            "api_reference": { "type": "string", "default": "https://platform.openai.com/docs/api-reference/audio" },
+            "pricing": { "type": "string", "default": "https://platform.openai.com/docs/pricing" }
+          }
+        },
+        "playgrounds": {
+          "type": "object",
+          "properties": {
+            "realtime_playground": { "type": "string", "default": "https://platform.openai.com/playground/realtime" },
+            "openai_fm": { "type": "string", "default": "https://openai.fm/" }
+          }
+        },
+        "sample_apps": {
+          "type": "object",
+          "properties": {
+            "realtime_agents_demo": { "type": "string", "default": "https://github.com/openai/openai-realtime-agents" },
+            "twilio_demo": { "type": "string", "default": "https://github.com/openai/openai-realtime-twilio-demo" },
+            "voice_agent_sample": { "type": "string", "default": "https://github.com/openai/openai-voice-agent-sdk-sample" },
+            "azure_realtime_sdk": { "type": "string", "default": "https://github.com/azure-samples/aoai-realtime-audio-sdk" }
+          }
+        },
+        "tools": {
+          "type": "object",
+          "properties": {
+            "voice_agent_metaprompter": { "type": "string", "default": "https://chatgpt.com/g/g-678865c9fb5c81918fa28699735dd08e-voice-agent-metaprompt-gpt" },
+            "metaprompt_source": { "type": "string", "default": "https://github.com/openai/openai-realtime-agents/blob/main/src/app/agentConfigs/voiceAgentMetaprompt.txt" }
+          }
+        }
+      }
+    }
+  }
+}

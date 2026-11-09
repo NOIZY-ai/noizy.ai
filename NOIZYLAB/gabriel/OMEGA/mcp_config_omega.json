@@ -1,0 +1,10 @@
+{
+    "mcpServers": {
+        "omega": {
+            "command": "python3",
+            "args": [
+                "/Users/m2ultra/NOIZYLAB/OMEGA/omega_mcp.py"
+            ]
+        }
+    }
+}

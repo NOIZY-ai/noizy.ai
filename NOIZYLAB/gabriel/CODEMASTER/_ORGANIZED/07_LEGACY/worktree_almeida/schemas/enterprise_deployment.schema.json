@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noizyvox.ai/schemas/enterprise_deployment.schema.json",
+  "title": "NOIZYVOX Enterprise Deployment",
+  "description": "Private deployment, on-premise, and enterprise configurations",
+  "type": "object",
+  "required": ["deployment_id", "organization", "deployment_type"],
+  "properties": {
+    "deployment_id": {
+      "type": "string",
+      "pattern": "^ent_[a-z0-9]{16}$",
+      "description": "Unique enterprise deployment identifier"
+    },
+    "organization": {
+      "type": "object",
+      "required": ["org_id", "name"],
+      "properties": {
+        "org_id": { "type": "string" },
+        "name": { "type": "string" },
+        "industry": { 
+          "enum": ["gaming", "film_tv", "advertising", "education", "healthcare", "finance", "government", "other"]
+        },
+        "size": { 
+          "enum": ["startup", "smb", "enterprise", "fortune500"]
+        },
+        "primary_contact": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "phone": { "type": "string" }
+          }
+        }
+      }
+    },
+    "deployment_type": {
+      "enum": ["cloud_dedicated", "hybrid", "on_premise", "air_gapped", "edge"],
+      "description": "Type of enterprise deployment"
+    },
+    "infrastructure": {
+      "type": "object",
+      "properties": {
+        "cloud_provider": { 
+          "enum": ["aws", "gcp", "azure", "oracle", "ibm", "private", "multi_cloud"]
+        },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "vpc_peering": { "type": "boolean", "default": false },
+        "private_link": { "type": "boolean", "default": true },
+        "dedicated_compute": {
+          "type": "object",
+          "properties": {
+            "gpu_type": { 
+              "enum": ["A100", "H100", "A10G", "L4", "T4", "custom"]
+            },
+            "gpu_count": { "type": "integer", "minimum": 0 },
+            "cpu_cores": { "type": "integer", "minimum": 1 },
+            "memory_gb": { "type": "integer", "minimum": 1 },
+            "storage_tb": { "type": "number", "minimum": 0 },
+            "reserved": { "type": "boolean", "default": true }
+          }
+        },
+        "kubernetes": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "distribution": { 
+              "enum": ["eks", "gke", "aks", "openshift", "rancher", "vanilla"]
+            },
+            "namespace": { "type": "string" },
+            "helm_chart_version": { "type": "string" }
+          }
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "sso": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "providers": { 
+              "type": "array", 
+              "items": { 
+                "enum": ["okta", "azure_ad", "google_workspace", "onelogin", "ping", "saml_generic", "oidc_generic"]
+              }
+            },
+            "scim_provisioning": { "type": "boolean", "default": true }
+          }
+        },
+        "rbac": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "custom_roles": { "type": "boolean", "default": true },
+            "role_hierarchy": { "type": "boolean", "default": true },
+            "default_roles": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["admin", "developer", "content_creator", "viewer", "billing_admin"]
+            }
+          }
+        },
+        "encryption": {
+          "type": "object",
+          "properties": {
+            "at_rest": { 
+              "enum": ["aes_256", "customer_managed_keys", "hsm"]
+            },
+            "in_transit": { 
+              "enum": ["tls_1_2", "tls_1_3", "mtls"]
+            },
+            "key_management": { 
+              "enum": ["platform_managed", "customer_managed", "byok", "hsm"]
+            },
+            "key_rotation_days": { "type": "integer", "default": 90, "minimum": 1 }
+          }
+        },
+        "compliance": {
+          "type": "object",
+          "properties": {
+            "certifications": {
+              "type": "array",
+              "items": { 
+                "enum": ["soc2_type2", "iso27001", "hipaa", "gdpr", "ccpa", "fedramp", "pci_dss", "c5"]
+              }
+            },
+            "data_residency": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Required data residency regions"
+            },
+            "audit_logging": { "type": "boolean", "default": true },
+            "log_retention_days": { "type": "integer", "default": 365, "minimum": 1 },
+            "log_export": { 
+              "enum": ["splunk", "datadog", "elastic", "cloudwatch", "siem_generic"]
+            }
+          }
+        },
+        "network": {
+          "type": "object",
+          "properties": {
+            "ip_allowlist": { 
+              "type": "array", 
+              "items": { "type": "string" }
+            },
+            "waf_enabled": { "type": "boolean", "default": true },
+            "ddos_protection": { "type": "boolean", "default": true },
+            "rate_limiting_custom": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "personas": {
+      "type": "object",
+      "properties": {
+        "access_model": { 
+          "enum": ["full_marketplace", "curated_subset", "custom_only", "licensed_bundle"]
+        },
+        "custom_personas": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "max_custom_personas": { "type": "integer", "default": 100, "minimum": 0 },
+            "training_included": { "type": "boolean", "default": true },
+            "fine_tuning_hours": { "type": "number", "minimum": 0 }
+          }
+        },
+        "persona_isolation": { 
+          "type": "boolean", 
+          "default": true, 
+          "description": "Org personas not shared with other orgs"
+        }
+      }
+    },
+    "support": {
+      "type": "object",
+      "properties": {
+        "tier": { 
+          "enum": ["standard", "premium", "dedicated"]
+        },
+        "sla_response_hours": {
+          "type": "object",
+          "properties": {
+            "critical": { "type": "number", "default": 1, "minimum": 0 },
+            "high": { "type": "number", "default": 4, "minimum": 0 },
+            "medium": { "type": "number", "default": 8, "minimum": 0 },
+            "low": { "type": "number", "default": 24, "minimum": 0 }
+          }
+        },
+        "dedicated_csm": { "type": "boolean", "default": true },
+        "dedicated_slack_channel": { "type": "boolean", "default": true },
+        "onboarding_hours": { "type": "number", "default": 20, "minimum": 0 },
+        "training_sessions": { "type": "integer", "default": 4, "minimum": 0 },
+        "quarterly_business_reviews": { "type": "boolean", "default": true }
+      }
+    },
+    "billing": {
+      "type": "object",
+      "properties": {
+        "model": { 
+          "enum": ["usage_based", "committed_spend", "flat_fee", "hybrid"]
+        },
+        "commitment_usd": { "type": "number", "minimum": 0 },
+        "term_months": { "type": "integer", "minimum": 1 },
+        "overage_rate_multiplier": { "type": "number", "default": 1.0, "minimum": 0 },
+        "payment_terms_days": { "type": "integer", "default": 30, "minimum": 1 },
+        "invoice_frequency": { 
+          "enum": ["monthly", "quarterly", "annual"]
+        },
+        "purchase_order_required": { "type": "boolean", "default": false }
+      }
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "api_gateway": { 
+          "enum": ["direct", "apigee", "kong", "aws_api_gateway", "azure_apim", "custom"]
+        },
+        "ci_cd": { 
+          "type": "array", 
+          "items": { 
+            "enum": ["github_actions", "gitlab_ci", "jenkins", "azure_devops", "circleci", "custom"]
+          }
+        },
+        "monitoring": { 
+          "type": "array", 
+          "items": { 
+            "enum": ["datadog", "new_relic", "prometheus", "grafana", "cloudwatch", "azure_monitor", "custom"]
+          }
+        },
+        "secrets_management": { 
+          "enum": ["vault", "aws_secrets", "azure_keyvault", "gcp_secrets", "custom"]
+        },
+        "custom_webhooks": { "type": "boolean", "default": true }
+      }
+    },
+    "disaster_recovery": {
+      "type": "object",
+      "properties": {
+        "rpo_hours": { 
+          "type": "number", 
+          "default": 1, 
+          "minimum": 0,
+          "description": "Recovery Point Objective"
+        },
+        "rto_hours": { 
+          "type": "number", 
+          "default": 4, 
+          "minimum": 0,
+          "description": "Recovery Time Objective"
+        },
+        "backup_frequency": { 
+          "enum": ["hourly", "daily", "continuous"]
+        },
+        "backup_retention_days": { "type": "integer", "default": 90, "minimum": 1 },
+        "multi_region_failover": { "type": "boolean", "default": true },
+        "dr_testing_frequency": { 
+          "enum": ["quarterly", "semi_annual", "annual"]
+        }
+      }
+    }
+  }
+}

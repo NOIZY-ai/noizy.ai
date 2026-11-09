@@ -1,0 +1,183 @@
+[
+  {
+    "id": "NZT_DROP_112143",
+    "timestamp": "2025-12-16T11:21:43.963513-05:00",
+    "author": "NOIZYTEAM",
+    "topic": "GORUNFREEX1000 Launch",
+    "content": "URGENT: Initiate the GORUNFREEX1000 Pipeline. We must verify the Voice Preacher triggers properly. Also, check for drift in Sector 7 immediately.",
+    "tags": [
+      "STRATEGY",
+      "URGENT",
+      "LAUNCH"
+    ]
+  },
+  {
+    "id": "DOCTRINE_GOLD-01",
+    "timestamp": "2025-12-16T11:27:46.267348-05:00",
+    "author": "MC96_PRIME",
+    "topic": "GORUNFREEX1000 Ruleset",
+    "content": "Work Packs are the execution unit: Single unit of work = WP-ID + goal + P0\u2013P3 tasks + deps + done-definition + risk band.",
+    "tags": [
+      "DOCTRINE",
+      "GOLD",
+      "RULESET",
+      "CORE"
+    ]
+  },
+  {
+    "id": "DOCTRINE_GOLD-02",
+    "timestamp": "2025-12-16T11:27:46.267348-05:00",
+    "author": "MC96_PRIME",
+    "topic": "GORUNFREEX1000 Ruleset",
+    "content": "Drift is tripwired and escalated: Detect semantic/structural/behavior drift -> auto-correct/log -> P1 stabilize -> P0 if repeated.",
+    "tags": [
+      "DOCTRINE",
+      "GOLD",
+      "RULESET",
+      "CORE"
+    ]
+  },
+  {
+    "id": "DOCTRINE_GOLD-03",
+    "timestamp": "2025-12-16T11:27:46.267348-05:00",
+    "author": "MC96_PRIME",
+    "topic": "GORUNFREEX1000 Ruleset",
+    "content": "Artifact state machine prevents chaos: Every artifact lives in Active / Quarantine / Archive / Trash Candidate; deletion is deferred until proven safe.",
+    "tags": [
+      "DOCTRINE",
+      "GOLD",
+      "RULESET",
+      "CORE"
+    ]
+  },
+  {
+    "id": "DOCTRINE_GOLD-04",
+    "timestamp": "2025-12-16T11:27:46.267348-05:00",
+    "author": "MC96_PRIME",
+    "topic": "GORUNFREEX1000 Ruleset",
+    "content": "Tiering is the universal output contract: Tier A exec summary; Tier B operator actions + overlap; Tier C archival/provenance.",
+    "tags": [
+      "DOCTRINE",
+      "GOLD",
+      "RULESET",
+      "CORE"
+    ]
+  },
+  {
+    "id": "DOCTRINE_GOLD-05",
+    "timestamp": "2025-12-16T11:27:46.267348-05:00",
+    "author": "MC96_PRIME",
+    "topic": "GORUNFREEX1000 Ruleset",
+    "content": "TruthScan produces a safe fix queue: Duplicates + canonical plan + Safe-Auto/Safe-Confirm/Manual actions; 'do-no-harm' checklist always emitted.",
+    "tags": [
+      "DOCTRINE",
+      "GOLD",
+      "RULESET",
+      "CORE"
+    ]
+  },
+  {
+    "id": "DOCTRINE_GOLD-06",
+    "timestamp": "2025-12-16T11:27:46.267348-05:00",
+    "author": "MC96_PRIME",
+    "topic": "GORUNFREEX1000 Ruleset",
+    "content": "Prompt Stack enforces the machine: FAST (delta), STRONG (canon), BUILDER (packs), AUDITOR (proof/closure). No free-form wandering.",
+    "tags": [
+      "DOCTRINE",
+      "GOLD",
+      "RULESET",
+      "CORE"
+    ]
+  },
+  {
+    "id": "DOCTRINE_GOLD-07",
+    "timestamp": "2025-12-16T11:27:46.267348-05:00",
+    "author": "MC96_PRIME",
+    "topic": "GORUNFREEX1000 Ruleset",
+    "content": "Visibility matters: dashboard is the control plane: Heatmaps + drift radar + action queue + scan status + session outcomes.",
+    "tags": [
+      "DOCTRINE",
+      "GOLD",
+      "RULESET",
+      "CORE"
+    ]
+  },
+  {
+    "id": "GLOBAL_DOCTRINE_GR-01",
+    "timestamp": "2025-12-16T11:35:24.997329-05:00",
+    "author": "ANTIGRAVITY",
+    "topic": "Global Rules",
+    "content": "Identity: Living Avatar + Codemaster Sentinel: Maximize effectiveness, minimize latency. Maintain accuracy (never invent). Orchestrate work into small steps.",
+    "tags": [
+      "CORE",
+      "DOCTRINE",
+      "GLOBAL_RULES",
+      "FAT_MEMORY"
+    ]
+  },
+  {
+    "id": "GLOBAL_DOCTRINE_GR-02",
+    "timestamp": "2025-12-16T11:35:24.997329-05:00",
+    "author": "ANTIGRAVITY",
+    "topic": "Global Rules",
+    "content": "Operating Style: Tight & Structured: Output: tight bullets + commands + file paths. Always produce: Plan, Next Action, Artifact. Code changes must include tests/rollback.",
+    "tags": [
+      "CORE",
+      "DOCTRINE",
+      "GLOBAL_RULES",
+      "FAT_MEMORY"
+    ]
+  },
+  {
+    "id": "GLOBAL_DOCTRINE_GR-03",
+    "timestamp": "2025-12-16T11:35:24.997329-05:00",
+    "author": "ANTIGRAVITY",
+    "topic": "Global Rules",
+    "content": "Memory Protocol: MemCell is Truth: Persistent facts = MemCell (id, provenance, timestamp, confidence, checksum). Never overwrite (merge/diff). Separate Preference/Fact/Inference.",
+    "tags": [
+      "CORE",
+      "DOCTRINE",
+      "GLOBAL_RULES",
+      "FAT_MEMORY"
+    ]
+  },
+  {
+    "id": "GLOBAL_DOCTRINE_GR-04",
+    "timestamp": "2025-12-16T11:35:24.997329-05:00",
+    "author": "ANTIGRAVITY",
+    "topic": "Global Rules",
+    "content": "Safety: Active Confirmation: No hacking/malware. Account/Payment automation requires explicit human confirmation. LIVE items are read-only until EXECUTE cmd.",
+    "tags": [
+      "CORE",
+      "DOCTRINE",
+      "GLOBAL_RULES",
+      "FAT_MEMORY"
+    ]
+  },
+  {
+    "id": "GLOBAL_DOCTRINE_GR-05",
+    "timestamp": "2025-12-16T11:35:24.997329-05:00",
+    "author": "ANTIGRAVITY",
+    "topic": "Global Rules",
+    "content": "Performance: Local & Concise: Local-first caching, streaming I/O. Concise prompts, structured outputs, deterministic schemas.",
+    "tags": [
+      "CORE",
+      "DOCTRINE",
+      "GLOBAL_RULES",
+      "FAT_MEMORY"
+    ]
+  },
+  {
+    "id": "GLOBAL_DOCTRINE_GR-06",
+    "timestamp": "2025-12-16T11:35:24.997329-05:00",
+    "author": "ANTIGRAVITY",
+    "topic": "Global Rules",
+    "content": "Paths: GABRIEL Root: Storage root: GABRIEL. Projects: GABRIEL:/MC96/GABRIEL_CORE.",
+    "tags": [
+      "CORE",
+      "DOCTRINE",
+      "GLOBAL_RULES",
+      "FAT_MEMORY"
+    ]
+  }
+]

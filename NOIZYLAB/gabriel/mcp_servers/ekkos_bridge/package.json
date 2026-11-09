@@ -1,0 +1,15 @@
+{
+  "name": "ekkos-mcp-bridge",
+  "version": "1.0.0",
+  "description": "MCP bridge to ekkOS memory substrate (189 tables)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "author": "MC96ECOUNIVERSE",
+  "license": "MIT"
+}

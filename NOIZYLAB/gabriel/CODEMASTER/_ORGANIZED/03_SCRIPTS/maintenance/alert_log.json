@@ -1,0 +1,14 @@
+[
+  {
+    "timestamp": "2025-12-25T00:13:20.043056",
+    "level": "critical",
+    "title": "Critical Volume Alert",
+    "message": "2 volumes at critical capacity: 607k 4.5M 12% /Library/Developer/CoreSimulatoriOS_23C54, 480M 8.4M 98% 4TB Blue Fish",
+    "data": {
+      "critical_volumes": [
+        "607k 4.5M 12% /Library/Developer/CoreSimulatoriOS_23C54",
+        "480M 8.4M 98% 4TB Blue Fish"
+      ]
+    }
+  }
+]

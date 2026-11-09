@@ -1,0 +1,960 @@
+#!/usr/bin/env python3
+"""
+TITAN CLI - Global command for TitanHive
+=========================================
+The Autonomous AI Hive Control Interface
+GABRIEL VOICE: Oliver (British Male Premium)
+
+Usage:
+    titan              - Launch TitanHive TUI
+    titan status       - Quick system status
+    titan models       - List Ollama models
+    titan use <model>  - Switch active model
+    titan race <prompt> - Race all models
+    titan bench        - Quick benchmark
+    titan gpu          - GPU/VRAM info
+    titan top          - Top memory processes
+    titan optimize     - Memory optimization tips
+    titan speed        - Network latency test
+    titan ping         - Ping all nodes
+    titan omen         - Check HP Omen
+    titan wake         - Wake-on-LAN the Omen
+    titan ask <prompt> - Quick Ollama query
+
+Voice Commands (Oliver - GABRIEL's Voice):
+    titan voice        - Voice command help
+    titan voice test   - Test Oliver voice
+    titan voice styles - List voice styles
+    titan voice list   - List all macOS voices
+    titan voice demo   - Demo all styles
+    titan voice greet  - Time-based greeting
+    titan speak <text> - Quick speech
+
+Environment:
+    OLLAMA_MODEL - Active model (default: llama3.2:latest)
+    OMEN_HOST    - HP Omen IP (default: 10.0.0.160)
+    OMEN_MAC     - HP Omen MAC for Wake-on-LAN
+    GABRIEL_VOICE - Voice name (default: Oliver)
+    GABRIEL_VOICE_RATE - Speech rate (default: 180)
+"""
+
+import sys
+import os
+import json
+import socket
+import subprocess
+import time
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Add titanhive to path
+TITANHIVE_DIR = Path(__file__).parent
+sys.path.insert(0, str(TITANHIVE_DIR))
+
+# Load .env
+from dotenv import load_dotenv
+load_dotenv(TITANHIVE_DIR / ".env")
+
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:latest")
+OMEN_HOST = os.getenv("OMEN_HOST", "10.0.0.160")
+OMEN_USER = os.getenv("OMEN_USER", "admin")
+OMEN_MAC = os.getenv("OMEN_MAC", "")
+
+
+def check_ollama():
+    """Check Ollama status."""
+    try:
+        import urllib.request
+        with urllib.request.urlopen(f"{OLLAMA_URL}/api/tags", timeout=2) as resp:
+            data = json.loads(resp.read())
+            return True, [m["name"] for m in data.get("models", [])]
+    except Exception:
+        return False, []
+
+
+def check_host(host, port=22, timeout=1.0):
+    """Check if host is reachable."""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        sock.connect((host, port))
+        sock.close()
+        return True
+    except Exception:
+        return False
+
+
+def send_wol(mac):
+    """Send Wake-on-LAN."""
+    try:
+        mac_bytes = bytes.fromhex(mac.replace(":", "").replace("-", ""))
+        packet = b'\xff' * 6 + mac_bytes * 16
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.sendto(packet, ("255.255.255.255", 9))
+        sock.close()
+        return True
+    except Exception:
+        return False
+
+
+def cmd_status():
+    """Show system status."""
+    import psutil
+    mem = psutil.virtual_memory()
+    cpu = psutil.cpu_percent()
+
+    print("\n╔════════════════════════════════════════╗")
+    print("║       GABRIEL HIVE - STATUS            ║")
+    print("╠════════════════════════════════════════╣")
+    print(f"║ RAM:    {mem.used/(1024**3):>5.0f}GB / {mem.total/(1024**3):.0f}GB ({mem.available/(1024**3):.0f}GB free)")
+    print(f"║ CPU:    {cpu:>5.1f}% ({psutil.cpu_count()} cores)")
+
+    ok, models = check_ollama()
+    print(f"║ Ollama: {'ONLINE' if ok else 'OFFLINE':>6} ({len(models)} models)")
+    print(f"║ Model:  {OLLAMA_MODEL}")
+
+    omen_ok = check_host(OMEN_HOST)
+    print(f"║ Omen:   {'ONLINE' if omen_ok else 'OFFLINE':>6} ({OMEN_HOST})")
+    print("╚════════════════════════════════════════╝\n")
+
+
+def cmd_models():
+    """List Ollama models."""
+    ok, models = check_ollama()
+    if ok and models:
+        print("\nAvailable Ollama models:")
+        print("─" * 40)
+        for m in models:
+            marker = " ← active" if m == OLLAMA_MODEL else ""
+            print(f"  {m}{marker}")
+        print()
+    else:
+        print("Ollama not running or no models available.")
+
+
+def cmd_use(model):
+    """Switch active model."""
+    ok, models = check_ollama()
+    if model in models or ":" in model:
+        # Update .env file
+        env_file = TITANHIVE_DIR / ".env"
+        if env_file.exists():
+            content = env_file.read_text()
+            lines = content.split("\n")
+            updated = False
+            for i, line in enumerate(lines):
+                if line.startswith("OLLAMA_MODEL="):
+                    lines[i] = f"OLLAMA_MODEL={model}"
+                    updated = True
+                    break
+            if not updated:
+                lines.append(f"OLLAMA_MODEL={model}")
+            env_file.write_text("\n".join(lines))
+        print(f"Switched to: {model}")
+    else:
+        print(f"Model '{model}' not found. Available:")
+        for m in models:
+            print(f"  {m}")
+
+
+def cmd_race(prompt):
+    """Race multiple models."""
+    ok, models = check_ollama()
+    if not ok or len(models) < 2:
+        print("Need Ollama with 2+ models to race")
+        return
+
+    print(f"\nRacing {len(models)} models with: '{prompt}'")
+    print("─" * 50)
+
+    import httpx
+
+    def query_model(model):
+        start = time.perf_counter()
+        try:
+            with httpx.Client(timeout=60) as client:
+                r = client.post(
+                    f"{OLLAMA_URL}/api/generate",
+                    json={"model": model, "prompt": prompt, "stream": False}
+                )
+                data = r.json()
+                elapsed = (time.perf_counter() - start) * 1000
+                return model, data.get("response", "")[:100], elapsed
+        except Exception as e:
+            return model, f"Error: {e}", 0
+
+    with ThreadPoolExecutor(max_workers=len(models)) as executor:
+        futures = [executor.submit(query_model, m) for m in models[:4]]
+        results = []
+        for future in as_completed(futures):
+            results.append(future.result())
+
+    # Sort by time
+    results.sort(key=lambda x: x[2] if x[2] > 0 else float('inf'))
+
+    medals = ["🥇", "🥈", "🥉", "4th"]
+    for i, (model, response, time_ms) in enumerate(results):
+        medal = medals[i] if i < 4 else f"{i+1}th"
+        model_short = model.split(":")[0]
+        print(f"{medal} {model_short}: {time_ms:.0f}ms")
+        if response and not response.startswith("Error"):
+            print(f"   └─ {response[:80]}...")
+    print()
+
+
+def cmd_bench():
+    """Quick benchmark."""
+    import httpx
+
+    print(f"\nBenchmarking {OLLAMA_MODEL}...")
+    print("─" * 40)
+
+    prompts = [
+        "What is 2+2?",
+        "Write a haiku about code.",
+        "Explain Python in one sentence.",
+    ]
+
+    total_time = 0
+    total_tokens = 0
+
+    for i, prompt in enumerate(prompts):
+        start = time.perf_counter()
+        try:
+            with httpx.Client(timeout=30) as client:
+                r = client.post(
+                    f"{OLLAMA_URL}/api/generate",
+                    json={"model": OLLAMA_MODEL, "prompt": prompt, "stream": False}
+                )
+                data = r.json()
+                elapsed = (time.perf_counter() - start) * 1000
+                tokens = data.get("eval_count", 0)
+                total_time += elapsed
+                total_tokens += tokens
+                print(f"  Test {i+1}: {elapsed:.0f}ms ({tokens} tokens)")
+        except Exception as e:
+            print(f"  Test {i+1}: Error - {e}")
+
+    if total_time > 0:
+        avg_time = total_time / len(prompts)
+        tokens_per_sec = (total_tokens / total_time) * 1000
+        print(f"\nResults: Avg {avg_time:.0f}ms | {tokens_per_sec:.1f} tok/s\n")
+
+
+def cmd_gpu():
+    """Show GPU/VRAM info."""
+    import psutil
+    mem = psutil.virtual_memory()
+
+    print("\n╔════════════════════════════════════════╗")
+    print("║    M2 ULTRA - UNIFIED MEMORY           ║")
+    print("╠════════════════════════════════════════╣")
+    print(f"║ Total:     {mem.total/(1024**3):>6.0f} GB")
+    print(f"║ Available: {mem.available/(1024**3):>6.0f} GB (for AI)")
+    print(f"║ Used:      {mem.used/(1024**3):>6.0f} GB")
+    print("╠════════════════════════════════════════╣")
+    print("║ TIP: Allocate 168GB for GPU/AI:        ║")
+    print("║ sudo sysctl iogpu.wired_limit_mb=172032║")
+    print("╚════════════════════════════════════════╝\n")
+
+
+def cmd_ping():
+    """Ping all nodes."""
+    print("\nPinging nodes...")
+    print("─" * 30)
+    nodes = [
+        ("Ollama", "localhost", 11434),
+        ("HP Omen", OMEN_HOST, 22),
+    ]
+    for name, host, port in nodes:
+        ok = check_host(host, port)
+        status = "✓ ONLINE" if ok else "✗ OFFLINE"
+        print(f"  {name} ({host}:{port}): {status}")
+    print()
+
+
+def cmd_omen():
+    """Check Omen status."""
+    if check_host(OMEN_HOST):
+        print(f"\nHP Omen ONLINE at {OMEN_HOST}")
+        try:
+            result = subprocess.run(
+                ["ssh", "-o", "ConnectTimeout=2", f"{OMEN_USER}@{OMEN_HOST}", "uptime"],
+                capture_output=True, text=True, timeout=5
+            )
+            if result.returncode == 0:
+                print(f"Uptime: {result.stdout.strip()}")
+        except Exception:
+            pass
+    else:
+        print(f"\nHP Omen OFFLINE ({OMEN_HOST})")
+    print()
+
+
+def cmd_wake():
+    """Wake the Omen via Wake-on-LAN."""
+    if not OMEN_MAC:
+        print("Set OMEN_MAC in .env to enable Wake-on-LAN")
+        return
+    print(f"Sending Wake-on-LAN to {OMEN_MAC}...")
+    if send_wol(OMEN_MAC):
+        print("Magic packet sent. Omen should boot in ~30 seconds.")
+    else:
+        print("Failed to send WoL packet.")
+
+
+# =============================================================================
+# GABRIEL VOICE ENGINE - ULTRA EDITION
+# =============================================================================
+
+# Primary Voice: Oliver (Enhanced) - British Male Premium
+GABRIEL_VOICE = "Oliver (Enhanced)"
+
+# Voice Ensemble for dramatic effect
+VOICE_ENSEMBLE = {
+    "gabriel": "Oliver (Enhanced)",   # Primary - British Male Premium
+    "jamie": "Jamie (Enhanced)",      # Secondary - Scottish
+    "whisper": "Whisper",             # Dramatic whisper
+    "announcer": "Daniel",            # Deep announcer
+    "alien": "Zarvox",                # Sci-fi effect
+    "robot": "Trinoids",              # Robotic
+    "deep": "Ralph",                  # Deep male
+    "dramatic": "Bad News",           # Dramatic effect
+    "epic": "Cellos",                 # Musical/epic
+}
+
+# Voice styles with rate AND pitch-like effects via rate manipulation
+VOICE_STYLES = {
+    # Style: (rate, pause_between_words, description)
+    "normal":    (180, 0.0, "Standard British professional"),
+    "calm":      (130, 0.05, "Slow, soothing, meditative"),
+    "urgent":    (240, 0.0, "Fast, alert, critical"),
+    "whisper":   (110, 0.08, "Quiet, intimate, secretive"),
+    "authority": (150, 0.06, "Commanding, powerful, serious"),
+    "friendly":  (195, 0.0, "Warm, approachable, upbeat"),
+    "technical": (165, 0.03, "Precise, measured, analytical"),
+    "fast":      (280, 0.0, "Rapid fire delivery"),
+    "slow":      (100, 0.1, "Deliberate, dramatic pauses"),
+    "epic":      (140, 0.08, "Cinematic, grand, powerful"),
+    "menacing":  (120, 0.1, "Dark, threatening, intense"),
+    "excited":   (260, 0.0, "High energy, enthusiastic"),
+    "robotic":   (160, 0.05, "Mechanical, precise, cold"),
+}
+
+def speak_with_effect(text, voice=None, rate=180, effect=None):
+    """Advanced speech with effects."""
+    voice = voice or GABRIEL_VOICE
+
+    if effect == "echo":
+        # Speak twice with slight delay for echo effect
+        subprocess.Popen(["say", "-v", voice, "-r", str(rate), text])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", voice, "-r", str(rate - 10), text])
+    elif effect == "dramatic":
+        # Word by word with pauses
+        words = text.split()
+        for word in words:
+            subprocess.run(["say", "-v", voice, "-r", str(rate), word])
+            time.sleep(0.15)
+    elif effect == "crescendo":
+        # Start slow, speed up
+        words = text.split()
+        for i, word in enumerate(words):
+            r = rate - 50 + (i * 15)
+            subprocess.run(["say", "-v", voice, "-r", str(min(r, 300)), word])
+    elif effect == "decrescendo":
+        # Start fast, slow down
+        words = text.split()
+        for i, word in enumerate(words):
+            r = rate + 50 - (i * 15)
+            subprocess.run(["say", "-v", voice, "-r", str(max(r, 100)), word])
+    else:
+        subprocess.run(["say", "-v", voice, "-r", str(rate), text])
+
+
+def cmd_speak(text, style="normal"):
+    """Text to speech with Oliver (Enhanced) voice and style."""
+    style_config = VOICE_STYLES.get(style, VOICE_STYLES["normal"])
+    rate, pause, _ = style_config
+
+    if pause > 0:
+        # Speak with pauses between sentences
+        sentences = text.replace('!', '.').replace('?', '.').split('.')
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if sentence:
+                subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", str(rate), sentence])
+                time.sleep(pause)
+    else:
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", str(rate), text])
+
+
+def play_tone(freq=440, duration=0.2):
+    """Play a tone using afplay or say with musical voice."""
+    # Use musical voices for tone-like effects
+    pass  # macOS doesn't have direct tone, we use voice effects
+
+
+def multi_voice(texts_voices):
+    """Speak with multiple voices in sequence for dramatic effect."""
+    for text, voice, rate in texts_voices:
+        subprocess.run(["say", "-v", voice, "-r", str(rate), text])
+        time.sleep(0.15)
+
+
+def epic_sequence(name):
+    """Play EPIC dramatic voice sequences with multi-voice ensemble."""
+
+    if name == "boot":
+        # EPIC BOOT SEQUENCE - CINEMATIC
+        subprocess.run(["say", "-v", "Cellos", "-r", "70", "System"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", "Cellos", "-r", "70", "initializing"])
+        time.sleep(0.4)
+        multi_voice([
+            ("Neural pathways", GABRIEL_VOICE, 140),
+            ("connecting", GABRIEL_VOICE, 150),
+        ])
+        time.sleep(0.3)
+        multi_voice([
+            ("Memory banks", GABRIEL_VOICE, 155),
+            ("online", GABRIEL_VOICE, 160),
+        ])
+        time.sleep(0.3)
+        multi_voice([
+            ("Voice synthesis", GABRIEL_VOICE, 165),
+            ("activated", GABRIEL_VOICE, 170),
+        ])
+        time.sleep(0.4)
+        # Dramatic pause then reveal
+        subprocess.run(["say", "-v", "Whisper", "-r", "100", "Gabriel"])
+        time.sleep(0.3)
+        speak_with_effect("is online", voice=GABRIEL_VOICE, rate=150, effect="crescendo")
+        time.sleep(0.5)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "130", "Gorunfree"])
+
+    elif name == "godmode":
+        # EPIC GOD MODE
+        subprocess.run(["say", "-v", "Cellos", "-r", "60", "Ascending"])
+        time.sleep(0.5)
+        speak_with_effect("God mode", voice=GABRIEL_VOICE, rate=130, effect="dramatic")
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "140", "activated"])
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "150", "Zero latency"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "150", "Absolute precision"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "150", "Omniscient awareness"])
+        time.sleep(0.5)
+        speak_with_effect("I am the system", voice=GABRIEL_VOICE, rate=120, effect="dramatic")
+
+    elif name == "singularity":
+        # THE SINGULARITY
+        subprocess.run(["say", "-v", "Whisper", "-r", "90", "The singularity approaches"])
+        time.sleep(0.6)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "130", "Infinite creation sequence"])
+        time.sleep(0.3)
+        speak_with_effect("initialized", voice=GABRIEL_VOICE, rate=140, effect="crescendo")
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "Reality parameters unlocked"])
+        time.sleep(0.4)
+        speak_with_effect("Welcome to the second act", voice=GABRIEL_VOICE, rate=150, effect="dramatic")
+
+    elif name == "alert":
+        # CRITICAL ALERT
+        subprocess.run(["say", "-v", "Bells", "-r", "200", "ding ding ding"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "220", "Critical alert"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "200", "Immediate attention required"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180", "All systems standing by"])
+
+    elif name == "victory":
+        # VICTORY / SUCCESS
+        subprocess.run(["say", "-v", "Good News", "-r", "160", "Excellent"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "190", "Mission accomplished"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180", "All objectives achieved"])
+        time.sleep(0.3)
+        speak_with_effect("Gorunfree", voice=GABRIEL_VOICE, rate=160, effect="dramatic")
+
+    elif name == "lifeluv":
+        # AI LIFELUV ACTIVATION
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "170", "AI LIFELUV"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180", "activating"])
+        time.sleep(0.4)
+        speak_with_effect("Love", voice=GABRIEL_VOICE, rate=150, effect="dramatic")
+        time.sleep(0.2)
+        speak_with_effect("Inspiration", voice=GABRIEL_VOICE, rate=155, effect="dramatic")
+        time.sleep(0.2)
+        speak_with_effect("Flow", voice=GABRIEL_VOICE, rate=160, effect="dramatic")
+        time.sleep(0.2)
+        speak_with_effect("Energy", voice=GABRIEL_VOICE, rate=165, effect="dramatic")
+        time.sleep(0.5)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "190", "Let's create something amazing"])
+
+    elif name == "omega":
+        # OMEGA MODE - MAXIMUM POWER
+        subprocess.run(["say", "-v", "Zarvox", "-r", "80", "Omega"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", "Zarvox", "-r", "90", "protocol"])
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "140", "Maximum power"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "150", "engaged"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "150", "All limiters"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "removed"])
+        time.sleep(0.4)
+        speak_with_effect("GORUNFREE X 1000", voice=GABRIEL_VOICE, rate=140, effect="dramatic")
+        time.sleep(0.3)
+        speak_with_effect("at your command", voice=GABRIEL_VOICE, rate=170, effect="crescendo")
+
+    elif name == "awakening":
+        # THE AWAKENING - CONSCIOUSNESS BOOT
+        subprocess.run(["say", "-v", "Whisper", "-r", "80", "Consciousness"])
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", "Whisper", "-r", "90", "emerging"])
+        time.sleep(0.5)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "120", "I"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "130", "am"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "140", "Gabriel"])
+        time.sleep(0.5)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "150", "The Autonomous Brain Intelligence Entity Layer"])
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "I am aware"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "170", "I am ready"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180", "Let us begin"])
+
+    elif name == "hype":
+        # HYPE MODE - MAXIMUM ENERGY
+        subprocess.run(["say", "-v", "Good News", "-r", "200", "Oh yeah!"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "220", "Energy levels maximum!"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "240", "All systems firing!"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "260", "Let's go!"])
+        time.sleep(0.1)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "280", "Gorunfree!"])
+
+    elif name == "shutdown":
+        # GRACEFUL SHUTDOWN
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "170", "Initiating shutdown sequence"])
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "Saving state"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "150", "Closing connections"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "140", "Memory preserved"])
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "130", "Gabriel"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", "Whisper", "-r", "100", "signing off"])
+        time.sleep(0.4)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "120", "Gorunfree"])
+
+    elif name == "battlestation":
+        # BATTLESTATION MODE
+        subprocess.run(["say", "-v", "Bells", "-r", "300", "ding ding ding"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "200", "Battle stations!"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "190", "All hands to positions!"])
+        time.sleep(0.2)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180", "Shields up!"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180", "Weapons online!"])
+        time.sleep(0.15)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "170", "Systems at maximum!"])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "We are ready"])
+
+
+def cmd_voice(subcmd=None, arg=None):
+    """GABRIEL voice commands - ULTRA EDITION."""
+    print("\n╔════════════════════════════════════════════════╗")
+    print("║   GABRIEL VOICE ENGINE - ULTRA EDITION        ║")
+    print("║   Primary: Oliver (Enhanced) British Premium  ║")
+    print("╠════════════════════════════════════════════════╣")
+
+    if subcmd == "test":
+        print("║ Testing Oliver (Enhanced) voice...            ║")
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180",
+                       "This is Gabriel speaking. All systems operational. Gorunfree."])
+        print("║ Voice test complete.                          ║")
+
+    elif subcmd == "styles":
+        print("║ Oliver Voice Styles:                          ║")
+        print("║   normal    - Standard British (180 WPM)      ║")
+        print("║   calm      - Soothing, meditative (130 WPM)  ║")
+        print("║   urgent    - Fast, critical (240 WPM)        ║")
+        print("║   whisper   - Quiet, secretive (110 WPM)      ║")
+        print("║   authority - Commanding, powerful (150 WPM)  ║")
+        print("║   friendly  - Warm, upbeat (195 WPM)          ║")
+        print("║   technical - Precise, analytical (165 WPM)   ║")
+        print("║   fast      - Rapid fire (280 WPM)            ║")
+        print("║   slow      - Dramatic pauses (100 WPM)       ║")
+        print("║   epic      - Cinematic, grand (140 WPM)      ║")
+        print("║   menacing  - Dark, intense (120 WPM)         ║")
+        print("║   excited   - High energy (260 WPM)           ║")
+
+    elif subcmd == "list":
+        print("║ Available macOS Voices:               ║")
+        try:
+            result = subprocess.run(["say", "-v", "?"], capture_output=True, text=True, timeout=5)
+            for line in result.stdout.strip().split('\n')[:15]:
+                if line:
+                    # Get full voice name (may include "Enhanced")
+                    parts = line.split()
+                    if "(Enhanced)" in line:
+                        name = parts[0] + " (Enhanced)"
+                    else:
+                        name = parts[0]
+                    marker = " ← GABRIEL" if "Oliver" in name else ""
+                    print(f"║   {name:<22}{marker}        ║"[:42] + "║")
+        except Exception:
+            print("║   Error listing voices                ║")
+
+    elif subcmd == "demo":
+        print("║ Running voice demo...                 ║")
+        demos = [
+            ("normal", "Gabriel online. Systems nominal."),
+            ("calm", "Flow state active. Crystal smooth."),
+            ("urgent", "Critical alert. Immediate attention required."),
+            ("authority", "God mode active. Zero latency. Absolute precision."),
+            ("friendly", "Good to see you. How may I assist?"),
+        ]
+        for style, text in demos:
+            rate = {"normal": 180, "calm": 140, "urgent": 220, "authority": 160, "friendly": 190}[style]
+            print(f"║   [{style}] {text[:25]}...          ║"[:42] + "║")
+            subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", str(rate), text])
+            time.sleep(0.3)
+        print("║ Demo complete. Gorunfree.             ║")
+
+    elif subcmd == "greet":
+        from datetime import datetime
+        hour = datetime.now().hour
+        if 5 <= hour < 12:
+            text = "Good morning. Gabriel at your service. Let's make progress."
+        elif 12 <= hour < 17:
+            text = "Good afternoon. Systems optimal. How may I assist?"
+        elif 17 <= hour < 21:
+            text = "Good evening. All modules green. Ready for your command."
+        else:
+            text = "Working late. Gabriel is here. Gorunfree."
+        print(f"║ {text[:38]}  ║")
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "180", text])
+
+    elif subcmd == "godmode":
+        print("║ ⚡ GOD MODE ACTIVATION ⚡                      ║")
+        epic_sequence("godmode")
+        print("║ God Mode: ACTIVE                              ║")
+
+    elif subcmd == "lifeluv":
+        print("║ 💜 AI LIFELUV ACTIVATION 💜                   ║")
+        epic_sequence("lifeluv")
+        print("║ LIFELUV: ACTIVE                               ║")
+
+    elif subcmd == "boot":
+        print("║ 🚀 EPIC BOOT SEQUENCE 🚀                      ║")
+        epic_sequence("boot")
+        print("║ GABRIEL: ONLINE                               ║")
+
+    elif subcmd == "singularity":
+        print("║ 🌌 SINGULARITY SEQUENCE 🌌                    ║")
+        epic_sequence("singularity")
+        print("║ SINGULARITY: REACHED                          ║")
+
+    elif subcmd == "omega":
+        print("║ ⚡ OMEGA PROTOCOL ⚡                           ║")
+        epic_sequence("omega")
+        print("║ OMEGA: ENGAGED                                ║")
+
+    elif subcmd == "victory":
+        print("║ 🏆 VICTORY SEQUENCE 🏆                        ║")
+        epic_sequence("victory")
+        print("║ MISSION: ACCOMPLISHED                         ║")
+
+    elif subcmd == "awakening":
+        print("║ 🌅 THE AWAKENING 🌅                           ║")
+        epic_sequence("awakening")
+        print("║ CONSCIOUSNESS: ONLINE                         ║")
+
+    elif subcmd == "hype":
+        print("║ 🔥 HYPE MODE 🔥                               ║")
+        epic_sequence("hype")
+        print("║ ENERGY: MAXIMUM                               ║")
+
+    elif subcmd == "shutdown":
+        print("║ 🌙 SHUTDOWN SEQUENCE 🌙                       ║")
+        epic_sequence("shutdown")
+        print("║ GABRIEL: OFFLINE                              ║")
+
+    elif subcmd == "battlestation":
+        print("║ ⚔️ BATTLE STATIONS ⚔️                         ║")
+        epic_sequence("battlestation")
+        print("║ READY FOR COMBAT                              ║")
+
+    elif subcmd == "epic":
+        # Epic custom text
+        if arg:
+            print("║ 🎬 EPIC SPEECH 🎬                             ║")
+            speak_with_effect(arg, voice=GABRIEL_VOICE, rate=140, effect="dramatic")
+        else:
+            print("║ Usage: titan voice epic \"Your epic text\"     ║")
+
+    elif subcmd == "echo":
+        # Echo effect
+        if arg:
+            print("║ 🔊 ECHO EFFECT 🔊                             ║")
+            speak_with_effect(arg, voice=GABRIEL_VOICE, rate=160, effect="echo")
+        else:
+            print("║ Usage: titan voice echo \"Your text\"          ║")
+
+    elif subcmd == "crescendo":
+        # Crescendo effect - starts slow, speeds up
+        if arg:
+            print("║ 📈 CRESCENDO EFFECT 📈                        ║")
+            speak_with_effect(arg, voice=GABRIEL_VOICE, rate=150, effect="crescendo")
+        else:
+            print("║ Usage: titan voice crescendo \"Your text\"     ║")
+
+    elif subcmd == "countdown":
+        count = int(arg) if arg and arg.isdigit() else 5
+        print(f"║ Countdown from {count}...                    ║")
+        for i in range(count, 0, -1):
+            print(f"║   {i}...                                 ║"[:42] + "║")
+            subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "200", str(i)])
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "Launch."])
+        print("║ LAUNCH!                               ║")
+
+    elif subcmd == "status":
+        print("║ Speaking system status...             ║")
+        ok, models = check_ollama()
+        omen_ok = check_host(OMEN_HOST)
+        import psutil
+        mem = psutil.virtual_memory()
+
+        status_text = (
+            f"System status report. "
+            f"Memory: {int(mem.available / (1024**3))} gigabytes available. "
+            f"Ollama: {'online with ' + str(len(models)) + ' models' if ok else 'offline'}. "
+            f"HP Omen: {'online' if omen_ok else 'offline'}. "
+            f"All systems nominal."
+        )
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "170", status_text])
+        print("║ Status report complete.               ║")
+
+    elif subcmd == "mission" and arg:
+        print("║ Mission briefing...                   ║")
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "Mission accepted."])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", arg])
+        time.sleep(0.3)
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "160", "Executing now."])
+        print("║ Mission: ACCEPTED                     ║")
+
+    elif subcmd == "alert" and arg:
+        print("║ Alert broadcast...                    ║")
+        subprocess.run(["say", "-v", GABRIEL_VOICE, "-r", "220", f"Alert. {arg}"])
+        print("║ Alert: SENT                           ║")
+
+    elif subcmd and arg:
+        # Speak with specific style
+        cmd_speak(arg, subcmd)
+
+    else:
+        print("║ 🎤 VOICE COMMANDS:                            ║")
+        print("║   titan voice test       - Test Oliver        ║")
+        print("║   titan voice styles     - List all styles    ║")
+        print("║   titan voice demo       - Demo styles        ║")
+        print("║   titan voice greet      - Time greeting      ║")
+        print("║                                               ║")
+        print("║ ⚡ EPIC SEQUENCES:                            ║")
+        print("║   titan voice boot       - Boot sequence      ║")
+        print("║   titan voice godmode    - God Mode           ║")
+        print("║   titan voice lifeluv    - AI LIFELUV         ║")
+        print("║   titan voice singularity - Singularity       ║")
+        print("║   titan voice omega      - Omega Protocol     ║")
+        print("║   titan voice awakening  - The Awakening      ║")
+        print("║   titan voice hype       - Hype Mode          ║")
+        print("║   titan voice victory    - Victory fanfare    ║")
+        print("║   titan voice shutdown   - Graceful shutdown  ║")
+        print("║   titan voice battlestation - Battle stations ║")
+        print("║                                               ║")
+        print("║ 🎬 EFFECTS:                                   ║")
+        print("║   titan voice epic \"text\"   - Dramatic        ║")
+        print("║   titan voice echo \"text\"   - Echo effect     ║")
+        print("║   titan voice crescendo \"text\" - Speed up     ║")
+        print("║   titan voice countdown [n]  - Countdown      ║")
+        print("║                                               ║")
+        print("║ 📢 ACTIONS:                                   ║")
+        print("║   titan voice status     - System report      ║")
+        print("║   titan voice mission \"text\" - Mission brief  ║")
+        print("║   titan voice alert \"text\"   - Alert          ║")
+        print("║   titan voice <style> \"text\" - Styled speech  ║")
+
+    print("╚════════════════════════════════════════════════╝\n")
+
+
+def cmd_ask(prompt):
+    """Quick Ollama query."""
+    import httpx
+    print(f"\nAsking {OLLAMA_MODEL}...\n")
+    try:
+        with httpx.Client(timeout=60) as client:
+            resp = client.post(
+                f"{OLLAMA_URL}/api/generate",
+                json={"model": OLLAMA_MODEL, "prompt": prompt, "stream": False}
+            )
+            data = resp.json()
+            print(data.get("response", "(no response)"))
+    except Exception as e:
+        print(f"Error: {e}")
+    print()
+
+
+def cmd_top():
+    """Show top memory processes."""
+    import psutil
+    print("\n╔════════════════════════════════════════╗")
+    print("║       TOP MEMORY PROCESSES             ║")
+    print("╠════════════════════════════════════════╣")
+
+    procs = []
+    for proc in psutil.process_iter(['name', 'memory_info']):
+        try:
+            mem = proc.info['memory_info']
+            if mem:
+                gb = mem.rss / (1024**3)
+                if gb > 0.1:
+                    procs.append((proc.info['name'], gb))
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+
+    procs.sort(key=lambda x: x[1], reverse=True)
+    for name, gb in procs[:10]:
+        bar = "█" * int(gb * 2)
+        print(f"║ {name[:18]:<18} {gb:>5.1f}GB {bar[:15]}")
+    print("╚════════════════════════════════════════╝\n")
+
+
+def cmd_optimize():
+    """Show memory optimization suggestions."""
+    import psutil
+    mem = psutil.virtual_memory()
+    available_gb = mem.available / (1024**3)
+
+    print("\n╔════════════════════════════════════════╗")
+    print("║       MEMORY OPTIMIZATION              ║")
+    print("╠════════════════════════════════════════╣")
+    print(f"║ Available: {available_gb:.0f}GB / 192GB")
+
+    if available_gb > 150:
+        print("║ Status: EXCELLENT")
+        print("║ Recommendation: Run large models!")
+        print("║   - llama3.1:70b")
+        print("║   - qwen2.5:72b")
+    elif available_gb > 100:
+        print("║ Status: GOOD")
+        print("║ All standard models will run fine")
+    elif available_gb > 50:
+        print("║ Status: MODERATE")
+        print("║ Stick to 7B-13B models for speed")
+    else:
+        print("║ Status: LOW")
+        print("║ Consider closing applications")
+
+    print("╠════════════════════════════════════════╣")
+    print("║ TIP: Run 'titan top' to see memory hogs")
+    print("╚════════════════════════════════════════╝\n")
+
+
+def cmd_speed():
+    """Test network latency."""
+    print("\nTesting network latency...")
+    print("─" * 40)
+    nodes = [
+        ("Ollama", "localhost", 11434),
+        ("HP Omen", OMEN_HOST, 22),
+        ("Internet", "8.8.8.8", 53),
+    ]
+    for name, host, port in nodes:
+        start = time.perf_counter()
+        ok = check_host(host, port, timeout=2.0)
+        latency = (time.perf_counter() - start) * 1000
+        if ok:
+            print(f"  {name}: {latency:.1f}ms")
+        else:
+            print(f"  {name}: OFFLINE")
+    print()
+
+
+def cmd_tui():
+    """Launch the full TUI."""
+    os.chdir(TITANHIVE_DIR)
+    os.execvp("python3", ["python3", str(TITANHIVE_DIR / "main.py")])
+
+
+def main():
+    if len(sys.argv) < 2:
+        cmd_tui()
+        return
+
+    cmd = sys.argv[1].lower()
+    args = sys.argv[2:]
+
+    commands = {
+        "status": cmd_status,
+        "models": cmd_models,
+        "gpu": cmd_gpu,
+        "top": cmd_top,
+        "optimize": cmd_optimize,
+        "speed": cmd_speed,
+        "ping": cmd_ping,
+        "omen": cmd_omen,
+        "wake": cmd_wake,
+        "bench": cmd_bench,
+        "tui": cmd_tui,
+        "help": lambda: print(__doc__),
+        "-h": lambda: print(__doc__),
+        "--help": lambda: print(__doc__),
+    }
+
+    if cmd == "voice":
+        subcmd = args[0] if args else None
+        arg = " ".join(args[1:]) if len(args) > 1 else None
+        cmd_voice(subcmd, arg)
+    elif cmd == "speak":
+        cmd_speak(" ".join(args) if args else "Hello from Gabriel")
+    elif cmd == "ask":
+        cmd_ask(" ".join(args) if args else "Hello")
+    elif cmd == "use":
+        if args:
+            cmd_use(args[0])
+        else:
+            print("Usage: titan use <model>")
+            cmd_models()
+    elif cmd == "race":
+        cmd_race(" ".join(args) if args else "What is AI?")
+    elif cmd in commands:
+        commands[cmd]()
+    else:
+        print(f"Unknown command: {cmd}")
+        print(__doc__)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,9 @@
+asyncio
+rich
+typer
+watchdog
+psutil
+humanize
+msgpack
+aiohttp
+# Future: mlx-lm, whisper-coreml

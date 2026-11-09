@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>⚡ GABRIEL MC96 MISSION CONTROL // OMEGA</title>
+
+     <!-- Three.js and 3D Force Graph -->
+     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+     <script src="https://unpkg.com/3d-force-graph@1.73.0/dist/3d-force-graph.min.js"></script>
+
+     <!-- Fonts -->
+     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <style>
+          :root {
+               /* V30: BLOOD OATH PALETTE - CINEMATIC MAX */
+               --neon-blue: #C2B280;
+               /* Dune Sand */
+               --neon-purple: #800020;
+               /* Rich Burgundy */
+               --neon-gold: #FFD700;
+               /* Gold */
+               --neon-pink: #4A0404;
+               /* Oxblood */
+               --neon-green: #00FF88;
+               /* Enhanced Bio-Green */
+               --deep-space: #050505;
+               /* Void Black */
+               --glass-bg: rgba(10, 0, 0, 0.75);
+               --glass-border: rgba(128, 0, 32, 0.5);
+               --flare-gold: rgba(194, 178, 128, 0.5);
+               --shadow-burgundy: rgba(128, 0, 32, 0.3);
+               --turbo-glow: rgba(255, 215, 0, 0.6);
+          }
+
+          /* CINEMATIC LAYERS */
+          .cinematic-vignette {
+               position: fixed;
+               inset: 0;
+               background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+               pointer-events: none;
+               z-index: 10000;
+          }
+
+          .film-grain {
+               position: fixed;
+               inset: 0;
+               background: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png');
+               opacity: 0.03;
+               pointer-events: none;
+               z-index: 9999;
+          }
+
+          .anamorphic-flare {
+               position: fixed;
+               top: 20%;
+               left: -50%;
+               width: 200%;
+               height: 2px;
+               background: linear-gradient(90deg, transparent, var(--flare-gold), transparent);
+               filter: blur(10px);
+               opacity: 0.3;
+               pointer-events: none;
+               z-index: 1001;
+               animation: flareSweep 10s infinite linear;
+          }
+
+          @keyframes flareSweep {
+               0% {
+                    transform: translateY(0) rotate(0deg);
+               }
+
+               50% {
+                    transform: translateY(100vh) rotate(5deg);
+               }
+
+               100% {
+                    transform: translateY(0) rotate(0deg);
+               }
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               background: var(--deep-space);
+               color: white;
+               font-family: 'Rajdhani', sans-serif;
+               overflow: hidden;
+               cursor: crosshair;
+          }
+
+          /* ========== GRAPH CONTAINER ========== */
+          #graph-container {
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100vw;
+               height: 100vh;
+               z-index: 1;
+          }
+
+          /* ========== STARFIELD / DUNE ATMOSPHERE ========== */
+          .starfield {
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               z-index: 0;
+               background:
+                    linear-gradient(to bottom, rgba(74, 4, 4, 0.4), rgba(5, 5, 5, 0.9)),
+                    url('dune_bg.jpg') center/cover no-repeat;
+               filter: contrast(1.1) brightness(0.9);
+          }
+
+          /* ========== HUD OVERLAY ========== */
+          .hud {
+               position: fixed;
+               z-index: 100;
+               pointer-events: none;
+               inset: 0;
+          }
+
+          /* ========== HEADER ========== */
+          .header {
+               position: absolute;
+               top: 0;
+               left: 0;
+               right: 0;
+               display: flex;
+               justify-content: space-between;
+               align-items: flex-start;
+               padding: 1.5rem 2rem;
+               background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);
+               pointer-events: auto;
+          }
+
+          .logo {
+               display: flex;
+               flex-direction: column;
+               gap: 0.3rem;
+          }
+
+          .logo h1 {
+               font-family: 'Orbitron', sans-serif;
+               font-size: clamp(2rem, 5vw, 3.5rem);
+               font-weight: 900;
+               text-transform: uppercase;
+               background: linear-gradient(135deg, #C2B280 0%, #800020 50%, #4A0404 100%);
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+               text-shadow: 0 0 40px rgba(128, 0, 32, 0.6);
+               letter-spacing: 0.4rem;
+               animation: titleGlow 4s ease-in-out infinite;
+               position: relative;
+          }
+
+          .logo h1::after {
+               content: '';
+               position: absolute;
+               bottom: -5px;
+               left: 0;
+               width: 100%;
+               height: 1px;
+               background: linear-gradient(90deg, transparent, var(--neon-gold), transparent);
+               box-shadow: 0 0 15px var(--neon-gold);
+          }
+
+          @keyframes titleGlow {
+
+               0%,
+               100% {
+                    filter: drop-shadow(0 0 10px var(--neon-blue));
+               }
+
+               50% {
+                    filter: drop-shadow(0 0 25px var(--neon-purple));
+               }
+          }
+
+          .logo .subtitle {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.75rem;
+               color: var(--neon-green);
+               letter-spacing: 0.3rem;
+               text-transform: uppercase;
+          }
+
+          /* ========== STATUS PANEL ========== */
+          .status-panel {
+               background: var(--glass-bg);
+               backdrop-filter: blur(20px);
+               border: 1px solid var(--glass-border);
+               padding: 1rem 1.5rem;
+               border-radius: 12px;
+               box-shadow:
+                    0 0 30px rgba(0, 243, 255, 0.15),
+                    inset 0 0 20px rgba(0, 243, 255, 0.05);
+               min-width: 220px;
+          }
+
+          .status-panel h3 {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.7rem;
+               color: var(--neon-purple);
+               margin-bottom: 0.8rem;
+               letter-spacing: 0.2rem;
+               border-bottom: 1px solid var(--glass-border);
+               padding-bottom: 0.5rem;
+          }
+
+          .status-item {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               margin-bottom: 0.5rem;
+               font-size: 0.85rem;
+          }
+
+          .status-label {
+               color: rgba(255, 255, 255, 0.6);
+               font-weight: 500;
+          }
+
+          .status-value {
+               font-family: 'Orbitron', monospace;
+               font-weight: 700;
+               font-size: 0.9rem;
+          }
+
+          .status-value.online {
+               color: var(--neon-green);
+               text-shadow: 0 0 10px var(--neon-green);
+          }
+
+          .status-value.offline {
+               color: var(--neon-pink);
+               text-shadow: 0 0 10px var(--neon-pink);
+          }
+
+          .status-value.loading {
+               color: var(--neon-gold);
+               animation: pulse 1s infinite;
+          }
+
+          .status-value.nodes {
+               color: var(--neon-blue);
+          }
+
+          @keyframes pulse {
+
+               0%,
+               100% {
+                    opacity: 1;
+               }
+
+               50% {
+                    opacity: 0.5;
+               }
+          }
+
+          /* ========== CONTROLS ========== */
+          .controls {
+               position: absolute;
+               bottom: 2rem;
+               left: 50%;
+               transform: translateX(-50%);
+               display: flex;
+               gap: 1rem;
+               pointer-events: auto;
+               flex-wrap: wrap;
+               justify-content: center;
+               padding: 0 1rem;
+          }
+
+          .btn {
+               background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 40, 0.9));
+               border: 1px solid var(--neon-blue);
+               color: var(--neon-blue);
+               padding: 0.9rem 1.8rem;
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.8rem;
+               font-weight: 600;
+               cursor: pointer;
+               transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+               text-transform: uppercase;
+               letter-spacing: 0.1rem;
+               border-radius: 8px;
+               position: relative;
+               overflow: hidden;
+          }
+
+          .btn::before {
+               content: '';
+               position: absolute;
+               top: 0;
+               left: -100%;
+               width: 100%;
+               height: 100%;
+               background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.3), transparent);
+               transition: left 0.5s;
+          }
+
+          .btn:hover::before {
+               left: 100%;
+          }
+
+          .btn:hover {
+               background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+               color: white;
+               box-shadow:
+                    0 0 30px var(--neon-blue),
+                    0 0 60px rgba(188, 19, 254, 0.3);
+               transform: translateY(-2px);
+               border-color: transparent;
+          }
+
+          .btn:active {
+               transform: translateY(0);
+          }
+
+          .btn.active {
+               background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+               border-color: var(--neon-purple);
+               color: white;
+               box-shadow: 0 0 20px var(--neon-purple);
+          }
+
+          .btn:disabled {
+               opacity: 0.4;
+               cursor: not-allowed;
+          }
+
+          /* ========== NOTIFICATION ========== */
+          .notification {
+               position: fixed;
+               top: 50%;
+               left: 50%;
+               transform: translate(-50%, -50%) scale(0.9);
+               font-family: 'Orbitron', sans-serif;
+               font-size: clamp(1.2rem, 3vw, 2rem);
+               padding: 1.5rem 3rem;
+               background: var(--glass-bg);
+               border: 2px solid var(--neon-purple);
+               border-radius: 15px;
+               box-shadow:
+                    0 0 50px rgba(188, 19, 254, 0.4),
+                    inset 0 0 30px rgba(188, 19, 254, 0.1);
+               opacity: 0;
+               transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+               pointer-events: none;
+               z-index: 1000;
+               text-align: center;
+               backdrop-filter: blur(20px);
+          }
+
+          .notification.show {
+               opacity: 1;
+               transform: translate(-50%, -50%) scale(1);
+          }
+
+          .notification.success {
+               border-color: var(--neon-green);
+               color: var(--neon-green);
+          }
+
+          .notification.error {
+               border-color: var(--neon-pink);
+               color: var(--neon-pink);
+          }
+
+          .notification.info {
+               border-color: var(--neon-blue);
+               color: var(--neon-blue);
+          }
+
+          /* ========== LOADER ========== */
+          .loader {
+               position: fixed;
+               top: 50%;
+               left: 50%;
+               transform: translate(-50%, -50%);
+               z-index: 500;
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               gap: 1.5rem;
+          }
+
+          .loader.hidden {
+               display: none;
+          }
+
+          .loader-ring {
+               width: 100px;
+               height: 100px;
+               border: 4px solid transparent;
+               border-top-color: var(--neon-blue);
+               border-right-color: var(--neon-purple);
+               border-radius: 50%;
+               animation: spin 1s linear infinite;
+               position: relative;
+          }
+
+          .loader-ring::before {
+               content: '';
+               position: absolute;
+               inset: 8px;
+               border: 3px solid transparent;
+               border-top-color: var(--neon-purple);
+               border-left-color: var(--neon-pink);
+               border-radius: 50%;
+               animation: spin 1.5s linear infinite reverse;
+          }
+
+          .loader-ring::after {
+               content: '';
+               position: absolute;
+               inset: 20px;
+               border: 2px solid transparent;
+               border-bottom-color: var(--neon-gold);
+               border-radius: 50%;
+               animation: spin 2s linear infinite;
+          }
+
+          @keyframes spin {
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          .loader-text {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.9rem;
+               color: var(--neon-blue);
+               letter-spacing: 0.3rem;
+               animation: pulse 1.5s infinite;
+          }
+
+          /* ========== LEGEND ========== */
+          .legend {
+               position: absolute;
+               bottom: 6rem;
+               right: 1.5rem;
+               background: var(--glass-bg);
+               backdrop-filter: blur(20px);
+               border: 1px solid var(--glass-border);
+               padding: 1rem;
+               border-radius: 10px;
+               pointer-events: auto;
+               font-size: 0.75rem;
+          }
+
+          .legend h4 {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.65rem;
+               color: var(--neon-purple);
+               margin-bottom: 0.7rem;
+               letter-spacing: 0.15rem;
+          }
+
+          .legend-item {
+               display: flex;
+               align-items: center;
+               gap: 0.6rem;
+               margin-bottom: 0.4rem;
+               color: rgba(255, 255, 255, 0.8);
+          }
+
+          .legend-dot {
+               width: 12px;
+               height: 12px;
+               border-radius: 50%;
+               box-shadow: 0 0 8px currentColor;
+          }
+
+          /* ========== NODE INFO PANEL ========== */
+          .node-info {
+               position: absolute;
+               bottom: 6rem;
+               left: 1.5rem;
+               background: var(--glass-bg);
+               backdrop-filter: blur(20px);
+               border: 1px solid var(--glass-border);
+               padding: 1.2rem;
+               border-radius: 10px;
+               min-width: 280px;
+               max-width: 350px;
+               pointer-events: auto;
+               opacity: 0;
+               transform: translateY(10px);
+               transition: all 0.3s ease;
+          }
+
+          .node-info.show {
+               opacity: 1;
+               transform: translateY(0);
+          }
+
+          .node-info h4 {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.9rem;
+               color: var(--neon-gold);
+               margin-bottom: 0.8rem;
+               word-break: break-all;
+          }
+
+          .node-info-row {
+               display: flex;
+               justify-content: space-between;
+               margin-bottom: 0.4rem;
+               font-size: 0.8rem;
+          }
+
+          .node-info-row .label {
+               color: rgba(255, 255, 255, 0.5);
+          }
+
+          .node-info-row .value {
+               color: var(--neon-blue);
+               font-family: 'Orbitron', monospace;
+          }
+
+          /* ========== SCAN LINES EFFECT ========== */
+          .scanlines {
+               position: fixed;
+               inset: 0;
+               background: repeating-linear-gradient(0deg,
+                         transparent,
+                         transparent 2px,
+                         rgba(0, 0, 0, 0.03) 2px,
+                         rgba(0, 0, 0, 0.03) 4px);
+               pointer-events: none;
+               z-index: 9999;
+          }
+
+          /* ========== GABRIEL CONSOLE OVERLAY ========== */
+          .gabriel-console {
+               position: absolute;
+               top: 120px;
+               right: 1.5rem;
+               width: 400px;
+               height: 500px;
+               background: var(--glass-bg);
+               backdrop-filter: blur(30px);
+               border: 1px solid var(--glass-border);
+               border-radius: 12px;
+               display: flex;
+               flex-direction: column;
+               pointer-events: auto;
+               box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+               z-index: 200;
+               transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+               overflow: hidden;
+          }
+
+          .gabriel-console.hidden {
+               opacity: 0;
+               transform: translateX(100px);
+               pointer-events: none;
+          }
+
+          .console-header {
+               padding: 0.8rem 1rem;
+               background: rgba(128, 0, 32, 0.2);
+               border-bottom: 1px solid var(--glass-border);
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+          }
+
+          .console-title {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.75rem;
+               font-weight: 700;
+               color: var(--neon-gold);
+               letter-spacing: 0.15rem;
+          }
+
+          .console-tools {
+               display: flex;
+               align-items: center;
+               gap: 0.8rem;
+          }
+
+          .badge {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.6rem;
+               padding: 0.2rem 0.5rem;
+               border-radius: 4px;
+               background: rgba(0, 0, 0, 0.5);
+               color: var(--neon-blue);
+               border: 1px solid var(--neon-blue);
+          }
+
+          .badge.active {
+               background: var(--turbo-glow);
+               color: black;
+               border-color: var(--neon-gold);
+               box-shadow: 0 0 10px var(--turbo-glow);
+          }
+
+          .console-btn {
+               background: none;
+               border: none;
+               color: white;
+               cursor: pointer;
+               opacity: 0.6;
+               transition: opacity 0.2s;
+               font-size: 0.9rem;
+          }
+
+          .console-btn:hover {
+               opacity: 1;
+          }
+
+          .console-output {
+               flex: 1;
+               padding: 1rem;
+               overflow-y: auto;
+               font-family: 'Orbitron', monospace;
+               font-size: 0.75rem;
+               line-height: 1.6;
+               display: flex;
+               flex-direction: column;
+               gap: 0.5rem;
+          }
+
+          /* Scrollbar for console */
+          .console-output::-webkit-scrollbar {
+               width: 4px;
+          }
+
+          .console-output::-webkit-scrollbar-track {
+               background: transparent;
+          }
+
+          .console-output::-webkit-scrollbar-thumb {
+               background: var(--glass-border);
+               border-radius: 2px;
+          }
+
+          .log-entry {
+               padding: 0.3rem 0;
+               border-left: 2px solid transparent;
+               padding-left: 0.8rem;
+          }
+
+          .log-entry.user {
+               color: var(--neon-blue);
+               border-color: var(--neon-blue);
+          }
+
+          .log-entry.gabriel {
+               color: #FFF;
+               border-color: var(--neon-purple);
+          }
+
+          .log-entry.system {
+               color: var(--neon-gold);
+               font-style: italic;
+               opacity: 0.8;
+          }
+
+          .console-input-area {
+               padding: 0.8rem;
+               background: rgba(0, 0, 0, 0.3);
+               border-top: 1px solid var(--glass-border);
+               display: flex;
+               align-items: center;
+               gap: 0.5rem;
+          }
+
+          .console-input-area .prompt {
+               color: var(--neon-gold);
+               font-family: 'Orbitron', monospace;
+               font-weight: 700;
+          }
+
+          .console-input-area input {
+               flex: 1;
+               background: none;
+               border: none;
+               color: white;
+               font-family: 'Orbitron', monospace;
+               font-size: 0.8rem;
+               outline: none;
+          }
+
+          /* ========== CORNER DECORATIONS ========== */
+          .corner {
+               position: fixed;
+               width: 60px;
+               height: 60px;
+               pointer-events: none;
+               z-index: 50;
+          }
+
+          /* ... rest of the styles ... */
+     </style>
+</head>
+
+<body>
+     <!-- Background Effects -->
+     <div class="starfield"></div>
+     <div class="scanlines"></div>
+     <div class="cinematic-vignette"></div>
+     <div class="film-grain"></div>
+     <div class="anamorphic-flare"></div>
+
+     <!-- Corner Decorations -->
+     <div class="corner corner-tl"></div>
+     <div class="corner corner-tr"></div>
+     <div class="corner corner-bl"></div>
+     <div class="corner corner-br"></div>
+
+     <!-- Loader -->
+     <div class="loader" id="loader">
+          <div class="loader-ring"></div>
+          <div class="loader-text">INITIALIZING NEURAL NETWORK</div>
+     </div>
+
+     <!-- 3D Graph Container -->
+     <div id="graph-container"></div>
+
+     <!-- HUD Overlay -->
+     <div class="hud">
+          <!-- Header -->
+          <div class="header">
+               <div class="logo">
+                    <h1>⚡ MC96 Mission Control</h1>
+                    <div class="subtitle">Gabriel System Omega • MC96 Digiuniverse</div>
+               </div>
+
+               <div class="status-panel">
+                    <h3>🔮 SYSTEM STATUS</h3>
+                    <div class="status-item">
+                         <span class="status-label">API</span>
+                         <span class="status-value loading" id="api-status">CONNECTING...</span>
+                    </div>
+                    <div class="status-item">
+                         <span class="status-label">PROTOCOL</span>
+                         <span class="status-value" style="color: var(--neon-purple);">GORUNFREE</span>
+                    </div>
+                    <div class="status-item">
+                         <span class="status-label">NODES</span>
+                         <span class="status-value nodes" id="node-count">—</span>
+                    </div>
+                    <div class="status-item">
+                         <span class="status-label">EDGES</span>
+                         <span class="status-value nodes" id="edge-count">—</span>
+                    </div>
+                    <div class="status-item">
+                         <span class="status-label">LATENCY</span>
+                         <span class="status-value" id="latency" style="color: var(--neon-green);">—</span>
+                    </div>
+               </div>
+          </div>
+
+          <!-- Node Info Panel -->
+          <div class="node-info" id="node-info">
+               <h4 id="node-name">—</h4>
+               <div class="node-info-row">
+                    <span class="label">TYPE</span>
+                    <span class="value" id="node-type">—</span>
+               </div>
+               <div class="node-info-row">
+                    <span class="label">SIZE</span>
+                    <span class="value" id="node-size">—</span>
+               </div>
+               <div class="node-info-row">
+                    <span class="label">ID</span>
+                    <span class="value" id="node-id">—</span>
+               </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="legend">
+               <h4>🌌 NODE TYPES</h4>
+               <div class="legend-item"><span class="legend-dot" style="background: #FFD700; color: #FFD700;"></span>
+                    Gabriel Core</div>
+               <div class="legend-item"><span class="legend-dot" style="background: #bc13fe; color: #bc13fe;"></span>
+                    MC96 Universe</div>
+               <div class="legend-item"><span class="legend-dot" style="background: #00f3ff; color: #00f3ff;"></span>
+                    Agents</div>
+               <div class="legend-item"><span class="legend-dot" style="background: #ff0055; color: #ff0055;"></span>
+                    LifeLuv Energy</div>
+               <div class="legend-item"><span class="legend-dot" style="background: #00ff88; color: #00ff88;"></span>
+                    Root</div>
+               <div class="legend-item"><span class="legend-dot" style="background: #ffffff; color: #ffffff;"></span>
+                    Directories</div>
+               <div class="legend-item"><span class="legend-dot" style="background: #555555; color: #555555;"></span>
+                    Files</div>
+          </div>
+
+          <!-- Network Bridge Panel -->
+          <div class="legend" id="bridge-panel" style="bottom: 12rem; opacity: 0.9;">
+               <h4>🌐 NETWORK BRIDGE</h4>
+               <div class="legend-item">
+                    <span id="bridge-status" style="color: var(--neon-gold);">CHECKING...</span>
+               </div>
+               <div id="peer-list" style="font-size: 0.7rem; margin-top: 0.5rem;"></div>
+               <button class="btn" onclick="discoverPeers()"
+                    style="margin-top: 0.5rem; padding: 0.4rem 0.8rem; font-size: 0.65rem;">📡 Discover</button>
+          </div>
+
+          <!-- Controls -->
+          <div class="controls">
+               <select id="host-select" class="btn" onchange="changeHost()"
+                    style="min-width: 180px; text-align: center;">
+                    <option value="http://localhost:8501">🩸 GABRIEL OMEGA (Streamlit)</option>
+                    <option value="http://localhost:5174">🏠 Local (M2Ultra)</option>
+                    <option value="http://10.0.0.160:5174">💻 HP-OMEN (10.0.0.160)</option>
+                    <option value="http://10.100.0.2:5174">� HP-OMEN (VPN)</option>
+                    <option value="custom">🌐 Custom Host...</option>
+               </select>
+               <button class="btn" id="btn-lite" onclick="loadLiteGraph()">⚡ Fast Scan</button>
+               <button class="btn" id="btn-full" onclick="loadFullGraph()">🔥 Deep Scan</button>
+               <button class="btn" onclick="focusOnFamily()">👁️ Summon Family</button>
+               <button class="btn" onclick="toggleOrbit()">🌀 Auto Orbit</button>
+               <button class="btn" onclick="resetCamera()">🔄 Reset View</button>
+          </div>
+
+          <!-- GABRIEL 3D AVATAR -->
+          <div id="gabriel-avatar" class="gabriel-avatar">
+               <div class="avatar-container">
+                    <div class="avatar-orb">
+                         <div class="orb-core"></div>
+                         <div class="orb-ring ring1"></div>
+                         <div class="orb-ring ring2"></div>
+                         <div class="orb-ring ring3"></div>
+                         <div class="orb-pulse"></div>
+                    </div>
+                    <div class="avatar-label">GABRIEL</div>
+               </div>
+               <div class="avatar-speech" id="gabriel-speech"></div>
+               <select id="voice-select" class="btn avatar-btn"
+                    style="width: 100%; margin-bottom: 0.5rem; font-size: 0.6rem;" onchange="changeVoice()">
+                    <optgroup label="🇬🇧 British">
+                         <option value="ryan">Ryan - Friendly</option>
+                         <option value="thomas">Thomas - Positive</option>
+                    </optgroup>
+                    <optgroup label="🇺🇸 American">
+                         <option value="andrew" selected>Andrew - Warm, Confident</option>
+                         <option value="brian">Brian - Approachable</option>
+                         <option value="christopher">Christopher - Authority</option>
+                         <option value="guy">Guy - Passionate</option>
+                         <option value="eric">Eric - Rational</option>
+                         <option value="roger">Roger - Lively</option>
+                    </optgroup>
+                    <optgroup label="🌍 Multilingual">
+                         <option value="william_au">William - Australian</option>
+                         <option value="florian_de">Florian - German</option>
+                         <option value="remy_fr">Remy - French</option>
+                    </optgroup>
+               </select>
+               <div class="avatar-controls">
+                    <button class="btn avatar-btn"
+                         onclick="gabrielSpeak('GABRIEL ONLINE. Neural voice system ready.')">🔊 Speak</button>
+                    <button class="btn avatar-btn" onclick="gabrielAnnounceStatus()">📊 Status</button>
+               </div>
+          </div>
+
+          <!-- GABRIEL CONSOLE OVERLAY -->
+          <div id="gabriel-console" class="gabriel-console">
+               <div class="console-header">
+                    <span class="console-title">⚡ GABRIEL_CONSOLE</span>
+                    <div class="console-tools">
+                         <span id="turbo-badge" class="badge">TURBO: OFF</span>
+                         <button class="console-btn" onclick="clearConsole()">🗑️</button>
+                         <button class="console-btn" onclick="toggleConsole()">✖</button>
+                    </div>
+               </div>
+               <div id="console-output" class="console-output">
+                    <div class="log-entry system">SYSTEM: NEURAL LINK ESTABLISHED.</div>
+               </div>
+               <div class="console-input-area">
+                    <span class="prompt">></span>
+                    <input type="text" id="console-input" placeholder="Enter command..."
+                         onkeydown="handleConsoleKey(event)">
+               </div>
+          </div>
+     </div>
+
+     <style>
+          /* GABRIEL 3D AVATAR STYLES */
+          .gabriel-avatar {
+               position: absolute;
+               top: 120px;
+               left: 1.5rem;
+               background: var(--glass-bg);
+               backdrop-filter: blur(20px);
+               border: 1px solid var(--neon-gold);
+               border-radius: 15px;
+               padding: 1.2rem;
+               pointer-events: auto;
+               box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+               min-width: 180px;
+          }
+
+          .avatar-container {
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               gap: 0.8rem;
+          }
+
+          .avatar-orb {
+               width: 80px;
+               height: 80px;
+               position: relative;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+          }
+
+          .orb-core {
+               width: 40px;
+               height: 40px;
+               background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500, #FF6600);
+               border-radius: 50%;
+               box-shadow:
+                    0 0 30px #FFD700,
+                    0 0 60px rgba(255, 165, 0, 0.5),
+                    inset 0 0 20px rgba(255, 255, 255, 0.3);
+               animation: orbPulse 2s ease-in-out infinite;
+               z-index: 3;
+          }
+
+          .gabriel-avatar.speaking .orb-core {
+               animation: orbSpeak 0.3s ease-in-out infinite;
+          }
+
+          @keyframes orbPulse {
+
+               0%,
+               100% {
+                    transform: scale(1);
+                    box-shadow: 0 0 30px #FFD700, 0 0 60px rgba(255, 165, 0, 0.5);
+               }
+
+               50% {
+                    transform: scale(1.1);
+                    box-shadow: 0 0 50px #FFD700, 0 0 80px rgba(255, 165, 0, 0.7);
+               }
+          }
+
+          @keyframes orbSpeak {
+
+               0%,
+               100% {
+                    transform: scale(1);
+               }
+
+               50% {
+                    transform: scale(1.3);
+               }
+          }
+
+          .orb-ring {
+               position: absolute;
+               border: 2px solid transparent;
+               border-radius: 50%;
+               animation: ringRotate 3s linear infinite;
+          }
+
+          .ring1 {
+               width: 55px;
+               height: 55px;
+               border-top-color: var(--neon-blue);
+               border-bottom-color: var(--neon-purple);
+          }
+
+          .ring2 {
+               width: 65px;
+               height: 65px;
+               border-left-color: var(--neon-purple);
+               border-right-color: var(--neon-pink);
+               animation-duration: 4s;
+               animation-direction: reverse;
+          }
+
+          .ring3 {
+               width: 75px;
+               height: 75px;
+               border-top-color: var(--neon-gold);
+               animation-duration: 5s;
+          }
+
+          @keyframes ringRotate {
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          .orb-pulse {
+               position: absolute;
+               width: 80px;
+               height: 80px;
+               border: 1px solid var(--neon-gold);
+               border-radius: 50%;
+               animation: pulseExpand 2s ease-out infinite;
+               opacity: 0;
+          }
+
+          @keyframes pulseExpand {
+               0% {
+                    transform: scale(0.5);
+                    opacity: 0.8;
+               }
+
+               100% {
+                    transform: scale(1.5);
+                    opacity: 0;
+               }
+          }
+
+          .avatar-label {
+               font-family: 'Orbitron', sans-serif;
+               font-size: 0.9rem;
+               font-weight: 700;
+               color: var(--neon-gold);
+               text-shadow: 0 0 10px var(--neon-gold);
+               letter-spacing: 0.2rem;
+          }
+
+          .avatar-speech {
+               font-size: 0.75rem;
+               color: rgba(255, 255, 255, 0.8);
+               text-align: center;
+               margin: 0.8rem 0;
+               min-height: 2.5rem;
+               max-width: 160px;
+               line-height: 1.4;
+          }
+
+          .avatar-controls {
+               display: flex;
+               gap: 0.5rem;
+          }
+
+          .avatar-btn {
+               padding: 0.4rem 0.6rem !important;
+               font-size: 0.65rem !important;
+               flex: 1;
+          }
+     </style>
+
+     <!-- Notification -->
+     <div class="notification" id="notification"></div>
+
+     <script>
+          // ============================================================
+          //          GABRIEL DREAMCHAMBER OMEGA - CORE ENGINE
+          // ============================================================
+
+          let API_BASE = 'http://localhost:5174';
+          let Graph = null;
+          let graphLoaded = false;
+          let apiOnline = false;
+          let orbitEnabled = false;
+          let orbitAngle = 0;
+          let orbitRadius = 300;
+
+          // ============================================================
+          //                    HOST SWITCHING
+          // ============================================================
+
+          function changeHost() {
+               const select = document.getElementById('host-select');
+               let newHost = select.value;
+
+               if (newHost === 'custom') {
+                    const customHost = prompt('Enter GABRIEL host URL:', 'http://10.0.0.X:5174');
+                    if (customHost && customHost.startsWith('http')) {
+                         newHost = customHost;
+                         // Add to dropdown
+                         const option = document.createElement('option');
+                         option.value = customHost;
+                         option.textContent = `🌐 ${customHost.replace('http://', '')}`;
+                         select.insertBefore(option, select.lastElementChild);
+                         select.value = customHost;
+                    } else {
+                         select.value = API_BASE;
+                         return;
+                    }
+               }
+
+               API_BASE = newHost;
+               console.log('[DREAMCHAMBER] 🔌 Switching to:', API_BASE);
+               showNotification(`Connecting to ${newHost.replace('http://', '')}...`, 'info');
+
+               // Re-check API and reload
+               checkAPI().then(online => {
+                    if (online) {
+                         loadLiteGraph();
+                         showNotification(`✅ Connected to ${newHost.replace('http://', '')}`, 'success');
+                    } else {
+                         showNotification(`❌ Cannot reach ${newHost.replace('http://', '')}`, 'error');
+                    }
+               });
+          }
+
+          // ============================================================
+          //                    NETWORK BRIDGE
+          // ============================================================
+
+          const BRIDGE_URL = 'http://localhost:5175';
+
+          async function checkBridgeStatus() {
+               const statusEl = document.getElementById('bridge-status');
+               const peerList = document.getElementById('peer-list');
+
+               try {
+                    const res = await fetch(`${BRIDGE_URL}/api/bridge/status`, {
+                         signal: AbortSignal.timeout(2000)
+                    });
+
+                    if (res.ok) {
+                         const data = await res.json();
+                         statusEl.textContent = `✅ ONLINE (${data.peer_count} peers)`;
+                         statusEl.style.color = 'var(--neon-green)';
+
+                         // Show peer list
+                         let html = '';
+                         for (const [id, peer] of Object.entries(data.peers)) {
+                              const isLocal = peer.ip === data.local_ip;
+                              html += `<div style="color: ${isLocal ? 'var(--neon-blue)' : 'var(--neon-purple)'};">
+                                   ${isLocal ? '🏠' : '💻'} ${peer.hostname} (${peer.ip})
+                              </div>`;
+
+                              // Auto-add discovered peers to host dropdown
+                              if (!isLocal) {
+                                   addHostOption(peer.ip, peer.hostname);
+                              }
+                         }
+                         peerList.innerHTML = html || '<div style="color: #666;">No peers yet...</div>';
+                    }
+               } catch (err) {
+                    statusEl.textContent = '🔴 OFFLINE';
+                    statusEl.style.color = 'var(--neon-pink)';
+                    peerList.innerHTML = '<div style="color: #666;">Bridge not running</div>';
+               }
+          }
+
+          async function discoverPeers() {
+               const statusEl = document.getElementById('bridge-status');
+               statusEl.textContent = '📡 Broadcasting...';
+               statusEl.style.color = 'var(--neon-gold)';
+
+               try {
+                    await fetch(`${BRIDGE_URL}/api/bridge/discover`);
+                    showNotification('📡 Discovery broadcast sent!', 'info');
+
+                    // Check for new peers after a delay
+                    setTimeout(checkBridgeStatus, 2000);
+               } catch (err) {
+                    showNotification('Bridge offline - start network_bridge.py', 'error');
+               }
+          }
+
+          function addHostOption(ip, hostname) {
+               const select = document.getElementById('host-select');
+               const url = `http://${ip}:5174`;
+
+               // Check if already exists
+               for (const opt of select.options) {
+                    if (opt.value === url) return;
+               }
+
+               // Add new option before "Custom Host..."
+               const option = document.createElement('option');
+               option.value = url;
+               option.textContent = `🔗 ${hostname} (${ip})`;
+               select.insertBefore(option, select.lastElementChild);
+
+               showNotification(`🔗 Discovered: ${hostname}`, 'success');
+          }
+
+          // Poll bridge status every 5 seconds
+          setInterval(checkBridgeStatus, 5000);
+          checkBridgeStatus(); // Initial check
+
+          // ============================================================
+          //                    INITIALIZATION
+          // ============================================================
+
+          document.addEventListener('DOMContentLoaded', async () => {
+               console.log('[DREAMCHAMBER] 🚀 Initializing Neural Visualization...');
+
+               showLoader(true);
+
+               // Check API
+               apiOnline = await checkAPI();
+
+               if (apiOnline) {
+                    initGraph();
+                    await loadLiteGraph();
+               } else {
+                    showNotification('⚠️ API Offline - Start server on port 5174', 'error');
+                    showLoader(false);
+               }
+
+               // Start status polling (Ultra-Fast)
+               setInterval(pollStatus, 2000);
+
+               // Start orbit animation loop
+               requestAnimationFrame(orbitLoop);
+
+               console.log('[DREAMCHAMBER] ✅ Ready');
+          });
+
+          // ============================================================
+          //                    GRAPH INITIALIZATION
+          // ============================================================
+
+          function initGraph() {
+               const container = document.getElementById('graph-container');
+
+               Graph = ForceGraph3D()
+                    (container)
+                    .backgroundColor('rgba(5,5,16,0)')
+                    .showNavInfo(false)
+
+                    // NODE CONFIGURATION
+                    .nodeLabel(node => `<div style="background:rgba(0,0,0,0.85);padding:8px 12px;border-radius:8px;border:1px solid #00f3ff;font-family:Orbitron,sans-serif;font-size:12px;color:#00f3ff;">${node.label || node.id}</div>`)
+                    .nodeColor(node => getNodeColor(node.type))
+                    .nodeVal(node => getNodeSize(node))
+                    .nodeOpacity(0.95)
+                    .nodeResolution(16)
+
+                    // LINK CONFIGURATION
+                    .linkColor(link => getLinkColor(link))
+                    .linkWidth(link => getLinkWidth(link))
+                    .linkOpacity(0.6)
+                    .linkDirectionalParticles(link => isImportantLink(link) ? 4 : 0)
+                    .linkDirectionalParticleWidth(2)
+                    .linkDirectionalParticleSpeed(0.006)
+                    .linkDirectionalParticleColor(() => '#00f3ff')
+
+                    // INTERACTIVITY
+                    .onNodeClick(handleNodeClick)
+                    .onNodeHover(handleNodeHover)
+                    .onEngineStop(() => {
+                         showLoader(false);
+                         updateStats();
+                         console.log('[DREAMCHAMBER] 🎯 Graph rendered');
+                    })
+
+                    // FORCES
+                    .d3Force('charge', null)
+                    .d3Force('center', null);
+
+               // Apply custom forces after init
+               Graph.d3Force('charge', d3.forceManyBody()
+                    .strength(node => {
+                         if (node.type === 'universe') return -500;
+                         if (node.type === 'agent_core') return -300;
+                         return -30;
+                    })
+               );
+
+               console.log('[DREAMCHAMBER] 📊 Graph engine initialized');
+          }
+
+          // ============================================================
+          //                    NODE/LINK STYLING
+          // ============================================================
+
+          function getNodeColor(type) {
+               const colors = {
+                    'agent_core': '#FFD700',
+                    'agent_sub': '#00f3ff',
+                    'universe': '#bc13fe',
+                    'energy': '#ff0055',
+                    'root': '#00ff88',
+                    'dir': '#ffffff',
+                    'file': '#666666'
+               };
+               return colors[type] || '#444444';
+          }
+
+          function getNodeSize(node) {
+               const sizes = {
+                    'universe': 80,
+                    'agent_core': 50,
+                    'energy': 40,
+                    'agent_sub': 30,
+                    'root': 25,
+                    'dir': 8,
+                    'file': 3
+               };
+               return sizes[node.type] || 5;
+          }
+
+          function getLinkColor(link) {
+               const src = link.source.type || link.source;
+               const tgt = link.target.type || link.target;
+
+               if (src === 'universe' || tgt === 'universe') return '#bc13fe';
+               if (src === 'agent_core' || tgt === 'agent_core') return '#FFD700';
+               if (src === 'energy' || tgt === 'energy') return '#ff0055';
+               return 'rgba(0, 243, 255, 0.3)';
+          }
+
+          function getLinkWidth(link) {
+               const src = link.source.type || link.source;
+               const tgt = link.target.type || link.target;
+
+               if (src === 'universe' || tgt === 'universe') return 3;
+               if (src === 'agent_core' || tgt === 'agent_core') return 2;
+               return 0.5;
+          }
+
+          function isImportantLink(link) {
+               const src = link.source.type || link.source;
+               const tgt = link.target.type || link.target;
+               return src === 'universe' || tgt === 'universe' ||
+                    src === 'agent_core' || tgt === 'agent_core' ||
+                    src === 'energy' || tgt === 'energy';
+          }
+
+          // ============================================================
+          //                    API FUNCTIONS
+          // ============================================================
+
+          async function checkAPI() {
+               const statusEl = document.getElementById('api-status');
+               const latencyEl = document.getElementById('latency');
+
+               try {
+                    const start = performance.now();
+                    const res = await fetch(`${API_BASE}/api/status`, {
+                         signal: AbortSignal.timeout(3000)
+                    });
+                    const latency = Math.round(performance.now() - start);
+
+                    if (res.ok) {
+                         const data = await res.json();
+                         statusEl.textContent = 'ONLINE';
+                         statusEl.className = 'status-value online';
+                         latencyEl.textContent = `${latency}ms`;
+
+                         // NEW: System Metrics update
+                         if (data.cpu_usage !== undefined) {
+                              updateSystemMetricsHUD(data);
+                         }
+                         return true;
+                    }
+               } catch (err) {
+                    console.warn('[API] Connection failed:', err.message);
+               }
+
+               statusEl.textContent = 'OFFLINE';
+               statusEl.className = 'status-value offline';
+               latencyEl.textContent = '—';
+               return false;
+          }
+
+          function updateSystemMetricsHUD(data) {
+               const statusPanel = document.querySelector('.status-panel');
+               let metricsEl = document.getElementById('system-metrics');
+
+               if (!metricsEl) {
+                    metricsEl = document.createElement('div');
+                    metricsEl.id = 'system-metrics';
+                    metricsEl.style.marginTop = '0.5rem';
+                    metricsEl.style.paddingTop = '0.5rem';
+                    metricsEl.style.borderTop = '1px solid var(--glass-border)';
+                    statusPanel.appendChild(metricsEl);
+               }
+
+               metricsEl.innerHTML = `
+                    <div class="status-item">
+                         <span class="status-label">CPU</span>
+                         <span class="status-value" style="color: var(--neon-gold);">${data.cpu_usage}%</span>
+                    </div>
+                    <div class="status-item">
+                         <span class="status-label">RAM</span>
+                         <span class="status-value" style="color: var(--neon-blue);">${data.ram_used_gb}/${data.ram_total_gb}GB</span>
+                    </div>
+               `;
+          }
+
+          async function pollStatus() {
+               apiOnline = await checkAPI();
+          }
+
+          // ============================================================
+          //                    GRAPH LOADING
+          // ============================================================
+
+          async function loadLiteGraph() {
+               if (!apiOnline) {
+                    apiOnline = await checkAPI();
+                    if (!apiOnline) {
+                         showNotification('❌ API Offline', 'error');
+                         return;
+                    }
+               }
+
+               showLoader(true);
+               showNotification('⚡ Loading neural network...', 'info');
+               setActiveButton('btn-lite');
+
+               try {
+                    const res = await fetch(`${API_BASE}/api/memcell/graph/lite?t=${Date.now()}`);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                    const data = await res.json();
+                    Graph.graphData(data);
+                    graphLoaded = true;
+
+                    setTimeout(() => {
+                         showNotification(`✅ Loaded ${data.nodes.length} nodes`, 'success');
+                         updateStats();
+                         // Focus on center
+                         Graph.cameraPosition({ x: 0, y: 0, z: 400 });
+                    }, 800);
+
+               } catch (err) {
+                    console.error('[LOAD]', err);
+                    showNotification('❌ Failed to load graph', 'error');
+                    showLoader(false);
+               }
+          }
+
+          async function loadFullGraph() {
+               if (!apiOnline) {
+                    apiOnline = await checkAPI();
+                    if (!apiOnline) {
+                         showNotification('❌ API Offline', 'error');
+                         return;
+                    }
+               }
+
+               showLoader(true);
+               showNotification('🔥 Deep scan initiated...', 'info');
+               setActiveButton('btn-full');
+
+               try {
+                    // Trigger scanner
+                    fetch(`${API_BASE}/api/scan/trigger`).catch(() => { });
+
+                    // Load limited graph
+                    const res = await fetch(`${API_BASE}/api/memcell/graph?limit=500&t=${Date.now()}`);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                    const data = await res.json();
+                    Graph.graphData(data);
+                    graphLoaded = true;
+
+                    setTimeout(() => {
+                         showNotification(`🔥 Loaded ${data.nodes.length} nodes`, 'success');
+                         updateStats();
+                    }, 1500);
+
+               } catch (err) {
+                    console.error('[DEEP SCAN]', err);
+                    showNotification('❌ Deep scan failed', 'error');
+                    showLoader(false);
+               }
+          }
+
+          // ============================================================
+          //                    INTERACTION HANDLERS
+          // ============================================================
+
+          function handleNodeClick(node) {
+               if (!node) return;
+
+               // Fly to node
+               const distance = 60;
+               const pos = {
+                    x: (node.x || 0) + distance,
+                    y: (node.y || 0) + distance,
+                    z: (node.z || 0) + distance
+               };
+
+               Graph.cameraPosition(pos, node, 1500);
+
+               // Update info panel
+               updateNodeInfo(node);
+               showNotification(`📍 ${node.label || node.id}`, 'info');
+          }
+
+          function handleNodeHover(node) {
+               document.body.style.cursor = node ? 'pointer' : 'crosshair';
+               if (node) updateNodeInfo(node);
+          }
+
+          function updateNodeInfo(node) {
+               const panel = document.getElementById('node-info');
+               document.getElementById('node-name').textContent = node.label || node.id;
+               document.getElementById('node-type').textContent = (node.type || 'unknown').toUpperCase();
+               document.getElementById('node-size').textContent = node.size ? formatBytes(node.size) : '—';
+               document.getElementById('node-id').textContent = node.id.substring(0, 30) + (node.id.length > 30 ? '...' : '');
+               panel.classList.add('show');
+          }
+
+          function focusOnFamily() {
+               if (!Graph || !graphLoaded) {
+                    showNotification('⚠️ Load graph first', 'error');
+                    return;
+               }
+
+               const nodes = Graph.graphData().nodes;
+               const gabriel = nodes.find(n => n.id === 'GABRIEL');
+
+               if (gabriel) {
+                    showNotification('👁️ Summoning the Family...', 'info');
+                    Graph.cameraPosition(
+                         { x: (gabriel.x || 0) + 100, y: (gabriel.y || 0) + 100, z: (gabriel.z || 0) + 150 },
+                         gabriel,
+                         2000
+                    );
+               } else {
+                    const mc96 = nodes.find(n => n.id === 'MC96');
+                    if (mc96) {
+                         Graph.cameraPosition(
+                              { x: (mc96.x || 0) + 100, y: (mc96.y || 0) + 100, z: (mc96.z || 0) + 150 },
+                              mc96,
+                              2000
+                         );
+                    }
+               }
+          }
+
+          // ============================================================
+          //                    GABRIEL CONSOLE LOGIC
+          // ============================================================
+
+          function toggleConsole() {
+               document.getElementById('gabriel-console').classList.toggle('hidden');
+          }
+
+          function clearConsole() {
+               document.getElementById('console-output').innerHTML = '<div class="log-entry system">CONSOLE CLEARED.</div>';
+          }
+
+          function addLog(text, type = 'system') {
+               const output = document.getElementById('console-output');
+               const entry = document.createElement('div');
+               entry.className = `log-entry ${type}`;
+               entry.textContent = (type === 'system' ? '' : (type === 'user' ? 'U: ' : 'G: ')) + text;
+               output.appendChild(entry);
+               output.scrollTop = output.scrollHeight;
+          }
+
+          async function handleConsoleKey(e) {
+               if (e.key === 'Enter') {
+                    const input = document.getElementById('console-input');
+                    const cmd = input.value.trim();
+                    if (!cmd) return;
+
+                    addLog(cmd, 'user');
+                    input.value = '';
+
+                    // Forward to GABRIEL API
+                    try {
+                         const res = await fetch(`${API_BASE}/api/gabriel/command`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ command: cmd })
+                         });
+                         const data = await res.json();
+                         if (data.response) {
+                              addLog(data.response, 'gabriel');
+                              if (data.response.includes('TURBO MODE: ON')) setTurboBadge(true);
+                              if (data.response.includes('TURBO MODE: OFF')) setTurboBadge(false);
+                         }
+                    } catch (err) {
+                         addLog(`Error connecting to GABRIEL: ${err.message}`, 'system');
+                    }
+               }
+          }
+
+          function setTurboBadge(active) {
+               const badge = document.getElementById('turbo-badge');
+               badge.textContent = active ? 'TURBO: ON' : 'TURBO: OFF';
+               badge.classList.toggle('active', active);
+
+               // Cinematic visual shift
+               document.body.style.filter = active ? 'contrast(1.2) saturate(1.2)' : 'none';
+               const orb = document.querySelector('.orb-core');
+               if (orb) orb.style.boxShadow = active ? '0 0 60px var(--turbo-glow)' : '0 0 30px #FFD700';
+          }
+
+          async function checkExtraStatus() {
+               try {
+                    const res = await fetch(`${API_BASE}/api/gabriel/status`);
+                    if (res.ok) {
+                         const data = await res.json();
+                         setTurboBadge(data.turbo_mode);
+
+                         // Sync interaction history if console is empty
+                         if (document.getElementById('console-output').children.length <= 1 && data.history) {
+                              data.history.forEach(h => {
+                                   addLog(h.user, 'user');
+                                   addLog(h.assistant, 'gabriel');
+                              });
+                         }
+                    }
+               } catch (err) { }
+          }
+
+          // Update extra status every 5 seconds
+          setInterval(checkExtraStatus, 5000);
+
+          function resetCamera() {
+               if (!Graph) return;
+               orbitEnabled = false;
+               Graph.cameraPosition({ x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 }, 1500);
+               showNotification('🔄 View reset', 'info');
+          }
+
+          function toggleOrbit() {
+               orbitEnabled = !orbitEnabled;
+               showNotification(orbitEnabled ? '🌀 Orbit enabled' : '🌀 Orbit disabled', 'info');
+          }
+
+          function orbitLoop() {
+               if (orbitEnabled && Graph && graphLoaded) {
+                    orbitAngle += 0.003;
+                    const x = orbitRadius * Math.sin(orbitAngle);
+                    const z = orbitRadius * Math.cos(orbitAngle);
+                    Graph.cameraPosition({ x, y: 100, z });
+               }
+               requestAnimationFrame(orbitLoop);
+          }
+
+          // ============================================================
+          //                    UI HELPERS
+          // ============================================================
+
+          function updateStats() {
+               if (!Graph) return;
+               const data = Graph.graphData();
+               document.getElementById('node-count').textContent = (data.nodes?.length || 0).toLocaleString();
+               document.getElementById('edge-count').textContent = (data.links?.length || 0).toLocaleString();
+          }
+
+          function showNotification(msg, type = 'info') {
+               const el = document.getElementById('notification');
+               el.textContent = msg;
+               el.className = `notification show ${type}`;
+               setTimeout(() => el.classList.remove('show'), 3000);
+          }
+
+          function showLoader(show) {
+               document.getElementById('loader').classList.toggle('hidden', !show);
+          }
+
+          function setActiveButton(id) {
+               document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+               document.getElementById(id)?.classList.add('active');
+          }
+
+          function formatBytes(bytes) {
+               if (bytes === 0) return '0 B';
+               const k = 1024;
+               const sizes = ['B', 'KB', 'MB', 'GB'];
+               const i = Math.floor(Math.log(bytes) / Math.log(k));
+               return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+          }
+
+          // ============================================================
+          //                    KEYBOARD SHORTCUTS
+          // ============================================================
+
+          document.addEventListener('keydown', (e) => {
+               switch (e.key.toLowerCase()) {
+                    case 'r': resetCamera(); break;
+                    case 'o': toggleOrbit(); break;
+                    case 'f': focusOnFamily(); break;
+                    case '1': loadLiteGraph(); break;
+                    case '2': loadFullGraph(); break;
+               }
+          });
+
+          console.log('[DREAMCHAMBER] ⚡ Keyboard shortcuts: R=Reset, O=Orbit, F=Family, 1=Fast, 2=Deep');
+
+          // ============================================================
+          //                    GABRIEL VOICE SYSTEM V4 (NEURAL)
+          // ============================================================
+
+          let gabrielSpeaking = false;
+          const VOICE_SERVER = 'http://localhost:5176';
+
+          async function gabrielSpeak(text) {
+               if (gabrielSpeaking) return;
+
+               const avatar = document.getElementById('gabriel-avatar');
+               const speechEl = document.getElementById('gabriel-speech');
+
+               speechEl.textContent = text;
+               avatar.classList.add('speaking');
+               gabrielSpeaking = true;
+
+               try {
+                    // Use neural voice server
+                    await fetch(`${VOICE_SERVER}/speak?text=${encodeURIComponent(text)}`);
+                    console.log('[GABRIEL V4] 🔊 Neural:', text.substring(0, 40) + '...');
+               } catch (err) {
+                    // Fallback to browser speech
+                    console.log('[GABRIEL] ⚠️ Fallback to browser speech');
+                    const synth = window.speechSynthesis;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.9;
+                    synth.speak(utterance);
+               }
+
+               // Estimate speech duration
+               const words = text.split(' ').length;
+               const duration = Math.max(3000, (words / 2.5) * 1000);
+
+               setTimeout(() => {
+                    avatar.classList.remove('speaking');
+                    gabrielSpeaking = false;
+                    setTimeout(() => { speechEl.textContent = ''; }, 2000);
+               }, duration);
+          }
+
+          function gabrielAnnounceStatus() {
+               const nodeCount = document.getElementById('node-count').textContent;
+               const edgeCount = document.getElementById('edge-count').textContent;
+               const apiStatus = document.getElementById('api-status').textContent;
+               const latency = document.getElementById('latency').textContent;
+               const host = document.getElementById('host-select');
+               const hostName = host.options[host.selectedIndex].text.replace('💻 ', '').replace('🏠 ', '');
+
+               const status = `${apiStatus === 'ONLINE' ? 'Systems operational' : 'Warning, systems offline'}. ` +
+                    `Connected to ${hostName}. ` +
+                    `Neural network active with ${nodeCount} nodes and ${edgeCount} connections. ` +
+                    `Latency: ${latency}. ` +
+                    `GABRIEL ready for commands.`;
+
+               gabrielSpeak(status);
+          }
+
+          // ============================================================
+          //                    V6 VOICE SELECTION
+          // ============================================================
+
+          let selectedVoice = 'andrew';
+
+          async function changeVoice() {
+               const select = document.getElementById('voice-select');
+               selectedVoice = select.value;
+
+               // Preview the new voice
+               try {
+                    await fetch(`${VOICE_SERVER}/preview?voice=${selectedVoice}&category=american`);
+                    console.log('[GABRIEL V6] 🎤 Voice changed to:', selectedVoice);
+               } catch (err) {
+                    console.log('[GABRIEL V6] Preview failed');
+               }
+          }
+
+          // Check V6 voice server on load
+          fetch(`${VOICE_SERVER}/`)
+               .then(r => r.json())
+               .then(data => {
+                    console.log(`[GABRIEL V6] 🌍 ${data.voice_count} premium voices ready`);
+                    console.log('[GABRIEL V6] 🎤 Current:', data.current_voice);
+               })
+               .catch(() => console.log('[GABRIEL] ⚠️ Voice server offline'));
+
+          // Announce on load with neural voice
+          setTimeout(() => {
+               gabrielSpeak('GABRIEL online. Neural voice system ready.');
+          }, 3000);
+
+          console.log('[GABRIEL V6] 🔮 Global Voice System loaded');
+     </script>
+</body>
+
+</html>

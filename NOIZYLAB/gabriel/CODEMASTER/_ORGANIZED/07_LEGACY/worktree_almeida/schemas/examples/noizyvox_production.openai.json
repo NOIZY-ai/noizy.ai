@@ -1,0 +1,384 @@
+{
+  "$schema": "../openai_voice_integration.schema.json",
+  "integration_id": "oai_voice_nzprod2024dec11v",
+  "version": "2.0.0",
+  "provider": "openai",
+  "api_configuration": {
+    "api_key": "sk-placeholder-replace-with-real-key",
+    "organization_id": "org-noizyvoxproduction",
+    "base_url": "https://api.openai.com/v1",
+    "api_version": "2024-12-01",
+    "timeout_ms": 30000,
+    "max_retries": 3
+  },
+  "tts_models": {
+    "tts_1": {
+      "model_id": "tts-1",
+      "enabled": true,
+      "use_case": "Fast, real-time applications",
+      "max_input_chars": 4096,
+      "supported_voices": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"],
+      "supported_formats": ["mp3", "opus", "aac", "flac", "wav", "pcm"],
+      "speed_range": {
+        "min": 0.25,
+        "max": 4.0,
+        "default": 1.0
+      },
+      "pricing": {
+        "per_1m_chars": 15.00,
+        "unit": "USD"
+      },
+      "streaming_enabled": false,
+      "instruction_guided": false
+    },
+    "tts_1_hd": {
+      "model_id": "tts-1-hd",
+      "enabled": true,
+      "use_case": "Studio quality, audiobooks, premium content",
+      "max_input_chars": 4096,
+      "supported_voices": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"],
+      "supported_formats": ["mp3", "opus", "aac", "flac", "wav", "pcm"],
+      "pricing": {
+        "per_1m_chars": 30.00,
+        "unit": "USD"
+      },
+      "streaming_enabled": false,
+      "instruction_guided": false
+    },
+    "gpt_4o_mini_tts": {
+      "model_id": "gpt-4o-mini-tts",
+      "enabled": true,
+      "use_case": "Custom personas, emotions, theatrical performances",
+      "max_input_chars": 4096,
+      "instruction_guided": true,
+      "supported_voices": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"],
+      "supported_formats": ["mp3", "opus", "aac", "flac", "wav", "pcm"],
+      "streaming_enabled": true,
+      "stream_formats": ["sse", "audio"],
+      "pricing": {
+        "text_input_per_1m_tokens": 0.60,
+        "audio_output_per_1m_tokens": 12.00,
+        "per_minute_audio": 0.015,
+        "unit": "USD"
+      },
+      "instruction_examples": [
+        "Speak with a warm, friendly tone like a trusted advisor",
+        "Use an excited, enthusiastic voice for this product announcement",
+        "Deliver this as a dramatic audiobook reading with character voices",
+        "Speak softly and calmly, like a meditation guide with gentle pauses",
+        "Use a professional news anchor delivery with clear enunciation",
+        "Add emphasis on key points like a motivational speaker"
+      ]
+    }
+  },
+  "asr_models": {
+    "whisper_1": {
+      "model_id": "whisper-1",
+      "enabled": true,
+      "use_case": "General transcription, 99 languages",
+      "supported_formats": ["flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"],
+      "max_file_size_mb": 25,
+      "supported_languages": 99,
+      "response_formats": ["json", "text", "srt", "verbose_json", "vtt"],
+      "timestamp_granularities": ["word", "segment"],
+      "translation_supported": true,
+      "streaming_supported": false,
+      "pricing": {
+        "per_minute": 0.006,
+        "unit": "USD"
+      }
+    },
+    "gpt_4o_transcribe": {
+      "model_id": "gpt-4o-transcribe",
+      "enabled": true,
+      "use_case": "Best accuracy, complex audio, noisy environments",
+      "supported_formats": ["flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"],
+      "response_formats": ["json"],
+      "streaming_supported": true,
+      "logprobs_supported": true,
+      "pricing": {
+        "text_input_per_1m_tokens": 2.50,
+        "text_output_per_1m_tokens": 10.00,
+        "audio_input_per_1m_tokens": 6.00,
+        "per_minute": 0.006,
+        "unit": "USD"
+      }
+    },
+    "gpt_4o_mini_transcribe": {
+      "model_id": "gpt-4o-mini-transcribe",
+      "enabled": true,
+      "use_case": "High volume, cost-sensitive transcription",
+      "supported_formats": ["flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"],
+      "response_formats": ["json"],
+      "streaming_supported": true,
+      "logprobs_supported": true,
+      "pricing": {
+        "text_input_per_1m_tokens": 1.25,
+        "text_output_per_1m_tokens": 5.00,
+        "audio_input_per_1m_tokens": 3.00,
+        "per_minute": 0.003,
+        "unit": "USD"
+      }
+    },
+    "gpt_4o_transcribe_diarize": {
+      "model_id": "gpt-4o-transcribe-diarize",
+      "enabled": true,
+      "use_case": "Multi-speaker conversations, interviews, meetings",
+      "max_speakers": 4,
+      "known_speaker_references": true,
+      "reference_audio_min_seconds": 2,
+      "reference_audio_max_seconds": 10,
+      "response_formats": ["json", "text", "diarized_json"],
+      "chunking_strategy": {
+        "auto": true,
+        "vad_enabled": true,
+        "required_for_long_audio": true,
+        "long_audio_threshold_seconds": 30
+      },
+      "pricing": {
+        "text_input_per_1m_tokens": 2.50,
+        "text_output_per_1m_tokens": 10.00,
+        "audio_input_per_1m_tokens": 6.00,
+        "per_minute": 0.006,
+        "unit": "USD"
+      }
+    }
+  },
+  "realtime_models": {
+    "gpt_realtime": {
+      "model_id": "gpt-realtime",
+      "enabled": true,
+      "use_case": "Production voice agents, low-latency conversations",
+      "supported_voices": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse", "cedar", "marin"],
+      "connection_methods": ["webrtc", "websocket", "sip"],
+      "features": {
+        "function_calling": true,
+        "agent_handoff": true,
+        "vad": true,
+        "interruption_handling": true,
+        "multimodal_input": true,
+        "image_input": true
+      },
+      "pricing": {
+        "text_input_per_1m_tokens": 4.00,
+        "text_output_per_1m_tokens": 16.00,
+        "audio_input_per_1m_tokens": 32.00,
+        "audio_output_per_1m_tokens": 64.00,
+        "image_input_per_1m_tokens": 5.00,
+        "unit": "USD"
+      }
+    },
+    "gpt_realtime_mini": {
+      "model_id": "gpt-realtime-mini",
+      "enabled": true,
+      "use_case": "High volume voice agents, cost-sensitive deployments",
+      "supported_voices": ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse", "cedar", "marin"],
+      "connection_methods": ["webrtc", "websocket", "sip"],
+      "pricing": {
+        "text_input_per_1m_tokens": 0.60,
+        "text_output_per_1m_tokens": 2.40,
+        "audio_input_per_1m_tokens": 10.00,
+        "audio_output_per_1m_tokens": 20.00,
+        "image_input_per_1m_tokens": 0.80,
+        "unit": "USD"
+      }
+    }
+  },
+  "voice_presets": {
+    "alloy": {
+      "voice_id": "alloy",
+      "gender": "neutral",
+      "character": "Balanced, versatile",
+      "best_for": "General narration, default choice"
+    },
+    "nova": {
+      "voice_id": "nova",
+      "gender": "female",
+      "character": "Friendly, upbeat",
+      "best_for": "Customer service, tutorials"
+    },
+    "onyx": {
+      "voice_id": "onyx",
+      "gender": "male",
+      "character": "Deep, authoritative",
+      "best_for": "Documentaries, news, announcements"
+    },
+    "shimmer": {
+      "voice_id": "shimmer",
+      "gender": "female",
+      "character": "Soft, soothing",
+      "best_for": "Meditation, ASMR, relaxation"
+    }
+  },
+  "voice_agent_architecture": {
+    "speech_to_speech": {
+      "enabled": true,
+      "use_case": "Low-latency, natural conversations",
+      "model": "gpt-realtime",
+      "advantages": [
+        "Lowest latency (<500ms)",
+        "Natural conversation flow",
+        "Understands emotion and intent from audio",
+        "Handles interruptions naturally",
+        "Single model handles everything"
+      ],
+      "best_for": [
+        "Interactive customer service",
+        "Language tutoring",
+        "Conversational search",
+        "Voice assistants"
+      ]
+    },
+    "chained": {
+      "enabled": true,
+      "use_case": "Predictable, controlled responses",
+      "pipeline": ["gpt-4o-transcribe", "gpt-4.1", "gpt-4o-mini-tts"],
+      "advantages": [
+        "Full transcript control",
+        "Predictable responses",
+        "Easy to extend existing LLM apps",
+        "Robust function calling"
+      ],
+      "best_for": [
+        "Structured workflows",
+        "Customer support with scripts",
+        "Sales and triage",
+        "Compliance-sensitive applications"
+      ]
+    }
+  },
+  "realtime_connection": {
+    "webrtc": {
+      "enabled": true,
+      "use_case": "Browser-based voice agents, client-side apps",
+      "ephemeral_key_url": "https://api.openai.com/v1/realtime/sessions"
+    },
+    "websocket": {
+      "enabled": true,
+      "use_case": "Server-side agents, telephony, consistent latency",
+      "endpoint": "wss://api.openai.com/v1/realtime"
+    },
+    "sip": {
+      "enabled": true,
+      "use_case": "Phone systems, call centers",
+      "twilio_integration": true
+    }
+  },
+  "noizyvox_recommendations": {
+    "tts_strategy": {
+      "premium_quality": {
+        "model": "gpt-4o-mini-tts",
+        "reason": "Instruction-guided for custom personas and emotions",
+        "estimated_cost_1m_chars": 12.00
+      },
+      "standard_production": {
+        "model": "tts-1-hd",
+        "reason": "Studio quality without instruction overhead",
+        "estimated_cost_1m_chars": 30.00
+      },
+      "high_volume": {
+        "model": "tts-1",
+        "reason": "Fast, cost-efficient for high throughput",
+        "estimated_cost_1m_chars": 15.00
+      },
+      "hybrid_recommendation": "Use open-source Fish Speech for bulk generation, OpenAI gpt-4o-mini-tts for premium persona work"
+    },
+    "asr_strategy": {
+      "best_accuracy": {
+        "model": "gpt-4o-transcribe",
+        "reason": "Highest accuracy, noisy environments",
+        "estimated_cost_per_hour": 0.36
+      },
+      "multi_speaker": {
+        "model": "gpt-4o-transcribe-diarize",
+        "reason": "Speaker identification up to 4 speakers",
+        "estimated_cost_per_hour": 0.36
+      },
+      "cost_efficient": {
+        "model": "gpt-4o-mini-transcribe",
+        "reason": "50% cheaper, good accuracy",
+        "estimated_cost_per_hour": 0.18
+      },
+      "hybrid_recommendation": "Use Faster-Whisper (open-source) for bulk, OpenAI gpt-4o-transcribe for quality-critical"
+    },
+    "voice_agent_strategy": {
+      "production_agents": {
+        "model": "gpt-realtime",
+        "reason": "GA model, best price-performance"
+      },
+      "high_volume_agents": {
+        "model": "gpt-realtime-mini",
+        "reason": "6x cheaper than full model"
+      },
+      "telephony": {
+        "connection": "sip",
+        "reason": "Direct VoIP integration"
+      },
+      "browser_agents": {
+        "connection": "webrtc",
+        "sdk": "@openai/agents",
+        "reason": "Lowest latency for browser apps"
+      }
+    },
+    "cost_optimization": {
+      "batch_processing": {
+        "enabled": true,
+        "discount": "50% off standard pricing",
+        "latency": "Up to 24 hours"
+      },
+      "flex_processing": {
+        "enabled": true,
+        "discount": "Variable, higher latency"
+      },
+      "caching": {
+        "prompt_caching": true,
+        "audio_caching": true
+      }
+    }
+  },
+  "hybrid_architecture": {
+    "enabled": true,
+    "strategy": "Use open-source for bulk operations, OpenAI for premium/realtime",
+    "tts_pipeline": {
+      "bulk_generation": "Fish Speech V1.5 (self-hosted)",
+      "premium_personas": "OpenAI gpt-4o-mini-tts",
+      "edge_deployment": "Kokoro TTS V1.0"
+    },
+    "asr_pipeline": {
+      "bulk_transcription": "Faster-Whisper (self-hosted)",
+      "realtime_transcription": "OpenAI gpt-4o-mini-transcribe",
+      "diarization": "OpenAI gpt-4o-transcribe-diarize"
+    },
+    "voice_agent_pipeline": {
+      "premium_agents": "OpenAI gpt-realtime",
+      "high_volume": "OpenAI gpt-realtime-mini",
+      "self_hosted": "LLaMA 3.3 70B + Fish Speech + Faster-Whisper"
+    },
+    "estimated_savings": {
+      "tts_bulk": "90%+ vs OpenAI-only",
+      "asr_bulk": "95%+ vs OpenAI-only",
+      "realtime_agents": "Use OpenAI for production reliability"
+    }
+  },
+  "resources": {
+    "documentation": {
+      "audio_guide": "https://platform.openai.com/docs/guides/audio",
+      "tts_guide": "https://platform.openai.com/docs/guides/text-to-speech",
+      "stt_guide": "https://platform.openai.com/docs/guides/speech-to-text",
+      "realtime_guide": "https://platform.openai.com/docs/guides/realtime",
+      "voice_agents_guide": "https://platform.openai.com/docs/guides/voice-agents",
+      "api_reference": "https://platform.openai.com/docs/api-reference/audio",
+      "pricing": "https://platform.openai.com/docs/pricing"
+    },
+    "playgrounds": {
+      "realtime_playground": "https://platform.openai.com/playground/realtime",
+      "openai_fm": "https://openai.fm/"
+    },
+    "sample_apps": {
+      "realtime_agents_demo": "https://github.com/openai/openai-realtime-agents",
+      "twilio_demo": "https://github.com/openai/openai-realtime-twilio-demo",
+      "voice_agent_sample": "https://github.com/openai/openai-voice-agent-sdk-sample",
+      "azure_realtime_sdk": "https://github.com/azure-samples/aoai-realtime-audio-sdk"
+    }
+  }
+}

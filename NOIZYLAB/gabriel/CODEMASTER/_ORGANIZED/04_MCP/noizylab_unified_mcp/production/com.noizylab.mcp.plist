@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.noizylab.mcp</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/m2ultra/NOIZYLAB/UNIFIED_MCP/noizylab_mcp.py</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/m2ultra/NOIZYLAB/UNIFIED_MCP</string>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/m2ultra/.noizylab/logs/mcp.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/m2ultra/.noizylab/logs/mcp.error.log</string>
+    
+    <key>KeepAlive</key>
+    <true/>
+    
+    <key>RunAtLoad</key>
+    <false/>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
